@@ -26,6 +26,11 @@ func createSchema(db *sql.DB) (err error) {
 		return
 	}
 
+	err = createCategoryTable(db)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
