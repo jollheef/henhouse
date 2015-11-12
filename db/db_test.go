@@ -18,14 +18,14 @@ const dbPath string = "user=postgres dbname=henhouse_test sslmode=disable"
 
 func rndString(len int) (str string, err error) {
 
-	rand_buf := make([]byte, len)
+	randBuf := make([]byte, len)
 
-	_, err = rand.Read(rand_buf)
+	_, err = rand.Read(randBuf)
 	if err != nil {
 		return
 	}
 
-	str = string(rand_buf)
+	str = string(randBuf)
 
 	return
 }

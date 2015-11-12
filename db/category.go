@@ -10,8 +10,9 @@ package db
 
 import "database/sql"
 
+// Category row
 type Category struct {
-	Id   int
+	ID   int
 	Name string
 }
 
