@@ -36,6 +36,8 @@ func TestAddCategory(*testing.T) {
 		panic(err)
 	}
 
+	defer db.Close()
+
 	category := Category{ID: 255, Name: "test"}
 
 	err = AddCategory(db, &category)
@@ -54,6 +56,8 @@ func TestGetCategories(*testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
+	defer db.Close()
 
 	categories := 150
 
