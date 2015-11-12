@@ -38,7 +38,7 @@ func AddCategory(db *sql.DB, category *Category) (err error) {
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(category.Name).Scan(&category.Id)
+	err = stmt.QueryRow(category.Name).Scan(&category.ID)
 	if err != nil {
 		return
 	}
@@ -59,7 +59,7 @@ func GetCategories(db *sql.DB) (categories []Category, err error) {
 	for rows.Next() {
 		var category Category
 
-		err = rows.Scan(&category.Id, &category.Name)
+		err = rows.Scan(&category.ID, &category.Name)
 		if err != nil {
 			return
 		}

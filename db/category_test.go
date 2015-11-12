@@ -36,14 +36,14 @@ func TestAddCategory(*testing.T) {
 		panic(err)
 	}
 
-	category := Category{Id: 255, Name: "test"}
+	category := Category{ID: 255, Name: "test"}
 
 	err = AddCategory(db, &category)
 	if err != nil {
 		panic(err)
 	}
 
-	if category.Id != 1 {
+	if category.ID != 1 {
 		panic(errors.New("Category id not correct"))
 	}
 }
@@ -76,7 +76,7 @@ func TestGetCategories(*testing.T) {
 
 	for i := 0; i < categories; i++ {
 
-		if cats[i].Name != fmt.Sprintf("%d", i) && cats[i].Id != i {
+		if cats[i].Name != fmt.Sprintf("%d", i) && cats[i].ID != i {
 			panic(errors.New("Get invalid category"))
 		}
 	}
