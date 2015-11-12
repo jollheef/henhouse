@@ -31,6 +31,11 @@ func createSchema(db *sql.DB) (err error) {
 		return
 	}
 
+	err = createFlagTable(db)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
