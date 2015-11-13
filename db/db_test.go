@@ -10,6 +10,7 @@ package db
 
 import (
 	"crypto/rand"
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -104,6 +105,24 @@ func TestCleanDatabase(*testing.T) {
 	err = CleanDatabase(db)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func TestTablesCount(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	ntables := 0
+	db.QueryRow("SELECT count(*) FROM information_schema.tables " +
+		" WHERE table_schema = 'public';").Scan(&ntables)
+
+	if ntables != len(tables) {
+		panic(errors.New("Invalid table list"))
 	}
 }
 

@@ -16,7 +16,7 @@ import (
 )
 
 // All table names
-var tables = [...]string{}
+var tables = [...]string{"category", "flag"}
 
 // Create tables
 func createSchema(db *sql.DB) (err error) {
