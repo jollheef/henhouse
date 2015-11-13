@@ -16,7 +16,7 @@ import (
 )
 
 // All table names
-var tables = [...]string{"category", "flag"}
+var tables = [...]string{"category", "flag", "score"}
 
 // Create tables
 func createSchema(db *sql.DB) (err error) {
@@ -32,6 +32,11 @@ func createSchema(db *sql.DB) (err error) {
 	}
 
 	err = createFlagTable(db)
+	if err != nil {
+		return
+	}
+
+	err = createScoreTable(db)
 	if err != nil {
 		return
 	}
