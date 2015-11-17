@@ -50,6 +50,22 @@ func TestAddCategory(*testing.T) {
 	}
 }
 
+// Test add category with closed database
+func TestFailAddCategory(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = AddCategory(db, &Category{})
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestGetCategories(*testing.T) {
 
 	db, err := InitDatabase(dbPath)

@@ -50,6 +50,22 @@ func TestAddTask(*testing.T) {
 	}
 }
 
+// Test add task with closed database
+func TestFailAddTask(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = AddTask(db, &Task{})
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestGetTasks(*testing.T) {
 
 	db, err := InitDatabase(dbPath)

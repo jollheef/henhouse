@@ -49,6 +49,22 @@ func TestAddSession(*testing.T) {
 	}
 }
 
+// Test add session with closed database
+func TestFailAddSession(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = AddSession(db, &Session{})
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestGetSessionTeam(*testing.T) {
 
 	db, err := InitDatabase(dbPath)

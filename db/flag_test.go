@@ -50,6 +50,22 @@ func TestAddFlag(*testing.T) {
 	}
 }
 
+// Test add flag with closed database
+func TestFailAddFlag(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = AddFlag(db, &Flag{})
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestGetFlags(*testing.T) {
 
 	db, err := InitDatabase(dbPath)

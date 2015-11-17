@@ -50,6 +50,22 @@ func TestAddTeam(*testing.T) {
 	}
 }
 
+// Test add team with closed database
+func TestFailAddTeam(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = AddTeam(db, &Team{})
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestGetTeams(*testing.T) {
 
 	db, err := InitDatabase(dbPath)

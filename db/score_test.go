@@ -49,6 +49,22 @@ func TestAddScore(*testing.T) {
 	}
 }
 
+// Test add score with closed database
+func TestFailAddScore(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = AddScore(db, &Score{})
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestGetLastScore(*testing.T) {
 
 	db, err := InitDatabase(dbPath)
