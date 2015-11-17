@@ -105,6 +105,22 @@ func TestGetFlags(*testing.T) {
 	}
 }
 
+// Test get flags with closed database
+func TestFailGetFlags(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = GetFlags(db)
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestGetSolvedCount(*testing.T) {
 
 	db, err := InitDatabase(dbPath)
@@ -142,5 +158,21 @@ func TestGetSolvedCount(*testing.T) {
 
 	if solvedFlags != nflags/2 {
 		panic(errors.New("Mismatch solved flags length"))
+	}
+}
+
+// Test get solved count with closed database
+func TestFailGetSolvedCount(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = GetSolvedCount(db, 0, 0)
+	if err == nil {
+		panic(err)
 	}
 }

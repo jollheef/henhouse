@@ -101,3 +101,19 @@ func TestGetCategories(*testing.T) {
 		}
 	}
 }
+
+// Test get categories with closed database
+func TestFailGetCategories(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = GetCategories(db)
+	if err == nil {
+		panic(err)
+	}
+}

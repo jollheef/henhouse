@@ -93,3 +93,19 @@ func TestGetSessionTeam(*testing.T) {
 		panic(errors.New("Session text not correct"))
 	}
 }
+
+// Test get session team with closed database
+func TestFailGetSessionTeam(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = GetSessionTeam(db, "ololo")
+	if err == nil {
+		panic(err)
+	}
+}

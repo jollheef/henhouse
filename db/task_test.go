@@ -103,3 +103,19 @@ func TestGetTasks(*testing.T) {
 		}
 	}
 }
+
+// Test get tasks with closed database
+func TestFailGetTasks(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = GetTasks(db)
+	if err == nil {
+		panic(err)
+	}
+}

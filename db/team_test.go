@@ -104,3 +104,19 @@ func TestGetTeams(*testing.T) {
 		}
 	}
 }
+
+// Test get teams with closed database
+func TestFailGetTeams(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = GetTeams(db)
+	if err == nil {
+		panic(err)
+	}
+}

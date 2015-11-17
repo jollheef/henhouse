@@ -96,3 +96,19 @@ func TestGetLastScore(*testing.T) {
 		panic(errors.New("Score value not correct"))
 	}
 }
+
+// Test get last score with closed database
+func TestFailGetLastScore(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = GetLastScore(db, 1)
+	if err == nil {
+		panic(err)
+	}
+}
