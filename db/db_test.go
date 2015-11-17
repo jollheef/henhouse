@@ -83,6 +83,22 @@ func TestCreateSchema(*testing.T) {
 	}
 }
 
+// Test create schema with closed database
+func TestFailCreateSchema(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = createSchema(db)
+	if err == nil {
+		panic(err)
+	}
+}
+
 func TestInitDatabase(*testing.T) {
 
 	db, err := InitDatabase(dbPath)
@@ -91,6 +107,20 @@ func TestInitDatabase(*testing.T) {
 	}
 
 	db.Close()
+}
+
+// Test init database with incorrect path
+func TestFailInitDatabase(*testing.T) {
+
+	rndStr, err := rndString(15) // 15 is random len
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = InitDatabase(fmt.Sprintf("user=%s  sslmode=disable", rndStr))
+	if err == nil {
+		panic(err)
+	}
 }
 
 func TestCleanDatabase(*testing.T) {
@@ -104,6 +134,45 @@ func TestCleanDatabase(*testing.T) {
 
 	err = CleanDatabase(db)
 	if err != nil {
+		panic(err)
+	}
+}
+
+// Test clean database with closed database
+func TestFailCleanDatabase(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	err = CleanDatabase(db)
+	if err == nil {
+		panic(err)
+	}
+}
+
+// Test clean database with removed sequence
+func TestFailCleanDatabase2(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	for _, table := range tables {
+		_, err = db.Exec("DROP SEQUENCE " + table + "_id_seq CASCADE;")
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	err = CleanDatabase(db)
+	if err == nil {
 		panic(err)
 	}
 }
