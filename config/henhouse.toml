@@ -1,0 +1,42 @@
+# henhouse.toml: config file for henhouse
+# Please check all values before running henhouse.
+
+log_file = "/tmp/henhouse.log"
+
+# Path to directory contains task xml files
+task_dir = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/config/tasks/"
+
+[Database]
+connection = "user=postgres dbname=henhouse sslmode=disable"
+max_connections = 90 # should be less than same value in postgresql.conf
+
+[Scoreboard]
+www_path = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/scoreboard/www"
+addr = ":8000"
+
+[Game]
+start = "Nov 17 10:00 2015"
+end = "Dec 31 23:59 2015"
+
+[Flag]
+# timeout between send flags
+send_timeout = "10s"
+
+[Task]
+# timeout after send correct flag before open next task
+open_timeout = "1m"
+# auto open task after previous solved
+auto_open = true
+auto_open_timeout = "6h"
+
+[[Teams]]
+name = "FooTeam"
+description = "Foo test team"
+login = "footeam"
+pass = "11"
+
+[[Teams]]
+name = "BarTeam"
+description = "Bar test team"
+login = "barteam"
+pass = "11"
