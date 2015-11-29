@@ -208,12 +208,19 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 
 				solved = true
 
-				db.AddFlag(g.db, &db.Flag{
-					TeamID: teamID,
-					TaskID: taskID,
-					Flag:   flag,
-					Solved: solved,
-				})
+				now := time.Now()
+
+				if now.After(g.start) && now.Before(g.end) {
+					err = db.AddFlag(g.db, &db.Flag{
+						TeamID: teamID,
+						TaskID: taskID,
+						Flag:   flag,
+						Solved: solved,
+					})
+					if err != nil {
+						return
+					}
+				}
 			}
 
 			break

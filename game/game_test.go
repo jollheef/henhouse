@@ -210,3 +210,127 @@ func TestScoreboard(*testing.T) {
 		}
 	}
 }
+
+func TestSolve(*testing.T) {
+
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer database.Close()
+
+	validFlag := "testflag"
+
+	nteams := 20
+
+	for i := 0; i < nteams; i++ {
+
+		team := db.Team{255, fmt.Sprintf("team%d", i),
+			"e", "d", "l", "p", "s"}
+
+		err = db.AddTeam(database, &team)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	ncategories := 5
+
+	for i := 0; i < ncategories; i++ {
+
+		category := db.Category{Name: fmt.Sprintf("category%d", i)}
+
+		err = db.AddCategory(database, &category)
+		if err != nil {
+			panic(err)
+		}
+
+		ntasks := 5
+
+		for i := 0; i < ntasks; i++ {
+
+			task := db.Task{
+				Name:          fmt.Sprintf("task%d", i),
+				Flag:          validFlag,
+				CategoryID:    category.ID,
+				Price:         500,
+				MaxSharePrice: 500,
+				MinSharePrice: 100,
+				Shared:        true,
+				Opened:        false,
+			}
+
+			err = db.AddTask(database, &task)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+
+	start := time.Now().Add(time.Second)
+	end := start.Add(time.Second)
+
+	game, err := NewGame(database, start, end)
+	if err != nil {
+		panic(err)
+	}
+
+	// Try to solve task before game start
+
+	solved, err := game.Solve(1, 1, validFlag)
+	if err != nil {
+		panic(err)
+	}
+	if !solved {
+		panic("solve task failed")
+	}
+
+	solved, err = db.IsSolved(database, 1, 1)
+	if err != nil {
+		panic(err)
+	}
+	if solved {
+		panic("task solved before game start")
+	}
+
+	time.Sleep(time.Second)
+
+	// Try to solve task after game start
+
+	solved, err = game.Solve(2, 2, validFlag)
+	if err != nil {
+		panic(err)
+	}
+	if !solved {
+		panic("solve task failed")
+	}
+
+	solved, err = db.IsSolved(database, 2, 2)
+	if err != nil {
+		panic(err)
+	}
+	if !solved {
+		panic("task unsolved after game start")
+	}
+
+	time.Sleep(time.Second)
+
+	// Try to solve task after game end
+
+	solved, err = game.Solve(3, 3, validFlag)
+	if err != nil {
+		panic(err)
+	}
+	if !solved {
+		panic("solve task failed")
+	}
+
+	solved, err = db.IsSolved(database, 3, 3)
+	if err != nil {
+		panic(err)
+	}
+	if solved {
+		panic("task solved after game end")
+	}
+}
