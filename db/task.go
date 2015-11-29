@@ -97,3 +97,21 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 
 	return
 }
+
+// SetOpened open or close task
+func SetOpened(db *sql.DB, taskID int, opened bool) (err error) {
+
+	stmt, err := db.Prepare("UPDATE task SET opened=$1 WHERE id=$2")
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(opened, taskID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -119,3 +119,54 @@ func TestFailGetTasks(*testing.T) {
 		panic(err)
 	}
 }
+
+func TestSetOpened(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	task := Task{Opened: false}
+
+	err = AddTask(db, &task)
+	if err != nil {
+		panic(err)
+	}
+
+	tasks, err := GetTasks(db)
+	if err != nil {
+		panic(err)
+	}
+	if tasks[0].Opened != false {
+		panic("closed task added as opened")
+	}
+
+	err = SetOpened(db, task.ID, true)
+	if err != nil {
+		panic(err)
+	}
+
+	tasks, err = GetTasks(db)
+	if err != nil {
+		panic(err)
+	}
+	if tasks[0].Opened != true {
+		panic("opened task closed")
+	}
+
+	err = SetOpened(db, task.ID, false)
+	if err != nil {
+		panic(err)
+	}
+
+	tasks, err = GetTasks(db)
+	if err != nil {
+		panic(err)
+	}
+	if tasks[0].Opened != false {
+		panic("closed task opened")
+	}
+}
