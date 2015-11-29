@@ -151,7 +151,7 @@ func TestGetSolvedCount(*testing.T) {
 		}
 	}
 
-	solvedFlags, err := GetSolvedCount(db, teamID, taskID)
+	solvedFlags, err := GetSolvedCount(db, taskID)
 	if err != nil {
 		panic(err)
 	}
@@ -171,8 +171,70 @@ func TestFailGetSolvedCount(*testing.T) {
 
 	db.Close()
 
-	_, err = GetSolvedCount(db, 0, 0)
+	_, err = GetSolvedCount(db, 0)
 	if err == nil {
 		panic(err)
+	}
+}
+
+func TestIsSolved(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	teamID := 10
+	taskID := 15
+
+	flag := Flag{TeamID: teamID, TaskID: taskID, Solved: true}
+
+	err = AddFlag(db, &flag)
+	if err != nil {
+		panic(err)
+	}
+
+	solved, err := IsSolved(db, teamID, taskID)
+	if !solved {
+		panic("Solved task unsolved")
+	}
+
+}
+
+// Test is task solved with closed database
+func TestFailIsSolved(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	db.Close()
+
+	_, err = IsSolved(db, 0, 0)
+	if err == nil {
+		panic(err)
+	}
+}
+
+// Test is task solved with unsolved task
+func TestFailIsSolved2(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	solved, err := IsSolved(db, 0, 0)
+	if err != nil {
+		panic(err)
+	}
+
+	if solved {
+		panic("Unsolved task solved")
 	}
 }

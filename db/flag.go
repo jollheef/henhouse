@@ -86,17 +86,36 @@ func GetFlags(db *sql.DB) (flags []Flag, err error) {
 }
 
 // GetSolvedCount return amount of solved flags
-func GetSolvedCount(db *sql.DB, teamID int, taskID int) (count int, err error) {
+func GetSolvedCount(db *sql.DB, taskID int) (count int, err error) {
 
 	stmt, err := db.Prepare("SELECT count(*) FROM flag " +
-		"WHERE team_id=$1 AND task_id=$2 AND solved=TRUE")
+		"WHERE task_id=$1 AND solved=TRUE")
 	if err != nil {
 		return
 	}
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(teamID, taskID).Scan(&count)
+	err = stmt.QueryRow(taskID).Scan(&count)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// IsSolved return true if task solved by team
+func IsSolved(db *sql.DB, teamID, taskID int) (solved bool, err error) {
+	stmt, err := db.Prepare("SELECT EXISTS(SELECT id FROM flag " +
+		"WHERE team_id=$1 AND task_id=$2 AND solved=TRUE)")
+
+	if err != nil {
+		return
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(teamID, taskID).Scan(&solved)
 	if err != nil {
 		return
 	}
