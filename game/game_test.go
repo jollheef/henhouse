@@ -222,7 +222,7 @@ func TestSolve(*testing.T) {
 
 	validFlag := "testflag"
 
-	nteams := 20
+	nteams := 4
 
 	for i := 0; i < nteams; i++ {
 
@@ -235,7 +235,7 @@ func TestSolve(*testing.T) {
 		}
 	}
 
-	ncategories := 5
+	ncategories := 4
 
 	for i := 0; i < ncategories; i++ {
 
@@ -246,7 +246,7 @@ func TestSolve(*testing.T) {
 			panic(err)
 		}
 
-		ntasks := 5
+		ntasks := 4
 
 		for i := 0; i < ntasks; i++ {
 
@@ -255,6 +255,7 @@ func TestSolve(*testing.T) {
 				Flag:          validFlag,
 				CategoryID:    category.ID,
 				Price:         500,
+				Level:         i + 1,
 				MaxSharePrice: 500,
 				MinSharePrice: 100,
 				Shared:        true,

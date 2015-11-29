@@ -31,10 +31,11 @@ type Game struct {
 
 // TaskInfo provide information about task
 type TaskInfo struct {
-	ID    int
-	Name  string
-	Desc  string
-	Price int
+	ID     int
+	Name   string
+	Desc   string
+	Price  int
+	Opened bool
 }
 
 // CategoryInfo provide information about categories and tasks
@@ -121,10 +122,11 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 				}
 
 				tInfo := TaskInfo{
-					ID:    task.ID,
-					Name:  task.Name,
-					Desc:  task.Desc,
-					Price: price,
+					ID:     task.ID,
+					Name:   task.Name,
+					Desc:   task.Desc,
+					Price:  price,
+					Opened: task.Opened,
 				}
 
 				cat.TasksInfo = append(cat.TasksInfo, tInfo)
@@ -198,6 +200,28 @@ func (g Game) RecalcScoreboard() (err error) {
 	return
 }
 
+// OpenNextTask open next task by level
+func (g Game) OpenNextTask(t db.Task) (err error) {
+
+	for _, task := range g.tasks {
+		// If same category and next level
+		if t.CategoryID == task.CategoryID && t.Level+1 == task.Level {
+			// If not already opened
+			if !task.Opened {
+				// Open it!
+				err = db.SetOpened(g.db, task.ID, true)
+				if err != nil {
+					return
+				}
+
+				task.Opened = true
+			}
+		}
+	}
+
+	return
+}
+
 // Solve check flag for task and recalc scoreboard if flag correct
 func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 
@@ -220,6 +244,8 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 					if err != nil {
 						return
 					}
+
+					g.OpenNextTask(task)
 				}
 			}
 
