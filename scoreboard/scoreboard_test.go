@@ -191,7 +191,7 @@ func TestScoreboard(*testing.T) {
 	addr := "localhost:8080"
 
 	go func() {
-		err = Scoreboard(&game, "", addr, start, end)
+		err = Scoreboard(&game, "", addr)
 		if err != nil {
 			panic(err)
 		}
