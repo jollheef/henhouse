@@ -159,6 +159,7 @@ func TestScoreboard(*testing.T) {
 				MinSharePrice: 100,
 				Shared:        true,
 				Opened:        false,
+				Level:         i,
 			}
 
 			err = db.AddTask(database, &task)
@@ -168,7 +169,13 @@ func TestScoreboard(*testing.T) {
 		}
 	}
 
-	game, err := NewGame(database, time.Now(), time.Now().Add(time.Hour))
+	game, err := NewGame(database, time.Now().Add(time.Second),
+		time.Now().Add(time.Hour))
+	if err != nil {
+		panic(err)
+	}
+
+	err = game.Run()
 	if err != nil {
 		panic(err)
 	}

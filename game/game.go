@@ -20,13 +20,16 @@ import (
 
 // Game struct
 type Game struct {
-	db             *sql.DB
-	Start          time.Time
-	End            time.Time
-	teams          []db.Team
-	tasks          []db.Task
-	categories     []db.Category
-	scoreboardLock sync.Mutex
+	db              *sql.DB
+	Start           time.Time
+	End             time.Time
+	OpenTimeout     time.Duration // after solve task
+	AutoOpen        bool
+	AutoOpenTimeout time.Duration // if task does not solved
+	teams           []db.Team
+	tasks           []db.Task
+	categories      []db.Category
+	scoreboardLock  sync.Mutex
 }
 
 // TaskInfo provide information about task
@@ -81,6 +84,35 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 	g.RecalcScoreboard()
 
 	return
+}
+
+// Run open first level tasks and start auto open routine
+func (g Game) Run() (err error) {
+
+	for time.Now().Before(g.Start) {
+		time.Sleep(time.Second)
+	}
+
+	for _, task := range g.tasks {
+		if task.Level == 1 && !task.Opened {
+			err = db.SetOpened(g.db, task.ID, true)
+			if err != nil {
+				return
+			}
+
+			task.Opened = true
+		}
+	}
+
+	if g.AutoOpen {
+		go g.autoOpen()
+	}
+
+	return
+}
+
+func (g Game) autoOpen() {
+	// TODO
 }
 
 func taskPrice(database *sql.DB, taskID int) (price int, err error) {
@@ -203,6 +235,8 @@ func (g Game) RecalcScoreboard() (err error) {
 // OpenNextTask open next task by level
 func (g Game) OpenNextTask(t db.Task) (err error) {
 
+	time.Sleep(g.OpenTimeout)
+
 	for _, task := range g.tasks {
 		// If same category and next level
 		if t.CategoryID == task.CategoryID && t.Level+1 == task.Level {
@@ -245,7 +279,7 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 						return
 					}
 
-					g.OpenNextTask(task)
+					go g.OpenNextTask(task)
 				}
 			}
 
