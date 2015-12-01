@@ -21,8 +21,8 @@ import (
 // Game struct
 type Game struct {
 	db             *sql.DB
-	start          time.Time
-	end            time.Time
+	Start          time.Time
+	End            time.Time
 	teams          []db.Team
 	tasks          []db.Task
 	categories     []db.Category
@@ -60,8 +60,8 @@ func (tr byScore) Less(i, j int) bool { return tr[i].Score > tr[j].Score }
 func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 
 	g.db = database
-	g.start = start
-	g.end = end
+	g.Start = start
+	g.End = end
 
 	g.teams, err = db.GetTeams(g.db)
 	if err != nil {
@@ -234,7 +234,7 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 
 				now := time.Now()
 
-				if now.After(g.start) && now.Before(g.end) {
+				if now.After(g.Start) && now.Before(g.End) {
 					err = db.AddFlag(g.db, &db.Flag{
 						TeamID: teamID,
 						TaskID: taskID,

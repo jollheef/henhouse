@@ -172,12 +172,11 @@ func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 }
 
 // Scoreboard implements web scoreboard
-func Scoreboard(game *game.Game, wwwPath, addr string,
-	start, end time.Time) (err error) {
+func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 
 	contestStatus = contestStateNotAvailable
-	startTime = start
-	endTime = end
+	startTime = game.Start
+	endTime = game.End
 
 	go resultUpdater(game, time.Second)
 	go scoreboardUpdater(game, time.Second)
