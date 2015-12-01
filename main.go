@@ -73,13 +73,13 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 
-	log.Print("Set task open timeout to", cfg.Task.OpenTimeout.Duration)
+	log.Println("Set task open timeout to", cfg.Task.OpenTimeout.Duration)
 	game.OpenTimeout = cfg.Task.OpenTimeout.Duration
 
 	if cfg.Task.AutoOpen {
-		log.Print("Auto open tasks after", cfg.Task.AutoOpenTimeout.Duration)
+		log.Println("Auto open tasks after", cfg.Task.AutoOpenTimeout.Duration)
 	} else {
-		log.Print("Auto open tasks disabled")
+		log.Println("Auto open tasks disabled")
 	}
 
 	game.AutoOpen = cfg.Task.AutoOpen
