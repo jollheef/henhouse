@@ -34,6 +34,19 @@ var (
 	lastUpdated   string
 )
 
+func durationToHMS(d time.Duration) string {
+
+	sec := int(d.Seconds())
+
+	var h, m, s int
+
+	h = sec / 60 / 60
+	m = (sec / 60) % 60
+	s = sec % 60
+
+	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
+}
+
 func getInfo() string {
 
 	var left time.Duration
@@ -55,14 +68,18 @@ func getInfo() string {
 
 	} else {
 		contestStatus = contestCompleted
-		left = time.Duration(0)
+		left = 0
 		btnType = "primary"
 	}
 
-	info := fmt.Sprintf(`<span class="btn btn-%s">contest %s</span>`+
-		`<span class="btn btn-info">Left %s</span>`+
-		`<span class="btn btn-info">Updated at %s</span>`,
-		btnType, contestStatus, left, lastUpdated)
+	info := fmt.Sprintf(`<span class="btn btn-%s">contest %s</span>`,
+		btnType, contestStatus)
+
+	if left != 0 {
+		info += fmt.Sprintf(`<span class="btn btn-info">Left %s</span>`+
+			`<span class="btn btn-info">Updated at %s</span>`,
+			durationToHMS(left), lastUpdated)
+	}
 
 	return info
 }
@@ -142,6 +159,18 @@ func resultUpdater(game *game.Game, updateTimeout time.Duration) {
 	}
 }
 
+func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
+
+	for {
+		time.Sleep(updateTimeout)
+
+		err := game.RecalcScoreboard()
+		if err != nil {
+			log.Println("Recalc scoreboard fail:", err)
+		}
+	}
+}
+
 // Scoreboard implements web scoreboard
 func Scoreboard(game *game.Game, wwwPath, addr string,
 	start, end time.Time) (err error) {
@@ -151,6 +180,7 @@ func Scoreboard(game *game.Game, wwwPath, addr string,
 	endTime = end
 
 	go resultUpdater(game, time.Second)
+	go scoreboardUpdater(game, time.Second)
 
 	http.Handle("/info", websocket.Handler(infoHandler))
 	http.Handle("/scoreboard", websocket.Handler(scoreboardHandler))
