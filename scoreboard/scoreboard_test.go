@@ -97,30 +97,30 @@ func TestGetInfo(*testing.T) {
 	startTime = time.Now().Add(time.Second)
 	endTime = startTime.Add(time.Second)
 
-	lastUpdated = "10:04:01"
+	lastScoreboardUpdated = "10:04:01"
 
-	info := getInfo()
+	info := getInfo(lastScoreboardUpdated)
 
 	testMatch(contestNotStarted, info)
-	testMatch(lastUpdated, info)
+	testMatch(lastScoreboardUpdated, info)
 
 	time.Sleep(time.Second)
 
-	lastUpdated = "10:04:02"
+	lastScoreboardUpdated = "10:04:02"
 
-	info = getInfo()
+	info = getInfo(lastScoreboardUpdated)
 
 	testMatch(contestRunning, info)
-	testMatch(lastUpdated, info)
+	testMatch(lastScoreboardUpdated, info)
 
 	time.Sleep(time.Second)
 
-	lastUpdated = "10:04:02"
+	lastScoreboardUpdated = "10:04:02"
 
-	info = getInfo()
+	info = getInfo(lastScoreboardUpdated)
 
 	testMatch(contestCompleted, info)
-	testNotMatch(lastUpdated, info)
+	testNotMatch(lastScoreboardUpdated, info)
 }
 
 func TestScoreboard(*testing.T) {
@@ -201,7 +201,7 @@ func TestScoreboard(*testing.T) {
 
 	originURL := "http://localhost/"
 
-	infoURL := "ws://" + addr + "/info"
+	infoURL := "ws://" + addr + "/scoreboard-info"
 
 	ws, err := websocket.Dial(infoURL, "", originURL)
 	if err != nil {
@@ -271,6 +271,37 @@ func TestScoreboard(*testing.T) {
 		}
 		time.Sleep(time.Second)
 	}
+
+	// tasks page
+	tasksInfoURL := "ws://" + addr + "/tasks"
+
+	ws, err = websocket.Dial(tasksInfoURL, "", originURL)
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err = ws.Read(msg); err != nil {
+		panic(err)
+	}
+
+	testMatch("category", string(msg))
+
+	ws.Close()
+
+	tasksURL := "ws://" + addr + "/tasks-info"
+
+	ws, err = websocket.Dial(tasksURL, "", originURL)
+	if err != nil {
+		panic(err)
+	}
+
+	if _, err = ws.Read(msg); err != nil {
+		panic(err)
+	}
+
+	testMatch(contestRunning, string(msg))
+
+	ws.Close()
 
 	// Check availablity after close database
 

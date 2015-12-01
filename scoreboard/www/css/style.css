@@ -1,0 +1,32 @@
+body {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    background: none;
+}
+
+.full {
+    background: url('/images/bg.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
+
+#juniorstext {
+    width: 30%;
+    height: 30%;
+}
+
+#scoreboard-table {
+    /* Fallback for web browsers that doesn't support RGBa */
+    background: rgb(255, 255, 255);
+    /* RGBa with 0.6 opacity */
+    background: rgba(255, 255, 255, 0.7);
+}
+
+#tasks-table {
+    /* Fallback for web browsers that doesn't support RGBa */
+    background: rgb(255, 255, 255);
+    /* RGBa with 0.6 opacity */
+    background: rgba(255, 255, 255, 0.7);
+}

@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="css/style.css">
 
     <script type="text/javascript">
-      var scoreboard = new WebSocket("ws://" + location.host + "/scoreboard");
+      var scoreboard = new WebSocket("ws://" + location.host + "/tasks");
 
       scoreboard.onmessage = function(e) {
-        document.getElementById('scoreboard-table').innerHTML = e.data
+        document.getElementById('tasks-table').innerHTML = e.data
       }
 
-      var info = new WebSocket("ws://" + location.host + "/scoreboard-info");
+      var info = new WebSocket("ws://" + location.host + "/tasks-info");
 
       info.onmessage = function(e) {
         document.getElementById('info').innerHTML = e.data
@@ -25,17 +25,16 @@
   </head>
   <body>
     <ul class="nav nav-tabs h4">
+      <li><a href="index.html">Scoreboard</a></li>
       <li class="active">
-        <a href="#">Scoreboard</a>
+        <a href="#">Tasks</a>
       </li>
-      <li><a href="tasks.html">Tasks</a></li>
       <li><a href="news.html">News</a></li>
     </ul>
     <div style="padding: 15px;">
       <div id="info"></div>
       <br>
-      <center><table id="scoreboard-table" class="table table-hover h2"></table></center>
-      <center><img id="juniorstext" src="/images/juniors_ctf_txt.png"></center>
+      <center><table id="tasks-table" class="table table-hover"></table></center>
     </div>
   </body>
 </html>

@@ -27,11 +27,13 @@ const (
 )
 
 var (
-	startTime     time.Time
-	endTime       time.Time
-	currentResult string
-	contestStatus string
-	lastUpdated   string
+	startTime             time.Time
+	endTime               time.Time
+	currentResult         string
+	currentTasks          string
+	contestStatus         string
+	lastScoreboardUpdated string
+	lastTasksUpdated      string
 )
 
 func durationToHMS(d time.Duration) string {
@@ -47,7 +49,7 @@ func durationToHMS(d time.Duration) string {
 	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }
 
-func getInfo() string {
+func getInfo(lastUpdated string) string {
 
 	var left time.Duration
 	var btnType string
@@ -88,7 +90,21 @@ func infoHandler(ws *websocket.Conn) {
 
 	defer ws.Close()
 	for {
-		_, err := fmt.Fprint(ws, getInfo())
+		_, err := fmt.Fprint(ws, getInfo(lastScoreboardUpdated))
+		if err != nil {
+			log.Println("Socket closed:", err)
+			return
+		}
+
+		time.Sleep(time.Second)
+	}
+}
+
+func tasksInfoHandler(ws *websocket.Conn) {
+
+	defer ws.Close()
+	for {
+		_, err := fmt.Fprint(ws, getInfo(lastTasksUpdated))
 		if err != nil {
 			log.Println("Socket closed:", err)
 			return
@@ -124,7 +140,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 	}
 }
 
-func resultUpdater(game *game.Game, updateTimeout time.Duration) {
+func scoreboardHTMLUpdater(game *game.Game, updateTimeout time.Duration) {
 
 	head := "<thead><th>#</th><th>Team</th><th>Score</th></thead>"
 
@@ -152,7 +168,7 @@ func resultUpdater(game *game.Game, updateTimeout time.Duration) {
 		currentResult = result
 
 		now := time.Now()
-		lastUpdated = fmt.Sprintf("%02d:%02d:%02d", now.Hour(),
+		lastScoreboardUpdated = fmt.Sprintf("%02d:%02d:%02d", now.Hour(),
 			now.Minute(), now.Second())
 
 		time.Sleep(updateTimeout)
@@ -171,6 +187,56 @@ func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 	}
 }
 
+func tasksHTMLUpdater(game *game.Game, updateTimeout time.Duration) {
+
+	for {
+		cats, err := game.Tasks()
+		if err != nil {
+			log.Println("Get tasks fail:", err)
+		}
+
+		var result string
+
+		for _, cat := range cats {
+			result += categoryToHTML(cat)
+		}
+
+		currentTasks = result
+
+		now := time.Now()
+		lastTasksUpdated = fmt.Sprintf("%02d:%02d:%02d", now.Hour(),
+			now.Minute(), now.Second())
+
+		time.Sleep(updateTimeout)
+	}
+}
+
+func tasksHandler(ws *websocket.Conn) {
+
+	defer ws.Close()
+
+	fmt.Fprint(ws, currentTasks)
+	sendedTasks := currentTasks
+	lastUpdate := time.Now()
+
+	for {
+		if sendedTasks != currentTasks ||
+			time.Now().After(lastUpdate.Add(time.Minute)) {
+
+			sendedTasks = currentTasks
+			lastUpdate = time.Now()
+
+			_, err := fmt.Fprint(ws, currentTasks)
+			if err != nil {
+				log.Println("Socket closed:", err)
+				return
+			}
+		}
+
+		time.Sleep(time.Second)
+	}
+}
+
 // Scoreboard implements web scoreboard
 func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 
@@ -178,11 +244,15 @@ func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 	startTime = game.Start
 	endTime = game.End
 
-	go resultUpdater(game, time.Second)
+	go scoreboardHTMLUpdater(game, time.Second)
+	go tasksHTMLUpdater(game, time.Second)
+
 	go scoreboardUpdater(game, time.Second)
 
-	http.Handle("/info", websocket.Handler(infoHandler))
 	http.Handle("/scoreboard", websocket.Handler(scoreboardHandler))
+	http.Handle("/scoreboard-info", websocket.Handler(infoHandler))
+	http.Handle("/tasks", websocket.Handler(tasksHandler))
+	http.Handle("/tasks-info", websocket.Handler(tasksInfoHandler))
 	http.Handle("/", http.FileServer(http.Dir(wwwPath)))
 
 	log.Println("Launching scoreboard at", addr)
