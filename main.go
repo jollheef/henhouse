@@ -17,6 +17,7 @@ import (
 	"github.com/jollheef/henhouse/game"
 	"github.com/jollheef/henhouse/scoreboard"
 	"gopkg.in/alecthomas/kingpin.v2"
+	"io/ioutil"
 	"log"
 )
 
@@ -26,6 +27,94 @@ var (
 
 	dbReinit = kingpin.Flag("reinit", "Reinit database.").Bool()
 )
+
+func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
+	log.Println("Reinit database")
+
+	for _, team := range cfg.Teams {
+		log.Println("Add team", team.Name)
+		err = db.AddTeam(database, &db.Team{
+			Name:  team.Name,
+			Desc:  team.Description,
+			Login: team.Login,
+			Pass:  team.Pass,
+		})
+		if err != nil {
+			return
+		}
+	}
+
+	entries, err := ioutil.ReadDir(cfg.TaskDir)
+	if err != nil {
+		return
+	}
+
+	var categories []db.Category
+
+	for _, entry := range entries {
+
+		if entry.IsDir() {
+			continue
+		}
+
+		var content []byte
+		content, err = ioutil.ReadFile(cfg.TaskDir + "/" +
+			entry.Name())
+		if err != nil {
+			return
+		}
+
+		var task config.Task
+		task, err = config.ParseXmlTask(content)
+		if err != nil {
+			return
+		}
+
+		var finded bool
+		var taskCategory db.Category
+		for _, cat := range categories {
+			if cat.Name == task.Category {
+				finded = true
+				taskCategory = cat
+				break
+			}
+		}
+
+		if !finded {
+			taskCategory.Name = task.Category
+
+			err = db.AddCategory(database, &taskCategory)
+			if err != nil {
+				return
+			}
+
+			categories = append(categories, taskCategory)
+
+			log.Println("Add category", taskCategory.Name)
+		}
+
+		err = db.AddTask(database, &db.Task{
+			Name:          task.Name,
+			Desc:          task.Description,
+			CategoryID:    taskCategory.ID,
+			Level:         task.Level,
+			Flag:          task.Flag,
+			Price:         500,   // TODO support non-shared task
+			Shared:        true,  // TODO support non-shared task
+			MaxSharePrice: 500,   // TODO support value from xml
+			MinSharePrice: 100,   // TODO support value from xml
+			Opened:        false, // by default task is closed
+		})
+
+		log.Println("Add task", task.Name)
+
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
 
 func main() {
 
@@ -41,7 +130,6 @@ func main() {
 	var database *sql.DB
 
 	if *dbReinit {
-		log.Println("Reinit database")
 
 		database, err = db.InitDatabase(cfg.Database.Connection)
 		if err != nil {
@@ -50,21 +138,13 @@ func main() {
 
 		defer database.Close()
 
-		for _, team := range cfg.Teams {
-			err = db.AddTeam(database, &db.Team{
-				Name:  team.Name,
-				Desc:  team.Description,
-				Login: team.Login,
-				Pass:  team.Pass,
-			})
-			if err != nil {
-				log.Fatalln("Error:", err)
-			}
+		err = reinitDatabase(database, cfg)
+		if err != nil {
+			log.Fatalln("Error:", err)
 		}
 
-		// TODO add categories from xml
-		// TODO add tasks from xml
 	} else {
+
 		database, err = db.OpenDatabase(cfg.Database.Connection)
 		if err != nil {
 			log.Fatalln("Error:", err)

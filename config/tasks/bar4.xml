@@ -1,0 +1,7 @@
+<Task>
+  <Name>bar4</Name>                           <!--отображаемое имя-->
+  <description>bar4 description</description> <!--описание-->
+  <Category>bar</Category>                    <!--категория с учетом регистра-->
+  <Level>4</Level>                            <!--последовательность при открытии-->
+  <Flag>test</Flag>                           <!--флаг (строка или регулярным выражением)-->
+</Task>
