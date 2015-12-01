@@ -23,8 +23,8 @@ type Task struct {
 	Flag        string
 }
 
-// ParseXmlTask parse xml task
-func ParseXmlTask(rawXML []byte) (task Task, err error) {
+// ParseXMLTask parse xml task
+func ParseXMLTask(rawXML []byte) (task Task, err error) {
 	err = xml.Unmarshal(rawXML, &task)
 	return
 }

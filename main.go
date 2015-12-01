@@ -65,7 +65,7 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 		}
 
 		var task config.Task
-		task, err = config.ParseXmlTask(content)
+		task, err = config.ParseXMLTask(content)
 		if err != nil {
 			return
 		}
