@@ -11,6 +11,7 @@
 package main
 
 import (
+	"database/sql"
 	"github.com/jollheef/henhouse/config"
 	"github.com/jollheef/henhouse/db"
 	"github.com/jollheef/henhouse/game"
@@ -37,10 +38,12 @@ func main() {
 
 	log.Println("Use db connection", cfg.Database.Connection)
 
+	var database *sql.DB
+
 	if *dbReinit {
 		log.Println("Reinit database")
 
-		database, err := db.InitDatabase(cfg.Database.Connection)
+		database, err = db.InitDatabase(cfg.Database.Connection)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
@@ -51,7 +54,7 @@ func main() {
 		// TODO add categories from xml
 		// TODO add tasks from xml
 	} else {
-		database, err := db.OpenDatabase(cfg.Database.Connection)
+		database, err = db.OpenDatabase(cfg.Database.Connection)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
