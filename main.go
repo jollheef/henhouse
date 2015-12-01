@@ -50,7 +50,18 @@ func main() {
 
 		defer database.Close()
 
-		// TODO add teams
+		for _, team := range cfg.Teams {
+			err = db.AddTeam(database, &db.Team{
+				Name:  team.Name,
+				Desc:  team.Description,
+				Login: team.Login,
+				Pass:  team.Pass,
+			})
+			if err != nil {
+				log.Fatalln("Error:", err)
+			}
+		}
+
 		// TODO add categories from xml
 		// TODO add tasks from xml
 	} else {
