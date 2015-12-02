@@ -9,19 +9,8 @@
     <link rel="stylesheet" href="https://bootswatch.com/yeti/bootstrap.min.css">
     <link rel="stylesheet" href="css/style.css">
 
-    <script type="text/javascript">
-      var scoreboard = new WebSocket("ws://" + location.host + "/scoreboard");
+    <script type="text/javascript" src="js/scoreboard.js"></script>
 
-      scoreboard.onmessage = function(e) {
-        document.getElementById('scoreboard-table').innerHTML = e.data
-      }
-
-      var info = new WebSocket("ws://" + location.host + "/scoreboard-info");
-
-      info.onmessage = function(e) {
-        document.getElementById('info').innerHTML = e.data
-      }
-    </script>
   </head>
   <body>
     <ul class="nav nav-tabs h4">
