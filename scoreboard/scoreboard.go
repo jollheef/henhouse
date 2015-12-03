@@ -237,17 +237,19 @@ func tasksHandler(ws *websocket.Conn) {
 	}
 }
 
-func task(w http.ResponseWriter, r *http.Request) {
+func taskHandler(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		log.Println("Atoi fail:", err)
+		http.Redirect(w, r, "/", 307)
 		return
 	}
 
 	cats, err := gameShim.Tasks()
 	if err != nil {
 		log.Println("Get tasks fail:", err)
+		http.Redirect(w, r, "/", 307)
 		return
 	}
 
@@ -306,6 +308,27 @@ func task(w http.ResponseWriter, r *http.Request) {
 </html>`, task.Name, task.Desc, task.ID)
 }
 
+func flagHandler(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", 307)
+		return
+	}
+
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		log.Println("Atoi fail:", err)
+		http.Redirect(w, r, "/", 307)
+		return
+	}
+
+	flag := r.FormValue("flag")
+
+	solved, err := gameShim.Solve(1, id, flag)
+
+	fmt.Fprintf(w, "flag: %s, id: %d, err: %v, solved: %t", flag, id, err, solved)
+}
+
 // Scoreboard implements web scoreboard
 func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 
@@ -324,7 +347,8 @@ func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 	http.Handle("/tasks", websocket.Handler(tasksHandler))
 	http.Handle("/tasks-info", websocket.Handler(tasksInfoHandler))
 
-	http.HandleFunc("/task", task)
+	http.HandleFunc("/task", taskHandler)
+	http.HandleFunc("/flag", flagHandler)
 
 	log.Println("Launching scoreboard at", addr)
 

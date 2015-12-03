@@ -93,14 +93,14 @@ func (g Game) Run() (err error) {
 		time.Sleep(time.Second)
 	}
 
-	for _, task := range g.tasks {
+	for i, task := range g.tasks {
 		if task.Level == 1 && !task.Opened {
 			err = db.SetOpened(g.db, task.ID, true)
 			if err != nil {
 				return
 			}
 
-			task.Opened = true
+			g.tasks[i].Opened = true
 		}
 	}
 
@@ -237,7 +237,7 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 
 	time.Sleep(g.OpenTimeout)
 
-	for _, task := range g.tasks {
+	for i, task := range g.tasks {
 		// If same category and next level
 		if t.CategoryID == task.CategoryID && t.Level+1 == task.Level {
 			// If not already opened
@@ -248,7 +248,7 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 					return
 				}
 
-				task.Opened = true
+				g.tasks[i].Opened = true
 			}
 		}
 	}
