@@ -13,6 +13,8 @@ import (
 	"github.com/jollheef/henhouse/db"
 	"github.com/jollheef/henhouse/game"
 	"golang.org/x/net/websocket"
+	"io/ioutil"
+	"net/http"
 	"regexp"
 	"testing"
 	"time"
@@ -94,8 +96,22 @@ func testNotMatch(pattern, s string) {
 
 func TestGetInfo(*testing.T) {
 
-	startTime = time.Now().Add(time.Second)
-	endTime = startTime.Add(time.Second)
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer database.Close()
+
+	startTime := time.Now().Add(time.Second)
+	endTime := startTime.Add(time.Second)
+
+	game, err := game.NewGame(database, startTime, endTime)
+	if err != nil {
+		panic(err)
+	}
+
+	gameShim = &game
 
 	lastScoreboardUpdated = "10:04:01"
 
@@ -190,6 +206,11 @@ func TestScoreboard(*testing.T) {
 
 	addr := "localhost:8080"
 
+	err = game.Run()
+	if err != nil {
+		panic(err)
+	}
+
 	go func() {
 		err = Scoreboard(&game, "", addr)
 		if err != nil {
@@ -200,6 +221,25 @@ func TestScoreboard(*testing.T) {
 	time.Sleep(time.Second) // wait for start listening
 
 	originURL := "http://localhost/"
+
+	resp, err := http.Get("http://" + addr + "/task?id=1")
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	cats, err := game.Tasks()
+	if err != nil {
+		panic(err)
+	}
+
+	testMatch(cats[0].TasksInfo[0].Desc, string(body))
 
 	infoURL := "ws://" + addr + "/scoreboard-info"
 

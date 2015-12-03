@@ -16,6 +16,7 @@ import (
 	"golang.org/x/net/websocket"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -27,8 +28,7 @@ const (
 )
 
 var (
-	startTime             time.Time
-	endTime               time.Time
+	gameShim              *game.Game
 	currentResult         string
 	currentTasks          string
 	contestStatus         string
@@ -56,16 +56,16 @@ func getInfo(lastUpdated string) string {
 
 	now := time.Now()
 
-	if now.Before(startTime) {
+	if now.Before(gameShim.Start) {
 
 		contestStatus = contestNotStarted
-		left = startTime.Sub(now)
+		left = gameShim.Start.Sub(now)
 		btnType = "warning"
 
-	} else if now.Before(endTime) {
+	} else if now.Before(gameShim.End) {
 
 		contestStatus = contestRunning
-		left = endTime.Sub(now)
+		left = gameShim.End.Sub(now)
 		btnType = "success"
 
 	} else {
@@ -237,12 +237,80 @@ func tasksHandler(ws *websocket.Conn) {
 	}
 }
 
+func task(w http.ResponseWriter, r *http.Request) {
+
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		log.Println("Atoi fail:", err)
+		return
+	}
+
+	cats, err := gameShim.Tasks()
+	if err != nil {
+		log.Println("Get tasks fail:", err)
+		return
+	}
+
+	task := game.TaskInfo{ID: id, Opened: false}
+
+	for _, c := range cats {
+		for _, t := range c.TasksInfo {
+			if t.ID == id {
+				task = t
+				break
+			}
+		}
+	}
+
+	if !task.Opened {
+		// Try to see closed task -> gtfo
+		http.Redirect(w, r, "/", 307)
+		return
+	}
+
+	fmt.Fprintf(w, `<!DOCTYPE html>
+<html class="full" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Juniors CTF</title>
+
+    <link rel="stylesheet" href="https://bootswatch.com/yeti/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+  </head>
+  <body>
+    <ul class="nav nav-tabs h4">
+      <li><a href="index.html">Scoreboard</a></li>
+      <li><a href="tasks.html">Tasks</a></li>
+      <li><a href="news.html">News</a></li>
+    </ul>
+    <div class="page-header"><center><h1>%s</h1></center></div>
+    <div style="padding: 15px;">
+      <center>
+        <div id="task">
+          %s
+          <br>
+          <div class="input-group">
+            <input id="address" type="textbox" placeholder="Flag" class="form-control">
+            <span class="input-group-btn">
+              <button class="btn btn-default" type="button" id="submitFlag">Submit</button>
+            </span>
+          </div>
+          <br>
+        </div>
+      </center>
+    </div>
+  </body>
+</html>`, task.Name, task.Desc)
+}
+
 // Scoreboard implements web scoreboard
 func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 
 	contestStatus = contestStateNotAvailable
-	startTime = game.Start
-	endTime = game.End
+	gameShim = game
 
 	go scoreboardHTMLUpdater(game, time.Second)
 	go tasksHTMLUpdater(game, time.Second)
@@ -255,6 +323,8 @@ func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 	http.Handle("/scoreboard-info", websocket.Handler(infoHandler))
 	http.Handle("/tasks", websocket.Handler(tasksHandler))
 	http.Handle("/tasks-info", websocket.Handler(tasksInfoHandler))
+
+	http.HandleFunc("/task", task)
 
 	log.Println("Launching scoreboard at", addr)
 

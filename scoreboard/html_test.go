@@ -28,9 +28,6 @@ func TestCategoryToHTML(*testing.T) {
 	cat.TasksInfo = append(cat.TasksInfo, game.TaskInfo{})
 
 	html := categoryToHTML(cat)
-	if html != `<div class="col-xs-3"> <h1></h1><p><a`+
-		` class="btn btn-default" disabled="disabled"`+
-		` title="Task is closed">0. </a></p></div>` {
-		panic(html)
-	}
+
+	testMatch("Task is closed", html)
 }

@@ -15,16 +15,19 @@ import (
 
 func taskToHTML(task game.TaskInfo) (html string) {
 
-	head := `<p><a class="btn btn-primary btn-lg"`
+	html = `<p><button class="btn btn-primary btn-lg"`
 
 	if task.Opened {
-		html = fmt.Sprintf(head+`title="%s">%d. %s</a></p>`,
-			task.Name, task.Price, task.Name)
+		html += fmt.Sprintf(`title="%s" onclick="window.location=`+
+			`'task?id=%d';">%d. %s `,
+			task.Name, task.ID, task.Price, task.Name)
 	} else {
-		html = fmt.Sprintf(head+
-			`disabled="disabled" title="Task is closed">%d. %s</a></p>`,
+		html += fmt.Sprintf(`disabled="disabled" `+
+			`title="Task is closed">%d. %s`,
 			task.Price, task.Name)
 	}
+
+	html += "</button></p>"
 
 	return
 }

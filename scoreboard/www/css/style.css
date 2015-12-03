@@ -17,16 +17,26 @@ body {
     height: 30%;
 }
 
-#scoreboard-table {
+#scoreboard-table, #tasks-table, #task {
     /* Fallback for web browsers that doesn't support RGBa */
     background: rgb(255, 255, 255);
     /* RGBa with 0.6 opacity */
     background: rgba(255, 255, 255, 0.7);
 }
 
-#tasks-table {
-    /* Fallback for web browsers that doesn't support RGBa */
-    background: rgb(255, 255, 255);
-    /* RGBa with 0.6 opacity */
-    background: rgba(255, 255, 255, 0.7);
+#task {
+    padding: 10px;
+    font-size: 155%;
+}
+
+p {
+    font-size: 155%;
+}
+
+h1 {
+    font-size: 350%;
+}
+
+.input-group {
+    width: 30%;
 }
