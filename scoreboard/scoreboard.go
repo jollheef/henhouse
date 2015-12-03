@@ -292,18 +292,18 @@ func task(w http.ResponseWriter, r *http.Request) {
         <div id="task">
           %s
           <br>
-          <div class="input-group">
-            <input id="address" type="textbox" placeholder="Flag" class="form-control">
+          <form class="input-group" action="/flag?id=%d" method="post">
+            <input class="form-control" name="flag" value="" placeholder="Flag">
             <span class="input-group-btn">
-              <button class="btn btn-default" type="button" id="submitFlag">Submit</button>
+              <button class="btn btn-default">Submit</button>
             </span>
-          </div>
+          </form>
           <br>
         </div>
       </center>
     </div>
   </body>
-</html>`, task.Name, task.Desc)
+</html>`, task.Name, task.Desc, task.ID)
 }
 
 // Scoreboard implements web scoreboard
