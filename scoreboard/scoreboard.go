@@ -367,13 +367,22 @@ func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 
 	go scoreboardUpdater(game, time.Second)
 
-	http.Handle("/", http.FileServer(http.Dir(wwwPath)))
+	for _, dir := range []string{"css", "images", "js"} {
+		http.Handle("/"+dir, http.FileServer(http.Dir(wwwPath+dir)))
+	}
 
+	// Get
+	http.HandleFunc("/index.html", staticScoreboard)
+	http.HandleFunc("/tasks.html", staticTasks)
+	http.Handle("/news.html", http.FileServer(http.Dir(wwwPath+"/news.html")))
+
+	// Websocket
 	http.Handle("/scoreboard", websocket.Handler(scoreboardHandler))
 	http.Handle("/scoreboard-info", websocket.Handler(infoHandler))
 	http.Handle("/tasks", websocket.Handler(tasksHandler))
 	http.Handle("/tasks-info", websocket.Handler(tasksInfoHandler))
 
+	// Post
 	http.HandleFunc("/task", taskHandler)
 	http.HandleFunc("/flag", flagHandler)
 
