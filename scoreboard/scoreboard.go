@@ -326,7 +326,34 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 
 	solved, err := gameShim.Solve(1, id, flag)
 
-	fmt.Fprintf(w, "flag: %s, id: %d, err: %v, solved: %t", flag, id, err, solved)
+	var solvedMsg string
+	if solved {
+		solvedMsg = "Solved"
+	} else {
+		solvedMsg = "Invalid flag"
+	}
+
+	fmt.Fprintf(w, `<!DOCTYPE html>
+<html class="full" lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Juniors CTF</title>
+
+    <link rel="stylesheet" href="https://bootswatch.com/yeti/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+  </head>
+  <body>
+    <ul class="nav nav-tabs h4">
+      <li><a href="index.html">Scoreboard</a></li>
+      <li><a href="tasks.html">Tasks</a></li>
+      <li><a href="news.html">News</a></li>
+    </ul>
+    <div class="page-header"><center><h1>%s</h1></center></div>
+  </body>
+</html>`, solvedMsg)
 }
 
 // Scoreboard implements web scoreboard
