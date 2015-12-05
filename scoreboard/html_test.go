@@ -14,10 +14,10 @@ import (
 )
 
 func TestTaskToHTML(*testing.T) {
-	html := taskToHTML(game.TaskInfo{})
+	html := taskToHTML(1, game.TaskInfo{})
 	testMatch("Task is closed", html)
 
-	html = taskToHTML(game.TaskInfo{Opened: true})
+	html = taskToHTML(1, game.TaskInfo{Opened: true})
 	testNotMatch("Task is closed", html)
 }
 
