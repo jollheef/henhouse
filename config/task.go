@@ -21,6 +21,7 @@ type Task struct {
 	Category    string
 	Level       int
 	Flag        string
+	Author      string
 }
 
 // ParseXMLTask parse xml task

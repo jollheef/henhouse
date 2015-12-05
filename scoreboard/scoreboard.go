@@ -293,13 +293,16 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
       <center>
         <div id="task">
           %s
+          <br><br>
+          Author: %s
+          <br>
           %s
           <br>
         </div>
       </center>
     </div>
   </body>
-</html>`, task.Name, task.Desc, submitForm)
+</html>`, task.Name, task.Desc, task.Author, submitForm)
 }
 
 func flagHandler(w http.ResponseWriter, r *http.Request) {

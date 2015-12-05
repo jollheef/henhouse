@@ -38,7 +38,7 @@ func TestAddTask(*testing.T) {
 
 	defer db.Close()
 
-	task := Task{255, "n", "d", 10, 100, 50, true, "f", 1, 10, true}
+	task := Task{255, "n", "d", 10, 100, 50, true, "f", 1, 10, true, ""}
 
 	err = AddTask(db, &task)
 	if err != nil {

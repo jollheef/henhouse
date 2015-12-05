@@ -25,6 +25,7 @@ type Task struct {
 	MaxSharePrice int
 	MinSharePrice int
 	Opened        bool
+	Author        string
 }
 
 func createTaskTable(db *sql.DB) (err error) {
@@ -41,7 +42,8 @@ func createTaskTable(db *sql.DB) (err error) {
 		flag		TEXT NOT NULL,
 		max_share_price	INTEGER NOT NULL,
 		min_share_price	INTEGER NOT NULL,
-		opened		BOOLEAN NOT NULL
+		opened		BOOLEAN NOT NULL,
+		author		TEXT NOT NULL
 	)`)
 
 	return
@@ -52,8 +54,8 @@ func AddTask(db *sql.DB, t *Task) (err error) {
 
 	stmt, err := db.Prepare("INSERT INTO task (name, description, " +
 		"category_id, level, price, shared, flag, max_share_price, " +
-		"min_share_price, opened) VALUES ($1, $2, $3, $4, $5, $6, " +
-		"$7, $8, $9, $10) RETURNING id")
+		"min_share_price, opened, author) VALUES ($1, $2, $3, $4, " +
+		"$5, $6, $7, $8, $9, $10, $11) RETURNING id")
 	if err != nil {
 		return
 	}
@@ -62,7 +64,7 @@ func AddTask(db *sql.DB, t *Task) (err error) {
 
 	err = stmt.QueryRow(t.Name, t.Desc, t.CategoryID, t.Level, t.Price,
 		t.Shared, t.Flag, t.MaxSharePrice, t.MinSharePrice,
-		t.Opened).Scan(&t.ID)
+		t.Opened, t.Author).Scan(&t.ID)
 	if err != nil {
 		return
 	}
@@ -75,7 +77,7 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 
 	rows, err := db.Query("SELECT id, name, description, category_id, " +
 		"level, price, shared, flag, max_share_price, " +
-		"min_share_price, opened FROM task")
+		"min_share_price, opened, author FROM task")
 	if err != nil {
 		return
 	}
@@ -87,7 +89,8 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 
 		err = rows.Scan(&t.ID, &t.Name, &t.Desc, &t.CategoryID,
 			&t.Level, &t.Price, &t.Shared, &t.Flag,
-			&t.MaxSharePrice, &t.MinSharePrice, &t.Opened)
+			&t.MaxSharePrice, &t.MinSharePrice, &t.Opened,
+			&t.Author)
 		if err != nil {
 			return
 		}
