@@ -11,6 +11,7 @@
 package scoreboard
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/jollheef/henhouse/game"
 	"golang.org/x/net/websocket"
@@ -368,7 +369,8 @@ func handleStaticFileSimple(file, wwwPath string) {
 }
 
 // Scoreboard implements web scoreboard
-func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
+func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
+	addr string) (err error) {
 
 	contestStatus = contestStateNotAvailable
 	gameShim = game
@@ -385,9 +387,10 @@ func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 	handleStaticFileSimple("/news.html", wwwPath)
 	handleStaticFileSimple("/images/bg.jpg", wwwPath)
 	handleStaticFileSimple("/images/juniors_ctf_txt.png", wwwPath)
+	handleStaticFileSimple("/auth.html", wwwPath)
 
 	// Get
-	http.HandleFunc("/", staticScoreboard)
+	http.Handle("/", authorized(database, http.HandlerFunc(staticScoreboard)))
 	http.HandleFunc("/index.html", staticScoreboard)
 	http.HandleFunc("/tasks.html", staticTasks)
 

@@ -180,7 +180,7 @@ func main() {
 
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
 	log.Println("Listen at", cfg.Scoreboard.Addr)
-	err = scoreboard.Scoreboard(&game, cfg.Scoreboard.WwwPath,
+	err = scoreboard.Scoreboard(database, &game, cfg.Scoreboard.WwwPath,
 		cfg.Scoreboard.Addr)
 	if err != nil {
 		log.Fatalln("Error:", err)
