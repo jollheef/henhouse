@@ -36,8 +36,7 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 		err = db.AddTeam(database, &db.Team{
 			Name:  team.Name,
 			Desc:  team.Description,
-			Login: team.Login,
-			Pass:  team.Pass,
+			Token: team.Token,
 		})
 		if err != nil {
 			return

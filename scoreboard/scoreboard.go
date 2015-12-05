@@ -386,23 +386,28 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 	handleStaticFileSimple("/js/tasks.js", wwwPath)
 	handleStaticFileSimple("/news.html", wwwPath)
 	handleStaticFileSimple("/images/bg.jpg", wwwPath)
+	handleStaticFileSimple("/images/401.jpg", wwwPath)
 	handleStaticFileSimple("/images/juniors_ctf_txt.png", wwwPath)
 	handleStaticFileSimple("/auth.html", wwwPath)
 
 	// Get
 	http.Handle("/", authorized(database, http.HandlerFunc(staticScoreboard)))
-	http.HandleFunc("/index.html", staticScoreboard)
-	http.HandleFunc("/tasks.html", staticTasks)
+	http.Handle("/index.html", authorized(database, http.HandlerFunc(staticScoreboard)))
+	http.Handle("/tasks.html", authorized(database, http.HandlerFunc(staticTasks)))
 
 	// Websocket
-	http.Handle("/scoreboard", websocket.Handler(scoreboardHandler))
-	http.Handle("/scoreboard-info", websocket.Handler(infoHandler))
-	http.Handle("/tasks", websocket.Handler(tasksHandler))
-	http.Handle("/tasks-info", websocket.Handler(tasksInfoHandler))
+	http.Handle("/scoreboard", authorized(database, websocket.Handler(scoreboardHandler)))
+	http.Handle("/scoreboard-info", authorized(database, websocket.Handler(infoHandler)))
+	http.Handle("/tasks", authorized(database, websocket.Handler(tasksHandler)))
+	http.Handle("/tasks-info", authorized(database, websocket.Handler(tasksInfoHandler)))
 
 	// Post
-	http.HandleFunc("/task", taskHandler)
-	http.HandleFunc("/flag", flagHandler)
+	http.Handle("/task", authorized(database, http.HandlerFunc(taskHandler)))
+	http.Handle("/flag", authorized(database, http.HandlerFunc(flagHandler)))
+	http.HandleFunc("/auth.php", http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			authHandler(database, w, r)
+		}))
 
 	log.Println("Launching scoreboard at", addr)
 

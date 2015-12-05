@@ -55,8 +55,7 @@ type Config struct {
 	Teams []struct {
 		Name        string
 		Description string
-		Login       string
-		Pass        string
+		Token       string
 	}
 }
 

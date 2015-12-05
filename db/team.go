@@ -83,3 +83,21 @@ func GetTeams(db *sql.DB) (teams []Team, err error) {
 
 	return
 }
+
+// GetTeamIDByToken get team id by access token
+func GetTeamIDByToken(db *sql.DB, token string) (teamID int, err error) {
+
+	stmt, err := db.Prepare("SELECT id FROM team WHERE token=$1")
+	if err != nil {
+		return
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(token).Scan(&teamID)
+	if err != nil {
+		return
+	}
+
+	return
+}

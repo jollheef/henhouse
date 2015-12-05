@@ -32,11 +32,9 @@ auto_open_timeout = "6h"
 [[Teams]]
 name = "FooTeam"
 description = "Foo test team"
-login = "footeam"
-pass = "11"
+token = "11"
 
 [[Teams]]
 name = "BarTeam"
 description = "Bar test team"
-login = "barteam"
-pass = "11"
+token = "11"

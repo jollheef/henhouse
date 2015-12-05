@@ -3,7 +3,7 @@
 TMP=`mktemp`
 COVERAGE=coverage.out
 
-MIN_COV=85
+MIN_COV=70
 
 function clean() {
     rm ${TMP}

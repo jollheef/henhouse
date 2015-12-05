@@ -172,7 +172,7 @@ func TestScoreboard(*testing.T) {
 	for i := 0; i < nteams; i++ {
 
 		team := db.Team{255, fmt.Sprintf("team%d", i),
-			"e", "d", "l", "p", "s"}
+			"e", "d", "l", "p"}
 
 		err = db.AddTeam(database, &team)
 		if err != nil {
@@ -229,7 +229,7 @@ func TestScoreboard(*testing.T) {
 	}
 
 	go func() {
-		err = Scoreboard(&game, "", addr)
+		err = Scoreboard(database, &game, "", addr)
 		if err != nil {
 			panic(err)
 		}
@@ -243,6 +243,8 @@ func TestScoreboard(*testing.T) {
 	if err != nil {
 		panic(err)
 	}
+
+	authEnabled = false
 
 	matchBody("http://"+addr+"/task?id=1", cats[0].TasksInfo[0].Desc)
 

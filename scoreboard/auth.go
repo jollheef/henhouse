@@ -13,24 +13,27 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jollheef/henhouse/db"
+	"log"
 	"net/http"
 )
 
 const sessionCookieName = "session"
 
+var authEnabled = true
+
 func genSession() (s string, err error) {
 
-	session_len := 256
+	sessionLen := 256
 
-	rand_buf := make([]byte, session_len)
+	randBuf := make([]byte, sessionLen)
 
-	_, err = rand.Read(rand_buf)
+	_, err = rand.Read(randBuf)
 
 	if err != nil {
 		return
 	}
 
-	s = fmt.Sprintf("%x", rand_buf)
+	s = fmt.Sprintf("%x", randBuf)
 
 	return
 }
@@ -77,10 +80,42 @@ func setSessionTeamID(database *sql.DB, w http.ResponseWriter,
 func authorized(database *sql.DB, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, err := getSessionTeamID(database, r)
-		if err != nil {
+		if err != nil && authEnabled {
 			http.Redirect(w, r, "/auth.html", 307)
 		} else {
 			next.ServeHTTP(w, r)
 		}
 	})
+}
+
+func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", 307)
+		return
+	}
+
+	token := r.FormValue("token")
+
+	if token == "" {
+		http.Redirect(w, r, "/", 307)
+		return
+	}
+
+	teamID, err := db.GetTeamIDByToken(database, token)
+	if err != nil {
+		fmt.Fprint(w, `<!DOCTYPE html><html><body>`+
+			`<img src="/images/401.jpg">`+
+			`</body></html>`)
+		return
+	}
+
+	err = setSessionTeamID(database, w, teamID)
+	if err != nil {
+		log.Println("Set session id fail:", err)
+		return
+	}
+
+	// Success auth
+	http.Redirect(w, r, "/", 303)
 }
