@@ -131,3 +131,9 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 	// Success auth
 	http.Redirect(w, r, "/", 303)
 }
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{Name: sessionCookieName})
+	http.Redirect(w, r, "/", 307)
+	return
+}

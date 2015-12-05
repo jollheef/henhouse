@@ -395,6 +395,7 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 	http.Handle("/", authorized(database, http.HandlerFunc(staticScoreboard)))
 	http.Handle("/index.html", authorized(database, http.HandlerFunc(staticScoreboard)))
 	http.Handle("/tasks.html", authorized(database, http.HandlerFunc(staticTasks)))
+	http.Handle("/logout", authorized(database, http.HandlerFunc(logoutHandler)))
 
 	// Websocket
 	http.Handle("/scoreboard", authorized(database, websocket.Handler(scoreboardHandler)))
