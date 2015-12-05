@@ -113,30 +113,21 @@ func TestGetInfo(*testing.T) {
 
 	gameShim = &game
 
-	lastScoreboardUpdated = "10:04:01"
-
-	info := getInfo(lastScoreboardUpdated)
+	info := getInfo()
 
 	testMatch(contestNotStarted, info)
-	testMatch(lastScoreboardUpdated, info)
 
 	time.Sleep(time.Second)
 
-	lastScoreboardUpdated = "10:04:02"
-
-	info = getInfo(lastScoreboardUpdated)
+	info = getInfo()
 
 	testMatch(contestRunning, info)
-	testMatch(lastScoreboardUpdated, info)
 
 	time.Sleep(time.Second)
 
-	lastScoreboardUpdated = "10:04:02"
-
-	info = getInfo(lastScoreboardUpdated)
+	info = getInfo()
 
 	testMatch(contestCompleted, info)
-	testNotMatch(lastScoreboardUpdated, info)
 }
 
 func matchBody(url, pattern string) {
@@ -258,7 +249,7 @@ func TestScoreboard(*testing.T) {
 	// Scoreboard wwwPath is "" => must be not found
 	matchBody("http://"+addr+"/news.html", "not found")
 
-	infoURL := "ws://" + addr + "/scoreboard-info"
+	infoURL := "ws://" + addr + "/info"
 
 	ws, err := websocket.Dial(infoURL, "", originURL)
 	if err != nil {
@@ -345,7 +336,7 @@ func TestScoreboard(*testing.T) {
 
 	ws.Close()
 
-	tasksURL := "ws://" + addr + "/tasks-info"
+	tasksURL := "ws://" + addr + "/info"
 
 	ws, err = websocket.Dial(tasksURL, "", originURL)
 	if err != nil {

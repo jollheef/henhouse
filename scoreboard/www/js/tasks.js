@@ -4,7 +4,7 @@ scoreboard.onmessage = function(e) {
     document.getElementById('tasks-table').innerHTML = e.data
 }
 
-var info = new WebSocket("ws://" + location.host + "/tasks-info");
+var info = new WebSocket("ws://" + location.host + "/info");
 
 info.onmessage = function(e) {
     document.getElementById('info').innerHTML = e.data

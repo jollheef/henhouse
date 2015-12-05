@@ -29,12 +29,8 @@ const (
 )
 
 var (
-	gameShim              *game.Game
-	currentResult         string
-	currentTasks          string
-	contestStatus         string
-	lastScoreboardUpdated string
-	lastTasksUpdated      string
+	gameShim      *game.Game
+	contestStatus string
 )
 
 func durationToHMS(d time.Duration) string {
@@ -50,7 +46,7 @@ func durationToHMS(d time.Duration) string {
 	return fmt.Sprintf("%02d:%02d:%02d", h, m, s)
 }
 
-func getInfo(lastUpdated string) string {
+func getInfo() string {
 
 	var left time.Duration
 	var btnType string
@@ -79,9 +75,8 @@ func getInfo(lastUpdated string) string {
 		btnType, contestStatus)
 
 	if left != 0 {
-		info += fmt.Sprintf(`<span class="btn btn-info">Left %s</span>`+
-			`<span class="btn btn-info">Updated at %s</span>`,
-			durationToHMS(left), lastUpdated)
+		info += fmt.Sprintf(`<span class="btn btn-info">Left %s</span>`,
+			durationToHMS(left))
 	}
 
 	return info
@@ -91,21 +86,7 @@ func infoHandler(ws *websocket.Conn) {
 
 	defer ws.Close()
 	for {
-		_, err := fmt.Fprint(ws, getInfo(lastScoreboardUpdated))
-		if err != nil {
-			log.Println("Socket closed:", err)
-			return
-		}
-
-		time.Sleep(time.Second)
-	}
-}
-
-func tasksInfoHandler(ws *websocket.Conn) {
-
-	defer ws.Close()
-	for {
-		_, err := fmt.Fprint(ws, getInfo(lastTasksUpdated))
+		_, err := fmt.Fprint(ws, getInfo())
 		if err != nil {
 			log.Println("Socket closed:", err)
 			return
@@ -119,11 +100,17 @@ func scoreboardHandler(ws *websocket.Conn) {
 
 	defer ws.Close()
 
+	currentResult := scoreboardHTML()
+
 	fmt.Fprint(ws, currentResult)
+
 	sendedResult := currentResult
+
 	lastUpdate := time.Now()
 
 	for {
+		currentResult := scoreboardHTML()
+
 		if sendedResult != currentResult ||
 			time.Now().After(lastUpdate.Add(time.Minute)) {
 
@@ -141,39 +128,28 @@ func scoreboardHandler(ws *websocket.Conn) {
 	}
 }
 
-func scoreboardHTMLUpdater(game *game.Game, updateTimeout time.Duration) {
+func scoreboardHTML() (result string) {
 
-	head := "<thead><th>#</th><th>Team</th><th>Score</th></thead>"
+	result = "<thead><th>#</th><th>Team</th><th>Score</th></thead>"
 
-	for {
-		result := head
+	result += "<tbody>"
 
-		result += "<tbody>"
-
-		scores, err := game.Scoreboard()
-		if err != nil {
-			log.Println("Get scoreboard fail:", err)
-			time.Sleep(updateTimeout)
-			continue
-		}
-
-		for n, teamScore := range scores {
-			result += fmt.Sprintf(
-				"<tr><td>%d</td><td>%s</td><td>%d</td><tr>",
-				n, teamScore.Name, teamScore.Score)
-
-		}
-
-		result += "</tbody>"
-
-		currentResult = result
-
-		now := time.Now()
-		lastScoreboardUpdated = fmt.Sprintf("%02d:%02d:%02d", now.Hour(),
-			now.Minute(), now.Second())
-
-		time.Sleep(updateTimeout)
+	scores, err := gameShim.Scoreboard()
+	if err != nil {
+		log.Println("Get scoreboard fail:", err)
+		return
 	}
+
+	for n, teamScore := range scores {
+		result += fmt.Sprintf(
+			"<tr><td>%d</td><td>%s</td><td>%d</td><tr>",
+			n, teamScore.Name, teamScore.Score)
+
+	}
+
+	result += "</tbody>"
+
+	return
 }
 
 func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
@@ -188,39 +164,35 @@ func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 	}
 }
 
-func tasksHTMLUpdater(game *game.Game, updateTimeout time.Duration) {
+func tasksHTML() (result string) {
 
-	for {
-		cats, err := game.Tasks()
-		if err != nil {
-			log.Println("Get tasks fail:", err)
-		}
-
-		var result string
-
-		for _, cat := range cats {
-			result += categoryToHTML(cat)
-		}
-
-		currentTasks = result
-
-		now := time.Now()
-		lastTasksUpdated = fmt.Sprintf("%02d:%02d:%02d", now.Hour(),
-			now.Minute(), now.Second())
-
-		time.Sleep(updateTimeout)
+	cats, err := gameShim.Tasks()
+	if err != nil {
+		log.Println("Get tasks fail:", err)
 	}
+
+	for _, cat := range cats {
+		result += categoryToHTML(cat)
+	}
+
+	return
 }
 
 func tasksHandler(ws *websocket.Conn) {
 
 	defer ws.Close()
 
+	currentTasks := tasksHTML()
+
 	fmt.Fprint(ws, currentTasks)
+
 	sendedTasks := currentTasks
+
 	lastUpdate := time.Now()
 
 	for {
+		currentTasks := tasksHTML()
+
 		if sendedTasks != currentTasks ||
 			time.Now().After(lastUpdate.Add(time.Minute)) {
 
@@ -384,9 +356,6 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 	contestStatus = contestStateNotAvailable
 	gameShim = game
 
-	go scoreboardHTMLUpdater(game, time.Second)
-	go tasksHTMLUpdater(game, time.Second)
-
 	go scoreboardUpdater(game, time.Second)
 
 	// Static files
@@ -406,9 +375,8 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 
 	// Websocket
 	http.Handle("/scoreboard", authorized(database, websocket.Handler(scoreboardHandler)))
-	http.Handle("/scoreboard-info", authorized(database, websocket.Handler(infoHandler)))
+	http.Handle("/info", authorized(database, websocket.Handler(infoHandler)))
 	http.Handle("/tasks", authorized(database, websocket.Handler(tasksHandler)))
-	http.Handle("/tasks-info", authorized(database, websocket.Handler(tasksInfoHandler)))
 
 	// Post
 	http.Handle("/task", authorized(database, http.HandlerFunc(taskHandler)))

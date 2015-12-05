@@ -46,7 +46,7 @@ func staticScoreboard(w http.ResponseWriter, r *http.Request) {
       <center><img id="juniorstext" src="/images/juniors_ctf_txt.png"></center>
     </div>
   </body>
-</html>`, getInfo(lastScoreboardUpdated), currentResult)
+</html>`, getInfo(), scoreboardHTML())
 }
 
 func staticTasks(w http.ResponseWriter, r *http.Request) {
@@ -85,5 +85,5 @@ func staticTasks(w http.ResponseWriter, r *http.Request) {
       </center>
     </div>
   </body>
-</html>`, getInfo(lastTasksUpdated), currentTasks)
+</html>`, getInfo(), tasksHTML())
 }
