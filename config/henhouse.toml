@@ -32,9 +32,14 @@ auto_open_timeout = "6h"
 [[Teams]]
 name = "FooTeam"
 description = "Foo test team"
-token = "11"
+token = "33"
 
 [[Teams]]
 name = "BarTeam"
 description = "Bar test team"
 token = "22"
+
+[[Teams]]
+name = "Admin"
+test = true
+token = "11"

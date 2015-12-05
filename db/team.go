@@ -19,7 +19,7 @@ type Team struct {
 	Email string
 	Desc  string
 	Token string
-	Salt  string
+	Test  bool
 }
 
 func createTeamTable(db *sql.DB) (err error) {
@@ -31,7 +31,7 @@ func createTeamTable(db *sql.DB) (err error) {
 		email		TEXT NOT NULL,
 		description	TEXT NOT NULL,
 		token		TEXT NOT NULL,
-		salt		TEXT NOT NULL
+		test		BOOLEAN NOT NULL
 	)`)
 
 	return
@@ -41,7 +41,7 @@ func createTeamTable(db *sql.DB) (err error) {
 func AddTeam(db *sql.DB, t *Team) (err error) {
 
 	stmt, err := db.Prepare("INSERT INTO team (name, email, " +
-		"description, token, salt) " +
+		"description, token, test) " +
 		"VALUES ($1, $2, $3, $4, $5) RETURNING id")
 	if err != nil {
 		return
@@ -50,7 +50,7 @@ func AddTeam(db *sql.DB, t *Team) (err error) {
 	defer stmt.Close()
 
 	err = stmt.QueryRow(t.Name, t.Email, t.Desc, t.Token,
-		t.Salt).Scan(&t.ID)
+		t.Test).Scan(&t.ID)
 	if err != nil {
 		return
 	}
@@ -62,7 +62,7 @@ func AddTeam(db *sql.DB, t *Team) (err error) {
 func GetTeams(db *sql.DB) (teams []Team, err error) {
 
 	rows, err := db.Query("SELECT id, name, email, description, token, " +
-		"salt FROM team")
+		"test FROM team")
 	if err != nil {
 		return
 	}
@@ -73,7 +73,7 @@ func GetTeams(db *sql.DB) (teams []Team, err error) {
 		var t Team
 
 		err = rows.Scan(&t.ID, &t.Name, &t.Email, &t.Desc, &t.Token,
-			&t.Salt)
+			&t.Test)
 		if err != nil {
 			return
 		}

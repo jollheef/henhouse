@@ -191,6 +191,11 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 	g.scoreboardLock.Lock()
 
 	for _, team := range g.teams {
+
+		if team.Test {
+			continue
+		}
+
 		var s db.Score
 		s, err = db.GetLastScore(g.db, team.ID)
 		if err != nil {
@@ -213,6 +218,10 @@ func (g Game) RecalcScoreboard() (err error) {
 	g.scoreboardLock.Lock()
 
 	for _, team := range g.teams {
+
+		if team.Test {
+			continue
+		}
 
 		score := 0
 
@@ -274,6 +283,15 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 	return
 }
 
+func (g Game) isTestTeam(teamID int) bool {
+	for _, team := range g.teams {
+		if team.ID == teamID {
+			return team.Test
+		}
+	}
+	return false
+}
+
 // Solve check flag for task and recalc scoreboard if flag correct
 func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 
@@ -283,6 +301,10 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 			if task.Flag == flag { // fix to regex
 
 				solved = true
+
+				if g.isTestTeam(teamID) {
+					return
+				}
 
 				now := time.Now()
 

@@ -37,6 +37,7 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 			Name:  team.Name,
 			Desc:  team.Description,
 			Token: team.Token,
+			Test:  team.Test,
 		})
 		if err != nil {
 			return

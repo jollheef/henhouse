@@ -56,6 +56,7 @@ type Config struct {
 		Name        string
 		Description string
 		Token       string
+		Test        bool
 	}
 }
 

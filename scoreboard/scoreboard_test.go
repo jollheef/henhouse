@@ -163,7 +163,7 @@ func TestScoreboard(*testing.T) {
 	for i := 0; i < nteams; i++ {
 
 		team := db.Team{255, fmt.Sprintf("team%d", i),
-			"e", "d", "l", "p"}
+			"e", "d", "l", false}
 
 		err = db.AddTeam(database, &team)
 		if err != nil {

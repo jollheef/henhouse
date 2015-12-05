@@ -38,7 +38,7 @@ func TestAddTeam(*testing.T) {
 
 	defer db.Close()
 
-	team := Team{255, "n", "e", "d", "l", "p"}
+	team := Team{255, "n", "e", "d", "l", false}
 
 	err = AddTeam(db, &team)
 	if err != nil {
@@ -80,7 +80,7 @@ func TestGetTeams(*testing.T) {
 	for i := 0; i < nteams; i++ {
 
 		team := Team{255, fmt.Sprintf("%d", i),
-			"e", "d", "l", "p"}
+			"e", "d", "l", false}
 
 		err = AddTeam(db, &team)
 		if err != nil {
