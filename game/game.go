@@ -54,6 +54,7 @@ type CategoryInfo struct {
 type TeamScoreInfo struct {
 	ID    int
 	Name  string
+	Desc  string
 	Score int
 }
 
@@ -204,7 +205,8 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 			return
 		}
 
-		scores = append(scores, TeamScoreInfo{team.ID, team.Name, s.Score})
+		scores = append(scores,
+			TeamScoreInfo{team.ID, team.Name, team.Desc, s.Score})
 	}
 
 	sort.Sort(byScore(scores))
