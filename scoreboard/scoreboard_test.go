@@ -246,9 +246,15 @@ func TestScoreboard(*testing.T) {
 
 	matchBody("http://"+addr+"/task?id=1", cats[0].TasksInfo[0].Desc)
 
-	matchBody("http://"+addr+"/", "HTML")
+	// Invalid id => get the fu^W scoreboard
+	matchBody("http://"+addr+"/task?id=kekeke", "Scoreboard")
 
-	matchBody("http://"+addr+"/tasks.html", "HTML")
+	matchBody("http://"+addr+"/", "DOCTYPE html")
+
+	matchBody("http://"+addr+"/tasks.html", "DOCTYPE html")
+
+	// Scoreboard wwwPath is "" => must be not found
+	matchBody("http://"+addr+"/news.html", "not found")
 
 	infoURL := "ws://" + addr + "/scoreboard-info"
 
