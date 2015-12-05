@@ -27,7 +27,7 @@ func TestCategoryToHTML(*testing.T) {
 
 	cat.TasksInfo = append(cat.TasksInfo, game.TaskInfo{})
 
-	html := categoryToHTML(cat)
+	html := categoryToHTML(0, cat)
 
 	testMatch("Task is closed", html)
 }

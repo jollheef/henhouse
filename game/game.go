@@ -34,11 +34,12 @@ type Game struct {
 
 // TaskInfo provide information about task
 type TaskInfo struct {
-	ID     int
-	Name   string
-	Desc   string
-	Price  int
-	Opened bool
+	ID       int
+	Name     string
+	Desc     string
+	Price    int
+	Opened   bool
+	SolvedBy []int
 }
 
 // CategoryInfo provide information about categories and tasks
@@ -154,12 +155,19 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 					return
 				}
 
+				var solvedBy []int
+				solvedBy, err = db.GetSolvedBy(g.db, task.ID)
+				if err != nil {
+					return
+				}
+
 				tInfo := TaskInfo{
-					ID:     task.ID,
-					Name:   task.Name,
-					Desc:   task.Desc,
-					Price:  price,
-					Opened: task.Opened,
+					ID:       task.ID,
+					Name:     task.Name,
+					Desc:     task.Desc,
+					Price:    price,
+					Opened:   task.Opened,
+					SolvedBy: solvedBy,
 				}
 
 				cat.TasksInfo = append(cat.TasksInfo, tInfo)

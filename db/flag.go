@@ -122,3 +122,35 @@ func IsSolved(db *sql.DB, teamID, taskID int) (solved bool, err error) {
 
 	return
 }
+
+// GetSolvedBy get all team ids who solved task
+func GetSolvedBy(db *sql.DB, taskID int) (teamIDs []int, err error) {
+
+	stmt, err := db.Prepare("SELECT team_id FROM flag " +
+		"WHERE task_id=$1 AND solved=TRUE")
+	if err != nil {
+		return
+	}
+
+	defer stmt.Close()
+
+	rows, err := stmt.Query(taskID)
+	if err != nil {
+		return
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+		var teamID int
+
+		err = rows.Scan(&teamID)
+		if err != nil {
+			return
+		}
+
+		teamIDs = append(teamIDs, teamID)
+	}
+
+	return
+}

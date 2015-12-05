@@ -13,9 +13,26 @@ import (
 	"github.com/jollheef/henhouse/game"
 )
 
-func taskToHTML(task game.TaskInfo) (html string) {
+func taskSolvedBy(task game.TaskInfo, teamID int) bool {
+	for _, t := range task.SolvedBy {
+		if t == teamID {
+			return true
+		}
+	}
+	return false
+}
 
-	html = `<p><button class="btn btn-primary btn-lg" `
+func taskToHTML(teamID int, task game.TaskInfo) (html string) {
+
+	buttonClass := "primary"
+
+	if len(task.SolvedBy) == 0 && task.Opened {
+		buttonClass = "warning"
+	} else if taskSolvedBy(task, teamID) {
+		buttonClass = "default"
+	}
+
+	html = fmt.Sprintf(`<p><button class="btn btn-%s btn-lg"`, buttonClass)
 
 	if task.Opened {
 		html += fmt.Sprintf(`title="%s" onclick="window.location=`+
@@ -32,13 +49,13 @@ func taskToHTML(task game.TaskInfo) (html string) {
 	return
 }
 
-func categoryToHTML(category game.CategoryInfo) (html string) {
+func categoryToHTML(teamID int, category game.CategoryInfo) (html string) {
 
 	html = fmt.Sprintf(`<div class="col-xs-3"> <h1>%s</h1> `,
 		category.Name)
 
 	for _, task := range category.TasksInfo {
-		html += taskToHTML(task)
+		html += taskToHTML(teamID, task)
 	}
 
 	html += `</div>`

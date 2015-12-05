@@ -180,7 +180,7 @@ func tasksHTML(teamID int) (result string) {
 	}
 
 	for _, cat := range cats {
-		result += categoryToHTML(cat)
+		result += categoryToHTML(teamID, cat)
 	}
 
 	return
