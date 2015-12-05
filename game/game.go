@@ -13,6 +13,7 @@ package game
 import (
 	"database/sql"
 	"github.com/jollheef/henhouse/db"
+	"log"
 	"sort"
 	"sync"
 	"time"
@@ -103,18 +104,22 @@ func (g Game) Run() (err error) {
 			}
 
 			g.tasks[i].Opened = true
-		}
-	}
 
-	if g.AutoOpen {
-		go g.autoOpen()
+			if g.AutoOpen {
+				go g.autoOpen(task)
+			}
+		}
 	}
 
 	return
 }
 
-func (g Game) autoOpen() {
-	// TODO
+func (g Game) autoOpen(task db.Task) {
+	time.Sleep(g.AutoOpenTimeout)
+	err := g.OpenNextTask(task)
+	if err != nil {
+		log.Println("Auto open next task fail:", err)
+	}
 }
 
 func taskPrice(database *sql.DB, taskID int) (price int, err error) {
@@ -258,6 +263,10 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 				}
 
 				g.tasks[i].Opened = true
+
+				if g.AutoOpen {
+					go g.autoOpen(task)
+				}
 			}
 		}
 	}
