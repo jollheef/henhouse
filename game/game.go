@@ -121,7 +121,7 @@ func taskPrice(database *sql.DB, taskID int) (price int, err error) {
 
 	fprice := float64(count) / 20.0
 
-	if fprice <= 0.5 {
+	if fprice <= 0.1 {
 		price = 500
 	} else if fprice <= 0.15 {
 		price = 400
