@@ -12,12 +12,16 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"fmt"
+	"github.com/gorilla/context"
 	"github.com/jollheef/henhouse/db"
 	"log"
 	"net/http"
 )
 
-const sessionCookieName = "session"
+const (
+	sessionCookieName = "session"
+	contextTeamIDName = "teamID"
+)
 
 var authEnabled = true
 
@@ -77,13 +81,21 @@ func setSessionTeamID(database *sql.DB, w http.ResponseWriter,
 	return
 }
 
+func getTeamID(r *http.Request) int {
+	if rv := context.Get(r, contextTeamIDName); rv != nil {
+		return rv.(int)
+	}
+	return 0
+}
+
 func authorized(database *sql.DB, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, err := getSessionTeamID(database, r)
+		teamID, err := getSessionTeamID(database, r)
 		if err != nil && authEnabled {
 			http.Redirect(w, r, "/auth.html", 307)
 		} else {
-			next.ServeHTTP(w, r)
+			context.Set(r, contextTeamIDName, teamID)
+			context.ClearHandler(next).ServeHTTP(w, r)
 		}
 	})
 }

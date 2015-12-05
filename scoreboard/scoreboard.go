@@ -100,7 +100,9 @@ func scoreboardHandler(ws *websocket.Conn) {
 
 	defer ws.Close()
 
-	currentResult := scoreboardHTML()
+	teamID := getTeamID(ws.Request())
+
+	currentResult := scoreboardHTML(teamID)
 
 	fmt.Fprint(ws, currentResult)
 
@@ -109,7 +111,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 	lastUpdate := time.Now()
 
 	for {
-		currentResult := scoreboardHTML()
+		currentResult := scoreboardHTML(teamID)
 
 		if sendedResult != currentResult ||
 			time.Now().After(lastUpdate.Add(time.Minute)) {
@@ -128,7 +130,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 	}
 }
 
-func scoreboardHTML() (result string) {
+func scoreboardHTML(teamID int) (result string) {
 
 	result = "<thead><th>#</th><th>Team</th><th>Score</th></thead>"
 
@@ -141,8 +143,14 @@ func scoreboardHTML() (result string) {
 	}
 
 	for n, teamScore := range scores {
+		if teamScore.ID == teamID {
+			result += `<tr class="self-team">`
+		} else {
+			result += `<tr>`
+		}
+
 		result += fmt.Sprintf(
-			"<tr><td>%d</td><td>%s</td><td>%d</td><tr>",
+			"<td>%d</td><td>%s</td><td>%d</td></tr>",
 			n, teamScore.Name, teamScore.Score)
 
 	}
@@ -164,7 +172,7 @@ func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 	}
 }
 
-func tasksHTML() (result string) {
+func tasksHTML(teamID int) (result string) {
 
 	cats, err := gameShim.Tasks()
 	if err != nil {
@@ -182,7 +190,9 @@ func tasksHandler(ws *websocket.Conn) {
 
 	defer ws.Close()
 
-	currentTasks := tasksHTML()
+	teamID := getTeamID(ws.Request())
+
+	currentTasks := tasksHTML(teamID)
 
 	fmt.Fprint(ws, currentTasks)
 
@@ -191,7 +201,7 @@ func tasksHandler(ws *websocket.Conn) {
 	lastUpdate := time.Now()
 
 	for {
-		currentTasks := tasksHTML()
+		currentTasks := tasksHTML(teamID)
 
 		if sendedTasks != currentTasks ||
 			time.Now().After(lastUpdate.Add(time.Minute)) {
@@ -281,7 +291,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 </html>`, task.Name, task.Desc, task.ID)
 }
 
-func flagHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
+func flagHandler(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", 307)
@@ -297,11 +307,7 @@ func flagHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	flag := r.FormValue("flag")
 
-	teamID, err := getSessionTeamID(database, r)
-	if err != nil {
-		http.Redirect(w, r, "/", 307)
-		return
-	}
+	teamID := getTeamID(r)
 
 	solved, err := gameShim.Solve(teamID, taskID, flag)
 	if err != nil {
@@ -380,10 +386,8 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 
 	// Post
 	http.Handle("/task", authorized(database, http.HandlerFunc(taskHandler)))
-	http.Handle("/flag", authorized(database, http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			flagHandler(database, w, r)
-		})))
+	http.Handle("/flag", authorized(database, http.HandlerFunc(flagHandler)))
+
 	http.HandleFunc("/auth.php", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			authHandler(database, w, r)

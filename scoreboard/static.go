@@ -17,6 +17,8 @@ import (
 
 func staticScoreboard(w http.ResponseWriter, r *http.Request) {
 
+	teamID := getTeamID(r)
+
 	fmt.Fprintf(w, `<!DOCTYPE html>
 <html class="full" lang="en">
   <head>
@@ -46,10 +48,12 @@ func staticScoreboard(w http.ResponseWriter, r *http.Request) {
       <center><img id="juniorstext" src="/images/juniors_ctf_txt.png"></center>
     </div>
   </body>
-</html>`, getInfo(), scoreboardHTML())
+</html>`, getInfo(), scoreboardHTML(teamID))
 }
 
 func staticTasks(w http.ResponseWriter, r *http.Request) {
+
+	teamID := getTeamID(r)
 
 	fmt.Fprintf(w, `<!DOCTYPE html>
 <html class="full" lang="en">
@@ -85,5 +89,5 @@ func staticTasks(w http.ResponseWriter, r *http.Request) {
       </center>
     </div>
   </body>
-</html>`, getInfo(), tasksHTML())
+</html>`, getInfo(), tasksHTML(teamID))
 }

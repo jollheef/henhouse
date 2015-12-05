@@ -42,3 +42,7 @@ h1 {
 .input-group {
     width: 30%;
 }
+
+.self-team {
+    background: rgba(255, 255, 255, 1);
+}
