@@ -356,6 +356,17 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 </html>`, solvedMsg)
 }
 
+func handleStaticFile(pattern, file string) {
+	http.HandleFunc(pattern,
+		func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, file)
+		})
+}
+
+func handleStaticFileSimple(file, wwwPath string) {
+	handleStaticFile(file, wwwPath+file)
+}
+
 // Scoreboard implements web scoreboard
 func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 
@@ -367,14 +378,18 @@ func Scoreboard(game *game.Game, wwwPath, addr string) (err error) {
 
 	go scoreboardUpdater(game, time.Second)
 
-	for _, dir := range []string{"css", "images", "js"} {
-		http.Handle("/"+dir, http.FileServer(http.Dir(wwwPath+dir)))
-	}
+	// Static files
+	handleStaticFileSimple("/css/style.css", wwwPath)
+	handleStaticFileSimple("/js/scoreboard.js", wwwPath)
+	handleStaticFileSimple("/js/tasks.js", wwwPath)
+	handleStaticFileSimple("/news.html", wwwPath)
+	handleStaticFileSimple("/images/bg.jpg", wwwPath)
+	handleStaticFileSimple("/images/juniors_ctf_txt.png", wwwPath)
 
 	// Get
+	http.HandleFunc("/", staticScoreboard)
 	http.HandleFunc("/index.html", staticScoreboard)
 	http.HandleFunc("/tasks.html", staticTasks)
-	http.Handle("/news.html", http.FileServer(http.Dir(wwwPath+"/news.html")))
 
 	// Websocket
 	http.Handle("/scoreboard", websocket.Handler(scoreboardHandler))

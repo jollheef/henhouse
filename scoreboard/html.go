@@ -15,7 +15,7 @@ import (
 
 func taskToHTML(task game.TaskInfo) (html string) {
 
-	html = `<p><button class="btn btn-primary btn-lg"`
+	html = `<p><button class="btn btn-primary btn-lg" `
 
 	if task.Opened {
 		html += fmt.Sprintf(`title="%s" onclick="window.location=`+
@@ -34,7 +34,7 @@ func taskToHTML(task game.TaskInfo) (html string) {
 
 func categoryToHTML(category game.CategoryInfo) (html string) {
 
-	html = fmt.Sprintf(`<div class="col-xs-3"> <h1>%s</h1>`,
+	html = fmt.Sprintf(`<div class="col-xs-3"> <h1>%s</h1> `,
 		category.Name)
 
 	for _, task := range category.TasksInfo {

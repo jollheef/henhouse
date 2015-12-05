@@ -74,9 +74,15 @@ func staticTasks(w http.ResponseWriter, r *http.Request) {
       <li><a href="news.html">News</a></li>
     </ul>
     <div style="padding: 15px;">
-      <div id="info">%s</div>
+      <div id="info">
+        %s
+      </div>
       <br>
-      <center><table id="tasks-table" class="table table-hover">%s</table></center>
+      <center>
+        <div id="tasks-table" class="table table-hover">
+          %s
+        </div>
+      </center>
     </div>
   </body>
 </html>`, getInfo(lastTasksUpdated), currentTasks)

@@ -139,6 +139,23 @@ func TestGetInfo(*testing.T) {
 	testNotMatch(lastScoreboardUpdated, info)
 }
 
+func matchBody(url, pattern string) {
+
+	resp, err := http.Get(url)
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	testMatch(pattern, string(body))
+}
+
 func TestScoreboard(*testing.T) {
 
 	database, err := db.InitDatabase(dbPath)
@@ -222,24 +239,16 @@ func TestScoreboard(*testing.T) {
 
 	originURL := "http://localhost/"
 
-	resp, err := http.Get("http://" + addr + "/task?id=1")
-	if err != nil {
-		panic(err)
-	}
-
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		panic(err)
-	}
-
 	cats, err := game.Tasks()
 	if err != nil {
 		panic(err)
 	}
 
-	testMatch(cats[0].TasksInfo[0].Desc, string(body))
+	matchBody("http://"+addr+"/task?id=1", cats[0].TasksInfo[0].Desc)
+
+	matchBody("http://"+addr+"/", "HTML")
+
+	matchBody("http://"+addr+"/tasks.html", "HTML")
 
 	infoURL := "ws://" + addr + "/scoreboard-info"
 
