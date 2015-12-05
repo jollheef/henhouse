@@ -309,14 +309,14 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 </html>`, task.Name, task.Desc, task.ID)
 }
 
-func flagHandler(w http.ResponseWriter, r *http.Request) {
+func flagHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", 307)
 		return
 	}
 
-	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	taskID, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		log.Println("Atoi fail:", err)
 		http.Redirect(w, r, "/", 307)
@@ -325,7 +325,16 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 
 	flag := r.FormValue("flag")
 
-	solved, err := gameShim.Solve(1, id, flag)
+	teamID, err := getSessionTeamID(database, r)
+	if err != nil {
+		http.Redirect(w, r, "/", 307)
+		return
+	}
+
+	solved, err := gameShim.Solve(teamID, taskID, flag)
+	if err != nil {
+		solved = false
+	}
 
 	var solvedMsg string
 	if solved {
@@ -403,7 +412,10 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 
 	// Post
 	http.Handle("/task", authorized(database, http.HandlerFunc(taskHandler)))
-	http.Handle("/flag", authorized(database, http.HandlerFunc(flagHandler)))
+	http.Handle("/flag", authorized(database, http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			flagHandler(database, w, r)
+		})))
 	http.HandleFunc("/auth.php", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			authHandler(database, w, r)

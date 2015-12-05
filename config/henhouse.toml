@@ -24,7 +24,7 @@ send_timeout = "10s"
 
 [Task]
 # timeout after send correct flag before open next task
-open_timeout = "1m"
+open_timeout = "1s"
 # auto open task after previous solved
 auto_open = true
 auto_open_timeout = "6h"
@@ -37,4 +37,4 @@ token = "11"
 [[Teams]]
 name = "BarTeam"
 description = "Bar test team"
-token = "11"
+token = "22"
