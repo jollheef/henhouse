@@ -253,6 +253,23 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	teamID := getTeamID(r)
+
+	flagSubmitFormat := `<br>` +
+		`<form class="input-group" action="/flag?id=%d" method="post">` +
+		`<input class="form-control" name="flag" value="" placeholder="Flag">` +
+		`<span class="input-group-btn">` +
+		`<button class="btn btn-default">Submit</button>` +
+		`</span>` +
+		`</form>`
+
+	var submitForm string
+	if taskSolvedBy(task, teamID) {
+		submitForm = "Already solved"
+	} else {
+		submitForm = fmt.Sprintf(flagSubmitFormat, task.ID)
+	}
+
 	fmt.Fprintf(w, `<!DOCTYPE html>
 <html class="full" lang="en">
   <head>
@@ -276,19 +293,13 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
       <center>
         <div id="task">
           %s
-          <br>
-          <form class="input-group" action="/flag?id=%d" method="post">
-            <input class="form-control" name="flag" value="" placeholder="Flag">
-            <span class="input-group-btn">
-              <button class="btn btn-default">Submit</button>
-            </span>
-          </form>
+          %s
           <br>
         </div>
       </center>
     </div>
   </body>
-</html>`, task.Name, task.Desc, task.ID)
+</html>`, task.Name, task.Desc, submitForm)
 }
 
 func flagHandler(w http.ResponseWriter, r *http.Request) {
