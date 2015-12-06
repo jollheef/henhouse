@@ -29,6 +29,7 @@ type Game struct {
 	AutoOpenTimeout time.Duration // if task does not solved
 	teams           []db.Team
 	tasks           []db.Task
+	tasksLock       sync.Mutex
 	categories      []db.Category
 	scoreboardLock  sync.Mutex
 }
@@ -88,6 +89,8 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 
 	g.RecalcScoreboard()
 
+	go g.updateRoutine()
+
 	return
 }
 
@@ -97,6 +100,9 @@ func (g Game) Run() (err error) {
 	for time.Now().Before(g.Start) {
 		time.Sleep(time.Second)
 	}
+
+	g.tasksLock.Lock()
+	defer g.tasksLock.Unlock()
 
 	for i, task := range g.tasks {
 		if task.Level == 1 && !task.Opened {
@@ -114,6 +120,35 @@ func (g Game) Run() (err error) {
 	}
 
 	return
+}
+
+func (g Game) updateRoutine() {
+	for {
+		time.Sleep(time.Minute)
+
+		teams, err := db.GetTeams(g.db)
+		if err != nil {
+			return
+		} else {
+			g.teams = teams
+		}
+
+		tasks, err := db.GetTasks(g.db)
+		if err != nil {
+			return
+		} else {
+			g.tasksLock.Lock()
+			g.tasks = tasks
+			g.tasksLock.Unlock()
+		}
+
+		categories, err := db.GetCategories(g.db)
+		if err != nil {
+			return
+		} else {
+			g.categories = categories
+		}
+	}
 }
 
 func (g Game) autoOpen(task db.Task) {
@@ -263,6 +298,9 @@ func (g Game) RecalcScoreboard() (err error) {
 func (g Game) OpenNextTask(t db.Task) (err error) {
 
 	time.Sleep(g.OpenTimeout)
+
+	g.tasksLock.Lock()
+	defer g.tasksLock.Unlock()
 
 	for i, task := range g.tasks {
 		// If same category and next level
