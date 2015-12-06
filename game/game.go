@@ -128,7 +128,8 @@ func (g Game) categoryAutoOpen(cat CategoryInfo) (err error) {
 
 			go g.autoOpen(t)
 
-			log.Println("Auto open", t, "after", g.AutoOpenTimeout)
+			log.Println("Auto open", t.Name, "after",
+				g.AutoOpenTimeout)
 
 			return
 		}
