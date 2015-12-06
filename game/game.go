@@ -12,6 +12,7 @@ package game
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/jollheef/henhouse/db"
 	"log"
 	"sort"
@@ -42,6 +43,7 @@ type TaskInfo struct {
 	Author   string
 	Price    int
 	Opened   bool
+	Level    int
 	SolvedBy []int
 }
 
@@ -64,6 +66,12 @@ type byScore []TeamScoreInfo
 func (tr byScore) Len() int           { return len(tr) }
 func (tr byScore) Swap(i, j int)      { tr[i], tr[j] = tr[j], tr[i] }
 func (tr byScore) Less(i, j int) bool { return tr[i].Score > tr[j].Score }
+
+type byLevel []TaskInfo
+
+func (ti byLevel) Len() int           { return len(ti) }
+func (ti byLevel) Swap(i, j int)      { ti[i], ti[j] = ti[j], ti[i] }
+func (ti byLevel) Less(i, j int) bool { return ti[i].Level < ti[j].Level }
 
 // NewGame create new game
 func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
@@ -94,6 +102,64 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 	return
 }
 
+func (g Game) findTaskByID(id int) (t db.Task, err error) {
+
+	for _, task := range g.tasks {
+		if task.ID == id {
+			t = task
+			return
+		}
+	}
+
+	err = errors.New("task no found")
+
+	return
+}
+
+func (g Game) categoryAutoOpen(cat CategoryInfo) (err error) {
+
+	for _, task := range cat.TasksInfo {
+		if !task.Opened {
+			var t db.Task
+			t, err = g.findTaskByID(task.ID)
+			if err != nil {
+				return
+			}
+
+			go g.autoOpen(t)
+
+			log.Println("Auto open", t, "after", g.AutoOpenTimeout)
+
+			return
+		}
+	}
+
+	return
+}
+
+func (g Game) startAutoOpen() (err error) {
+	maxLevel := 0
+	for _, task := range g.tasks {
+		if task.Level > maxLevel {
+			maxLevel = task.Level
+		}
+	}
+
+	cats, err := g.Tasks()
+	if err != nil {
+		return
+	}
+
+	for _, cat := range cats {
+		err = g.categoryAutoOpen(cat)
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 // Run open first level tasks and start auto open routine
 func (g Game) Run() (err error) {
 
@@ -112,10 +178,13 @@ func (g Game) Run() (err error) {
 			}
 
 			g.tasks[i].Opened = true
+		}
+	}
 
-			if g.AutoOpen {
-				go g.autoOpen(task)
-			}
+	if g.AutoOpen {
+		err = g.startAutoOpen()
+		if err != nil {
+			return
 		}
 	}
 
@@ -128,14 +197,14 @@ func (g Game) updateRoutine() {
 
 		teams, err := db.GetTeams(g.db)
 		if err != nil {
-			return
+			log.Println("Update. Get teams fail:", err)
 		} else {
 			g.teams = teams
 		}
 
 		tasks, err := db.GetTasks(g.db)
 		if err != nil {
-			return
+			log.Println("Update. Get tasks fail:", err)
 		} else {
 			g.tasksLock.Lock()
 			g.tasks = tasks
@@ -144,7 +213,7 @@ func (g Game) updateRoutine() {
 
 		categories, err := db.GetCategories(g.db)
 		if err != nil {
-			return
+			log.Println("Update. Get categories fail:", err)
 		} else {
 			g.categories = categories
 		}
@@ -211,11 +280,14 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 					Opened:   task.Opened,
 					SolvedBy: solvedBy,
 					Author:   task.Author,
+					Level:    task.Level,
 				}
 
 				cat.TasksInfo = append(cat.TasksInfo, tInfo)
 			}
 		}
+
+		sort.Sort(byLevel(cat.TasksInfo))
 
 		cats = append(cats, cat)
 	}
