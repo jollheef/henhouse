@@ -19,6 +19,8 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"log"
+	"os"
+	"syscall"
 )
 
 var (
@@ -125,6 +127,22 @@ func main() {
 	if err != nil {
 		log.Fatalln("Cannot open config:", err)
 	}
+
+	logFile, err := os.OpenFile(cfg.LogFile,
+		os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalln("Cannot open file:", err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
+
+	var rlim syscall.Rlimit
+	err = syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlim)
+	if err != nil {
+		log.Fatalln("Getrlimit fail:", err)
+	}
+
+	log.Println("RLIMIT_NOFILE CUR:", rlim.Cur, "MAX:", rlim.Max)
 
 	log.Println("Use db connection", cfg.Database.Connection)
 
