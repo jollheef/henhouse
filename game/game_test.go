@@ -356,4 +356,31 @@ func TestSolve(*testing.T) {
 
 func TestFirstOpen(*testing.T) {
 
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer database.Close()
+
+	validFlag := "testflag"
+
+	err = fillTestDB(database, validFlag)
+	if err != nil {
+		panic(err)
+	}
+
+	start := time.Now().Add(time.Second)
+	end := start.Add(time.Second)
+
+	game, err := NewGame(database, start, end)
+	if err != nil {
+		panic(err)
+	}
+
+	game.Run()
+
+	go game.UpdateDBRoutine(time.Second / 10)
+
+	time.Sleep(time.Second)
 }

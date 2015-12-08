@@ -97,8 +97,6 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 
 	g.RecalcScoreboard()
 
-	go g.updateRoutine()
-
 	return
 }
 
@@ -192,9 +190,9 @@ func (g Game) Run() (err error) {
 	return
 }
 
-func (g Game) updateRoutine() {
+func (g Game) UpdateDBRoutine(timeout time.Duration) {
 	for {
-		time.Sleep(time.Minute)
+		time.Sleep(timeout)
 
 		teams, err := db.GetTeams(g.db)
 		if err != nil {
