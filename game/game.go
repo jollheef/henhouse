@@ -28,10 +28,7 @@ type Game struct {
 	OpenTimeout     time.Duration // after solve task
 	AutoOpen        bool
 	AutoOpenTimeout time.Duration // if task does not solved
-	teams           []db.Team
-	tasks           []db.Task
 	tasksLock       sync.Mutex
-	categories      []db.Category
 	scoreboardLock  sync.Mutex
 }
 
@@ -80,29 +77,17 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 	g.Start = start
 	g.End = end
 
-	g.teams, err = db.GetTeams(g.db)
+	err = g.RecalcScoreboard()
 	if err != nil {
 		return
 	}
-
-	g.tasks, err = db.GetTasks(g.db)
-	if err != nil {
-		return
-	}
-
-	g.categories, err = db.GetCategories(g.db)
-	if err != nil {
-		return
-	}
-
-	g.RecalcScoreboard()
 
 	return
 }
 
-func (g Game) findTaskByID(id int) (t db.Task, err error) {
+func (g Game) findTaskByID(id int, tasks []db.Task) (t db.Task, err error) {
 
-	for _, task := range g.tasks {
+	for _, task := range tasks {
 		if task.ID == id {
 			t = task
 			return
@@ -114,45 +99,6 @@ func (g Game) findTaskByID(id int) (t db.Task, err error) {
 	return
 }
 
-func (g Game) categoryAutoOpen(cat CategoryInfo) (err error) {
-
-	for _, task := range cat.TasksInfo {
-		if !task.Opened {
-			var t db.Task
-			t, err = g.findTaskByID(task.ID)
-			if err != nil {
-				return
-			}
-
-			go g.autoOpen(t)
-
-			log.Println("Auto open", t.Name, "after",
-				g.AutoOpenTimeout)
-
-			return
-		}
-	}
-
-	return
-}
-
-func (g Game) startAutoOpen() (err error) {
-
-	cats, err := g.Tasks()
-	if err != nil {
-		return
-	}
-
-	for _, cat := range cats {
-		err = g.categoryAutoOpen(cat)
-		if err != nil {
-			return
-		}
-	}
-
-	return
-}
-
 // Run open first level tasks and start auto open routine
 func (g Game) Run() (err error) {
 
@@ -160,65 +106,23 @@ func (g Game) Run() (err error) {
 		time.Sleep(time.Second)
 	}
 
-	g.tasksLock.Lock()
-	defer g.tasksLock.Unlock()
+	cats, err := g.Tasks()
+	if err != nil {
+		return
+	}
 
-	for i, task := range g.tasks {
-		if task.Level == 1 && !task.Opened {
-			err = db.SetOpened(g.db, task.ID, true)
+	for _, c := range cats {
+		for _, t := range c.TasksInfo {
+			err = db.SetOpened(g.db, t.ID, true)
 			if err != nil {
 				return
 			}
 
-			g.tasks[i].Opened = true
-		}
-	}
-
-	if g.AutoOpen {
-		err = g.startAutoOpen()
-		if err != nil {
-			return
+			break
 		}
 	}
 
 	return
-}
-
-func (g Game) UpdateDBRoutine(timeout time.Duration) {
-	for {
-		time.Sleep(timeout)
-
-		teams, err := db.GetTeams(g.db)
-		if err != nil {
-			log.Println("Update. Get teams fail:", err)
-		} else {
-			g.teams = teams
-		}
-
-		tasks, err := db.GetTasks(g.db)
-		if err != nil {
-			log.Println("Update. Get tasks fail:", err)
-		} else {
-			g.tasksLock.Lock()
-			g.tasks = tasks
-			g.tasksLock.Unlock()
-		}
-
-		categories, err := db.GetCategories(g.db)
-		if err != nil {
-			log.Println("Update. Get categories fail:", err)
-		} else {
-			g.categories = categories
-		}
-	}
-}
-
-func (g Game) autoOpen(task db.Task) {
-	time.Sleep(g.AutoOpenTimeout)
-	err := g.OpenNextTask(task)
-	if err != nil {
-		log.Println("Auto open next task fail:", err)
-	}
 }
 
 func taskPrice(database *sql.DB, taskID int) (price int, err error) {
@@ -245,11 +149,21 @@ func taskPrice(database *sql.DB, taskID int) (price int, err error) {
 // Tasks returns categories with tasks
 func (g Game) Tasks() (cats []CategoryInfo, err error) {
 
-	for _, category := range g.categories {
+	tasks, err := db.GetTasks(g.db)
+	if err != nil {
+		return
+	}
+
+	categories, err := db.GetCategories(g.db)
+	if err != nil {
+		return
+	}
+
+	for _, category := range categories {
 
 		cat := CategoryInfo{Name: category.Name}
 
-		for _, task := range g.tasks {
+		for _, task := range tasks {
 
 			if task.CategoryID == category.ID {
 
@@ -293,7 +207,12 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 
 	g.scoreboardLock.Lock()
 
-	for _, team := range g.teams {
+	teams, err := db.GetTeams(g.db)
+	if err != nil {
+		return
+	}
+
+	for _, team := range teams {
 
 		if team.Test {
 			continue
@@ -321,7 +240,17 @@ func (g Game) RecalcScoreboard() (err error) {
 
 	g.scoreboardLock.Lock()
 
-	for _, team := range g.teams {
+	teams, err := db.GetTeams(g.db)
+	if err != nil {
+		return
+	}
+
+	tasks, err := db.GetTasks(g.db)
+	if err != nil {
+		return
+	}
+
+	for _, team := range teams {
 
 		if team.Test {
 			continue
@@ -329,7 +258,7 @@ func (g Game) RecalcScoreboard() (err error) {
 
 		score := 0
 
-		for _, task := range g.tasks {
+		for _, task := range tasks {
 
 			var price int
 			price, err = taskPrice(g.db, task.ID)
@@ -364,10 +293,12 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 
 	time.Sleep(g.OpenTimeout)
 
-	g.tasksLock.Lock()
-	defer g.tasksLock.Unlock()
+	tasks, err := db.GetTasks(g.db)
+	if err != nil {
+		return
+	}
 
-	for i, task := range g.tasks {
+	for _, task := range tasks {
 		// If same category and next level
 		if t.CategoryID == task.CategoryID && t.Level+1 == task.Level {
 			// If not already opened
@@ -377,12 +308,6 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 				if err != nil {
 					return
 				}
-
-				g.tasks[i].Opened = true
-
-				if g.AutoOpen {
-					go g.autoOpen(task)
-				}
 			}
 		}
 	}
@@ -391,18 +316,31 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 }
 
 func (g Game) isTestTeam(teamID int) bool {
-	for _, team := range g.teams {
+
+	teams, err := db.GetTeams(g.db)
+	if err != nil {
+		log.Println("Get teams fail:", err)
+		return true
+	}
+
+	for _, team := range teams {
 		if team.ID == teamID {
 			return team.Test
 		}
 	}
+
 	return false
 }
 
 // Solve check flag for task and recalc scoreboard if flag correct
 func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 
-	for _, task := range g.tasks {
+	tasks, err := db.GetTasks(g.db)
+	if err != nil {
+		return
+	}
+
+	for _, task := range tasks {
 		if task.ID == taskID {
 
 			if task.Flag == flag { // fix to regex

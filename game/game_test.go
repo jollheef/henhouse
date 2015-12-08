@@ -381,10 +381,6 @@ func TestFirstOpen(*testing.T) {
 
 	game.Run()
 
-	go game.UpdateDBRoutine(time.Second / 10)
-
-	time.Sleep(time.Second)
-
 	cats, err := game.Tasks()
 	if err != nil {
 		panic(err)
