@@ -9,6 +9,7 @@
 package game
 
 import (
+	"database/sql"
 	"fmt"
 	"github.com/jollheef/henhouse/db"
 	"testing"
@@ -218,16 +219,7 @@ func TestScoreboard(*testing.T) {
 	}
 }
 
-func TestSolve(*testing.T) {
-
-	database, err := db.InitDatabase(dbPath)
-	if err != nil {
-		panic(err)
-	}
-
-	defer database.Close()
-
-	validFlag := "testflag"
+func fillTestDB(database *sql.DB, validFlag string) (err error) {
 
 	nteams := 4
 
@@ -274,6 +266,25 @@ func TestSolve(*testing.T) {
 				panic(err)
 			}
 		}
+	}
+
+	return
+}
+
+func TestSolve(*testing.T) {
+
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer database.Close()
+
+	validFlag := "testflag"
+
+	err = fillTestDB(database, validFlag)
+	if err != nil {
+		panic(err)
 	}
 
 	start := time.Now().Add(time.Second)
@@ -341,4 +352,8 @@ func TestSolve(*testing.T) {
 	if solved {
 		panic("task solved after game end")
 	}
+}
+
+func TestFirstOpen(*testing.T) {
+
 }
