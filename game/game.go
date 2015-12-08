@@ -28,7 +28,6 @@ type Game struct {
 	OpenTimeout     time.Duration // after solve task
 	AutoOpen        bool
 	AutoOpenTimeout time.Duration // if task does not solved
-	tasksLock       sync.Mutex
 	scoreboardLock  sync.Mutex
 }
 
