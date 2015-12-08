@@ -137,12 +137,6 @@ func (g Game) categoryAutoOpen(cat CategoryInfo) (err error) {
 }
 
 func (g Game) startAutoOpen() (err error) {
-	maxLevel := 0
-	for _, task := range g.tasks {
-		if task.Level > maxLevel {
-			maxLevel = task.Level
-		}
-	}
 
 	cats, err := g.Tasks()
 	if err != nil {
