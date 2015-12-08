@@ -288,6 +288,14 @@ func (g Game) RecalcScoreboard() (err error) {
 	return
 }
 
+func (g Game) autoOpen(task db.Task) {
+	time.Sleep(g.AutoOpenTimeout)
+	err := g.OpenNextTask(task)
+	if err != nil {
+		log.Println("Auto open next task fail:", err)
+	}
+}
+
 // OpenNextTask open next task by level
 func (g Game) OpenNextTask(t db.Task) (err error) {
 
@@ -307,6 +315,10 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 				err = db.SetOpened(g.db, task.ID, true)
 				if err != nil {
 					return
+				}
+
+				if g.AutoOpen {
+					go g.autoOpen(task)
 				}
 			}
 		}
