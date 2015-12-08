@@ -12,6 +12,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/jollheef/henhouse/db"
+	"log"
 	"testing"
 	"time"
 )
@@ -383,4 +384,21 @@ func TestFirstOpen(*testing.T) {
 	go game.UpdateDBRoutine(time.Second / 10)
 
 	time.Sleep(time.Second)
+
+	cats, err := game.Tasks()
+	if err != nil {
+		panic(err)
+	}
+
+	for _, c := range cats {
+		if !c.TasksInfo[0].Opened {
+			log.Fatalln("Err: first task not opened")
+		}
+
+		for i := 1; i < len(c.TasksInfo); i++ {
+			if c.TasksInfo[i].Opened {
+				log.Fatalln("Err: not first task is opened")
+			}
+		}
+	}
 }
