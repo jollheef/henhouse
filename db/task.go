@@ -10,6 +10,7 @@ package db
 
 import (
 	"database/sql"
+	"time"
 )
 
 // Task row
@@ -26,6 +27,7 @@ type Task struct {
 	MinSharePrice int
 	Opened        bool
 	Author        string
+	OpenedTime    time.Time
 }
 
 func createTaskTable(db *sql.DB) (err error) {
@@ -43,7 +45,8 @@ func createTaskTable(db *sql.DB) (err error) {
 		max_share_price	INTEGER NOT NULL,
 		min_share_price	INTEGER NOT NULL,
 		opened		BOOLEAN NOT NULL,
-		author		TEXT NOT NULL
+		author		TEXT NOT NULL,
+		opened_time	TIMESTAMP with time zone
 	)`)
 
 	return
@@ -54,8 +57,9 @@ func AddTask(db *sql.DB, t *Task) (err error) {
 
 	stmt, err := db.Prepare("INSERT INTO task (name, description, " +
 		"category_id, level, price, shared, flag, max_share_price, " +
-		"min_share_price, opened, author) VALUES ($1, $2, $3, $4, " +
-		"$5, $6, $7, $8, $9, $10, $11) RETURNING id")
+		"min_share_price, opened, author, opened_time) " +
+		"VALUES ($1, $2, $3, $4, " +
+		"$5, $6, $7, $8, $9, $10, $11, $12) RETURNING id")
 	if err != nil {
 		return
 	}
@@ -64,7 +68,7 @@ func AddTask(db *sql.DB, t *Task) (err error) {
 
 	err = stmt.QueryRow(t.Name, t.Desc, t.CategoryID, t.Level, t.Price,
 		t.Shared, t.Flag, t.MaxSharePrice, t.MinSharePrice,
-		t.Opened, t.Author).Scan(&t.ID)
+		t.Opened, t.Author, t.OpenedTime).Scan(&t.ID)
 	if err != nil {
 		return
 	}
@@ -77,7 +81,7 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 
 	rows, err := db.Query("SELECT id, name, description, category_id, " +
 		"level, price, shared, flag, max_share_price, " +
-		"min_share_price, opened, author FROM task")
+		"min_share_price, opened, author, opened_time FROM task")
 	if err != nil {
 		return
 	}
@@ -90,7 +94,7 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 		err = rows.Scan(&t.ID, &t.Name, &t.Desc, &t.CategoryID,
 			&t.Level, &t.Price, &t.Shared, &t.Flag,
 			&t.MaxSharePrice, &t.MinSharePrice, &t.Opened,
-			&t.Author)
+			&t.Author, &t.OpenedTime)
 		if err != nil {
 			return
 		}
@@ -104,14 +108,15 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 // SetOpened open or close task
 func SetOpened(db *sql.DB, taskID int, opened bool) (err error) {
 
-	stmt, err := db.Prepare("UPDATE task SET opened=$1 WHERE id=$2")
+	stmt, err := db.Prepare("UPDATE task SET opened=$1, opened_time=$2 " +
+		"WHERE id=$3")
 	if err != nil {
 		return err
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(opened, taskID)
+	_, err = stmt.Exec(opened, time.Now(), taskID)
 	if err != nil {
 		return err
 	}
