@@ -29,6 +29,10 @@ type Game struct {
 	AutoOpen        bool
 	AutoOpenTimeout time.Duration // if task does not solved
 	scoreboardLock  sync.Mutex
+	TaskPrice       struct {
+		TeamsBase              float64
+		P500, P400, P300, P200 float64
+	}
 }
 
 // TaskInfo provide information about task
@@ -70,6 +74,8 @@ func (ti byLevel) Len() int           { return len(ti) }
 func (ti byLevel) Swap(i, j int)      { ti[i], ti[j] = ti[j], ti[i] }
 func (ti byLevel) Less(i, j int) bool { return ti[i].Level < ti[j].Level }
 
+// TaskPrice provide task price info
+
 // NewGame create new game
 func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 
@@ -77,12 +83,37 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 	g.Start = start
 	g.End = end
 
+	// Default values
+	g.TaskPrice.P200 = 0.50
+	g.TaskPrice.P300 = 0.30
+	g.TaskPrice.P400 = 0.15
+	g.TaskPrice.P500 = 0.10
+
+	tasks, err := db.GetTasks(g.db)
+	if err != nil {
+		return
+	}
+	g.TaskPrice.TeamsBase = float64(len(tasks))
+
 	err = g.RecalcScoreboard()
 	if err != nil {
 		return
 	}
 
 	return
+}
+
+// SetTaskPrice convert and set price of tasks
+func (g Game) SetTaskPrice(p500, p400, p300, p200 int) {
+	g.TaskPrice.P200 = float64(p200) / 100
+	g.TaskPrice.P300 = float64(p300) / 100
+	g.TaskPrice.P400 = float64(p400) / 100
+	g.TaskPrice.P500 = float64(p500) / 100
+}
+
+// SetTeamsBase force set amount of teams for calc price task
+func (g Game) SetTeamsBase(teams int) {
+	g.TaskPrice.TeamsBase = float64(teams)
 }
 
 func (g Game) findTaskByID(id int, tasks []db.Task) (t db.Task, err error) {
@@ -169,19 +200,19 @@ func (g Game) autoOpenTasks() (err error) {
 	return
 }
 
-func taskPrice(database *sql.DB, taskID int) (price int, err error) {
+func (g Game) taskPrice(database *sql.DB, taskID int) (price int, err error) {
 
 	count, err := db.GetSolvedCount(database, taskID)
 
-	fprice := float64(count) / 20.0
+	fprice := float64(count) / g.TaskPrice.TeamsBase
 
-	if fprice <= 0.1 {
+	if fprice <= g.TaskPrice.P500 {
 		price = 500
-	} else if fprice <= 0.15 {
+	} else if fprice <= g.TaskPrice.P400 {
 		price = 400
-	} else if fprice <= 0.3 {
+	} else if fprice <= g.TaskPrice.P300 {
 		price = 300
-	} else if fprice <= 0.5 {
+	} else if fprice <= g.TaskPrice.P200 {
 		price = 200
 	} else {
 		price = 100
@@ -212,7 +243,7 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 			if task.CategoryID == category.ID {
 
 				var price int
-				price, err = taskPrice(g.db, task.ID)
+				price, err = g.taskPrice(g.db, task.ID)
 				if err != nil {
 					return
 				}
@@ -306,7 +337,7 @@ func (g Game) RecalcScoreboard() (err error) {
 		for _, task := range tasks {
 
 			var price int
-			price, err = taskPrice(g.db, task.ID)
+			price, err = g.taskPrice(g.db, task.ID)
 			if err != nil {
 				return
 			}

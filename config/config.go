@@ -40,6 +40,12 @@ type Config struct {
 		Tasks      _duration
 	}
 
+	TaskPrice struct {
+		UseTeamsBase           bool
+		TeamsBase              int
+		P500, P400, P300, P200 int
+	}
+
 	Game struct {
 		Start _time
 		End   _time

@@ -19,6 +19,18 @@ info = "1s"
 scoreboard = "10s"
 tasks = "10s"
 
+[TaskPrice]
+# for correct work with small amount of teams
+use_teams_base = true
+teams_base = 20
+# 500 if percent of solve less than value
+p500 = 10
+p400 = 15
+p300 = 30
+# 200 if percent of solve less than value
+p200 = 50
+# other 100
+
 [Game]
 start = "Nov 17 10:00 2015"
 end = "Dec 31 23:59 2015"

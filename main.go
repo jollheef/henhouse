@@ -183,11 +183,33 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 
+	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
+		cfg.TaskPrice.P400 == 0 || cfg.TaskPrice.P500 == 0 {
+		log.Fatalln("Error: Task price not setted")
+	}
+
+	fmt := "Set task price %d if solved less than %d%%\n"
+	log.Printf(fmt, 200, cfg.TaskPrice.P200)
+	log.Printf(fmt, 300, cfg.TaskPrice.P300)
+	log.Printf(fmt, 400, cfg.TaskPrice.P400)
+	log.Printf(fmt, 500, cfg.TaskPrice.P500)
+
+	game.SetTaskPrice(cfg.TaskPrice.P500, cfg.TaskPrice.P400,
+		cfg.TaskPrice.P300, cfg.TaskPrice.P200)
+
+	if cfg.TaskPrice.UseTeamsBase {
+		game.SetTeamsBase(cfg.TaskPrice.TeamsBase)
+		log.Println("Set teams base to", cfg.TaskPrice.TeamsBase)
+	} else {
+		log.Println("Use teams amount as teams base")
+	}
+
 	log.Println("Set task open timeout to", cfg.Task.OpenTimeout.Duration)
 	game.OpenTimeout = cfg.Task.OpenTimeout.Duration
 
 	if cfg.Task.AutoOpen {
-		log.Println("Auto open tasks after", cfg.Task.AutoOpenTimeout.Duration)
+		log.Println("Auto open tasks after",
+			cfg.Task.AutoOpenTimeout.Duration)
 	} else {
 		log.Println("Auto open tasks disabled")
 	}
@@ -205,10 +227,9 @@ func main() {
 
 	scoreboardD := cfg.WebsocketTimeout.Scoreboard.Duration
 	if scoreboardD != 0 {
-		log.Println("Update scoreboard timeout:", scoreboardD)
 		scoreboard.ScoreboardTimeout = scoreboardD
 	}
-	log.Println("Update info timeout:", scoreboard.ScoreboardTimeout)
+	log.Println("Update scoreboard timeout:", scoreboard.ScoreboardTimeout)
 
 	tasksD := cfg.WebsocketTimeout.Tasks.Duration
 	if tasksD != 0 {
