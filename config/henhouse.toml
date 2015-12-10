@@ -14,6 +14,11 @@ max_connections = 90 # should be less than same value in postgresql.conf
 www_path = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/scoreboard/www"
 addr = ":8000"
 
+[WebsocketTimeout]
+info = "1s"
+scoreboard = "10s"
+tasks = "10s"
+
 [Game]
 start = "Nov 17 10:00 2015"
 end = "Dec 31 23:59 2015"

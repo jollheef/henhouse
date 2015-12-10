@@ -197,6 +197,25 @@ func main() {
 
 	go game.Run()
 
+	infoD := cfg.WebsocketTimeout.Info.Duration
+	if infoD != 0 {
+		scoreboard.InfoTimeout = infoD
+	}
+	log.Println("Update info timeout:", scoreboard.InfoTimeout)
+
+	scoreboardD := cfg.WebsocketTimeout.Scoreboard.Duration
+	if scoreboardD != 0 {
+		log.Println("Update scoreboard timeout:", scoreboardD)
+		scoreboard.ScoreboardTimeout = scoreboardD
+	}
+	log.Println("Update info timeout:", scoreboard.ScoreboardTimeout)
+
+	tasksD := cfg.WebsocketTimeout.Tasks.Duration
+	if tasksD != 0 {
+		scoreboard.TasksTimeout = tasksD
+	}
+	log.Println("Update tasks timeout:", scoreboard.TasksTimeout)
+
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
 	log.Println("Listen at", cfg.Scoreboard.Addr)
 	err = scoreboard.Scoreboard(database, &game, cfg.Scoreboard.WwwPath,

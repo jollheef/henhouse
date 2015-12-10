@@ -34,6 +34,12 @@ type Config struct {
 		Addr    string
 	}
 
+	WebsocketTimeout struct {
+		Info       _duration
+		Scoreboard _duration
+		Tasks      _duration
+	}
+
 	Game struct {
 		Start _time
 		End   _time

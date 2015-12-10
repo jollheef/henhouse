@@ -33,6 +33,15 @@ var (
 	contestStatus string
 )
 
+var (
+	// InfoTimeout timeout between update info through websocket
+	InfoTimeout = time.Second
+	// ScoreboardTimeout timeout between update scoreboard through websocket
+	ScoreboardTimeout = time.Second
+	// TasksTimeout timeout between update tasks through websocket
+	TasksTimeout = time.Second
+)
+
 func durationToHMS(d time.Duration) string {
 
 	sec := int(d.Seconds())
@@ -92,7 +101,7 @@ func infoHandler(ws *websocket.Conn) {
 			return
 		}
 
-		time.Sleep(time.Second)
+		time.Sleep(InfoTimeout)
 	}
 }
 
@@ -126,7 +135,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 			}
 		}
 
-		time.Sleep(time.Second)
+		time.Sleep(ScoreboardTimeout)
 	}
 }
 
@@ -219,7 +228,7 @@ func tasksHandler(ws *websocket.Conn) {
 			}
 		}
 
-		time.Sleep(time.Second)
+		time.Sleep(TasksTimeout)
 	}
 }
 
