@@ -37,7 +37,7 @@ end = "Dec 31 23:59 2015"
 
 [Flag]
 # timeout between send flags
-send_timeout = "10s"
+send_timeout = "1s"
 
 [Task]
 # timeout after send correct flag before open next task

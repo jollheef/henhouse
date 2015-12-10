@@ -237,6 +237,12 @@ func main() {
 	}
 	log.Println("Update tasks timeout:", scoreboard.TasksTimeout)
 
+	flagSendD := cfg.Flag.SendTimeout.Duration
+	if flagSendD != 0 {
+		scoreboard.FlagTimeout = flagSendD
+	}
+	log.Println("Flag timeout:", scoreboard.FlagTimeout)
+
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
 	log.Println("Listen at", cfg.Scoreboard.Addr)
 	err = scoreboard.Scoreboard(database, &game, cfg.Scoreboard.WwwPath,

@@ -40,6 +40,8 @@ var (
 	ScoreboardTimeout = time.Second
 	// TasksTimeout timeout between update tasks through websocket
 	TasksTimeout = time.Second
+	// FlagTimeout timeout between send flags
+	FlagTimeout = time.Second
 )
 
 func durationToHMS(d time.Duration) string {
@@ -346,6 +348,8 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		solvedMsg = "Invalid flag"
 	}
+
+	time.Sleep(FlagTimeout)
 
 	fmt.Fprintf(w, `<!DOCTYPE html>
 <html class="full" lang="en">
