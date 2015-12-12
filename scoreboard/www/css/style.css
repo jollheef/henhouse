@@ -26,13 +26,9 @@ body {
     overflow: hidden;
 }
 
-#task {
+#task table {
     padding: 10px;
-    font-size: 155%;
-}
-
-p {
-    font-size: 155%;
+    font-size: 125%;
 }
 
 h1 {
