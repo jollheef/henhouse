@@ -15,6 +15,7 @@ import (
 	"errors"
 	"github.com/jollheef/henhouse/db"
 	"log"
+	"regexp"
 	"sort"
 	"sync"
 	"time"
@@ -420,9 +421,13 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 	for _, task := range tasks {
 		if task.ID == taskID {
 
-			if task.Flag == flag { // fix to regex
+			solved, err = regexp.MatchString("^"+task.Flag+"$", flag)
+			if err != nil {
+				log.Println("Match regex fail:", err)
+				return
+			}
 
-				solved = true
+			if solved {
 
 				if g.isTestTeam(teamID) {
 					return
