@@ -113,7 +113,7 @@ func (g Game) SetTaskPrice(p500, p400, p300, p200 int) {
 }
 
 // SetTeamsBase force set amount of teams for calc price task
-func (g Game) SetTeamsBase(teams int) {
+func (g *Game) SetTeamsBase(teams int) {
 	g.TaskPrice.TeamsBase = float64(teams)
 }
 
