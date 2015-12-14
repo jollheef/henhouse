@@ -34,6 +34,12 @@ var (
 	taskUpdateID  = taskUpdate.Arg("id", "ID of task.").Required().Int()
 	taskUpdateXML = taskUpdate.Arg("xml", "Path to xml.").Required().String()
 
+	taskOpen   = task.Command("open", "Open task.")
+	taskOpenID = taskOpen.Arg("id", "ID of task").Required().Int()
+
+	taskClose   = task.Command("close", "Close task.")
+	taskCloseID = taskClose.Arg("id", "ID of task").Required().Int()
+
 	// Category
 	category = kingpin.Command("category", "Work with categories.")
 
@@ -67,6 +73,7 @@ func taskRow(task db.Task, categories []db.Category) (row []string) {
 	row = append(row, task.Name)
 	row = append(row, getCategoryByID(task.CategoryID, categories))
 	row = append(row, task.Flag)
+	row = append(row, fmt.Sprintf("%v", task.Opened))
 	return
 }
 
@@ -160,13 +167,26 @@ func main() {
 		}
 
 		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name", "Category", "Flag"})
+		header := []string{"ID", "Name", "Category", "Flag", "Opened"}
+		table.SetHeader(header)
 
 		for _, task := range tasks {
 			table.Append(taskRow(task, categories))
 		}
 
 		table.Render()
+
+	case "task open":
+		err = db.SetOpened(database, *taskOpenID, true)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+
+	case "task close":
+		err = db.SetOpened(database, *taskCloseID, false)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
 
 	case "category add":
 		err = db.AddCategory(database, &db.Category{Name: *categoryName})
