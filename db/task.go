@@ -123,3 +123,50 @@ func SetOpened(db *sql.DB, taskID int, opened bool) (err error) {
 
 	return nil
 }
+
+// UpdateTask update task
+func UpdateTask(db *sql.DB, t *Task) (err error) {
+
+	stmt, err := db.Prepare("UPDATE task SET name=$1, description=$2, " +
+		"category_id=$3, level=$4, price=$5, shared=$6, flag=$7, " +
+		"max_share_price=$8, min_share_price=$9, opened=$10, " +
+		"author=$11, opened_time=$12 WHERE id=$13")
+	if err != nil {
+		return
+	}
+
+	defer stmt.Close()
+
+	_, err = stmt.Exec(t.Name, t.Desc, t.CategoryID, t.Level, t.Price,
+		t.Shared, t.Flag, t.MaxSharePrice, t.MinSharePrice, t.Opened,
+		t.Author, t.OpenedTime, t.ID)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// GetTask get task by id
+func GetTask(db *sql.DB, taskID int) (t Task, err error) {
+
+	stmt, err := db.Prepare("SELECT id, name, description, category_id, " +
+		"level, price, shared, flag, max_share_price, " +
+		"min_share_price, opened, author, opened_time " +
+		"FROM task WHERE id=$1")
+	if err != nil {
+		return
+	}
+
+	defer stmt.Close()
+
+	err = stmt.QueryRow(taskID).Scan(&t.ID, &t.Name, &t.Desc,
+		&t.CategoryID, &t.Level, &t.Price, &t.Shared, &t.Flag,
+		&t.MaxSharePrice, &t.MinSharePrice, &t.Opened,
+		&t.Author, &t.OpenedTime)
+	if err != nil {
+		return
+	}
+
+	return
+}
