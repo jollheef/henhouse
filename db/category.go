@@ -21,7 +21,7 @@ func createCategoryTable(db *sql.DB) (err error) {
 	_, err = db.Exec(`
 	CREATE TABLE IF NOT EXISTS "category" (
 		id	SERIAL PRIMARY KEY,
-		name	TEXT NOT NULL
+		name	TEXT NOT NULL UNIQUE
 	)`)
 
 	return
