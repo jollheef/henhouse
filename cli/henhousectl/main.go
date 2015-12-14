@@ -20,6 +20,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"sort"
 )
 
 var (
@@ -76,6 +77,12 @@ func taskRow(task db.Task, categories []db.Category) (row []string) {
 	row = append(row, fmt.Sprintf("%v", task.Opened))
 	return
 }
+
+type byID []db.Task
+
+func (t byID) Len() int           { return len(t) }
+func (t byID) Swap(i, j int)      { t[i], t[j] = t[j], t[i] }
+func (t byID) Less(i, j int) bool { return t[i].ID < t[j].ID }
 
 func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 
@@ -165,6 +172,8 @@ func main() {
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
+
+		sort.Sort(byID(tasks))
 
 		table := tablewriter.NewWriter(os.Stdout)
 		header := []string{"ID", "Name", "Category", "Flag", "Opened"}
