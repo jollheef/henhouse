@@ -99,7 +99,7 @@ func infoHandler(ws *websocket.Conn) {
 	for {
 		_, err := fmt.Fprint(ws, getInfo())
 		if err != nil {
-			log.Println("Socket closed:", err)
+			//log.Println("Socket closed:", err)
 			return
 		}
 
@@ -132,7 +132,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 
 			_, err := fmt.Fprint(ws, currentResult)
 			if err != nil {
-				log.Println("Socket closed:", err)
+				//log.Println("Socket closed:", err)
 				return
 			}
 		}
@@ -225,7 +225,7 @@ func tasksHandler(ws *websocket.Conn) {
 
 			_, err := fmt.Fprint(ws, currentTasks)
 			if err != nil {
-				log.Println("Socket closed:", err)
+				//log.Println("Socket closed:", err)
 				return
 			}
 		}
