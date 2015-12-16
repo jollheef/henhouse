@@ -11,6 +11,7 @@
 package main
 
 import (
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"github.com/jollheef/henhouse/config"
@@ -40,6 +41,9 @@ var (
 
 	taskClose   = task.Command("close", "Close task.")
 	taskCloseID = taskClose.Arg("id", "ID of task").Required().Int()
+
+	taskDump   = task.Command("dump", "Dump task to xml.")
+	taskDumpID = taskDump.Arg("id", "ID of task").Required().Int()
 
 	// Category
 	category = kingpin.Command("category", "Work with categories.")
@@ -196,6 +200,28 @@ func main() {
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
+
+	case "task dump":
+		task, err := db.GetTask(database, *taskDumpID)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+
+		xmlTask := config.Task{
+			Name:        task.Name,
+			Description: task.Desc,
+			Category:    getCategoryByID(task.CategoryID, categories),
+			Level:       task.Level,
+			Flag:        task.Flag,
+			Author:      task.Author,
+		}
+
+		output, err := xml.MarshalIndent(xmlTask, "", "	")
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+
+		os.Stdout.Write(output)
 
 	case "category add":
 		err = db.AddCategory(database, &db.Category{Name: *categoryName})
