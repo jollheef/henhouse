@@ -119,6 +119,8 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 	return
 }
 
+var cfgFiles = []string{"/etc/henhouse/cli.toml", "cli.toml", "henhouse.toml"}
+
 func main() {
 
 	kingpin.Parse()
@@ -128,7 +130,18 @@ func main() {
 	if *configPath != "" {
 		cfgPath = *configPath
 	} else {
-		cfgPath = "/etc/henhouse/cli.toml"
+
+		for _, cfgFile := range cfgFiles {
+			_, err := os.Stat(cfgFile)
+			if err == nil {
+				cfgPath = cfgFile
+				break
+			}
+		}
+	}
+
+	if cfgPath == "" {
+		log.Fatalln("Config not found")
 	}
 
 	cfg, err := config.ReadConfig(cfgPath)
