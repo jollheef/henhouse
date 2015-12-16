@@ -1,3 +1,16 @@
+/* from https://fonts.googleapis.com/css?family=Open+Sans */
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url(https://fonts.gstatic.com/s/opensans/v13/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+
+html *
+{
+    font-family: 'Open Sans', sans-serif !important;
+}
+
 body {
     margin-top: 50px;
     margin-bottom: 50px;
@@ -21,7 +34,7 @@ body {
     /* Fallback for web browsers that doesn't support RGBa */
     background: rgb(255, 255, 255);
     /* RGBa with 0.6 opacity */
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
     /* http://stackoverflow.com/questions/944663/css-background-color-has-no-effect-on-a-div */
     overflow: hidden;
 }
@@ -33,6 +46,7 @@ body {
 
 h1 {
     font-size: 350%;
+    text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
 }
 
 .input-group {
