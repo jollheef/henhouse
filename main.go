@@ -21,6 +21,7 @@ import (
 	"log"
 	"os"
 	"syscall"
+	"time"
 )
 
 var (
@@ -149,6 +150,12 @@ func main() {
 	var database *sql.DB
 
 	if *dbReinit {
+
+		if cfg.Database.SafeReinit {
+			if time.Now().After(cfg.Game.Start.Time) {
+				log.Fatalln("Reinit after start not allowed")
+			}
+		}
 
 		database, err = db.InitDatabase(cfg.Database.Connection)
 		if err != nil {
