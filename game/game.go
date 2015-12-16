@@ -433,6 +433,12 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 					return
 				}
 
+				var isSolv bool // if already solved
+				isSolv, err = db.IsSolved(g.db, teamID, taskID)
+				if isSolv {
+					return
+				}
+
 				now := time.Now()
 
 				if now.After(g.Start) && now.Before(g.End) {
