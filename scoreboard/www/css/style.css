@@ -37,6 +37,8 @@ body {
     background: rgba(255, 255, 255, 0.9);
     /* http://stackoverflow.com/questions/944663/css-background-color-has-no-effect-on-a-div */
     overflow: hidden;
+
+    padding: 10px;
 }
 
 #task table {
