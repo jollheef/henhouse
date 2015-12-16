@@ -52,6 +52,11 @@ var (
 
 	categoryAdd  = category.Command("add", "Add category.")
 	categoryName = categoryAdd.Arg("name", "Name.").Required().String()
+
+	// Team
+	team = kingpin.Command("team", "Work with teams.")
+
+	teamList = team.Command("list", "List teams.")
 )
 
 var (
@@ -269,6 +274,22 @@ func main() {
 
 		for _, cat := range categories {
 			row := []string{fmt.Sprintf("%d", cat.ID), cat.Name}
+			table.Append(row)
+		}
+
+		table.Render()
+
+	case "team list":
+		teams, err := db.GetTeams(database)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"ID", "Name"})
+
+		for _, t := range teams {
+			row := []string{fmt.Sprintf("%d", t.ID), t.Name}
 			table.Append(row)
 		}
 
