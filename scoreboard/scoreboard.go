@@ -350,6 +350,9 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 		solvedMsg = "Invalid flag"
 	}
 
+	log.Printf("Team ID: %d, Task ID: %d, Flag: %s, Result: %s\n",
+		teamID, taskID, flag, solvedMsg)
+
 	time.Sleep(FlagTimeout)
 
 	fmt.Fprintf(w, `<!DOCTYPE html>
