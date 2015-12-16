@@ -155,6 +155,11 @@ func main() {
 			log.Fatalln("Error:", err)
 		}
 
+		err = db.CleanDatabase(database)
+		if err != nil {
+			log.Fatalln("Error:", err)
+		}
+
 		defer database.Close()
 
 		err = reinitDatabase(database, cfg)
