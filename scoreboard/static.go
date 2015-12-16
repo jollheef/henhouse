@@ -40,6 +40,7 @@ func staticScoreboard(w http.ResponseWriter, r *http.Request) {
       </li>
       <li><a href="tasks.html">Tasks</a></li>
       <li><a href="news.html">News</a></li>
+      <li><a href="sponsors.html">Sponsors</a></li>
     </ul>
     <div style="padding: 15px;">
       <div id="info">%s</div>
@@ -76,6 +77,7 @@ func staticTasks(w http.ResponseWriter, r *http.Request) {
         <a href="#">Tasks</a>
       </li>
       <li><a href="news.html">News</a></li>
+      <li><a href="sponsors.html">Sponsors</a></li>
     </ul>
     <div style="padding: 15px;">
       <div id="info">

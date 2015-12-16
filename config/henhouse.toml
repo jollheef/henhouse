@@ -9,7 +9,7 @@ task_dir = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/config/tasks/"
 [Database]
 connection = "user=postgres dbname=henhouse sslmode=disable"
 max_connections = 90 # should be less than same value in postgresql.conf
-safe_reinit = true # disallow reinit after game start
+safe_reinit = false # disallow reinit after game start
 
 [Scoreboard]
 www_path = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/scoreboard/www"

@@ -301,6 +301,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
       <li><a href="index.html">Scoreboard</a></li>
       <li><a href="tasks.html">Tasks</a></li>
       <li><a href="news.html">News</a></li>
+      <li><a href="sponsors.html">Sponsors</a></li>
     </ul>
     <div class="page-header"><center><h1>%s</h1></center></div>
     <div style="padding: 15px;">
@@ -308,7 +309,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
         <div id="task">
           %s
           <br><br>
-          Author: %s
+          Автор: %s
           <br>
           %s
           <br>
@@ -368,6 +369,7 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
       <li><a href="index.html">Scoreboard</a></li>
       <li><a href="tasks.html">Tasks</a></li>
       <li><a href="news.html">News</a></li>
+      <li><a href="sponsors.html">Sponsors</a></li>
     </ul>
     <div class="page-header"><center><h1>%s</h1></center></div>
   </body>
@@ -399,6 +401,7 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 	handleStaticFileSimple("/js/scoreboard.js", wwwPath)
 	handleStaticFileSimple("/js/tasks.js", wwwPath)
 	handleStaticFileSimple("/news.html", wwwPath)
+	handleStaticFileSimple("/sponsors.html", wwwPath)
 	handleStaticFileSimple("/images/bg.jpg", wwwPath)
 	handleStaticFileSimple("/images/401.jpg", wwwPath)
 	handleStaticFileSimple("/images/juniors_ctf_txt.png", wwwPath)
