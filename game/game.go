@@ -255,6 +255,10 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 					return
 				}
 
+				if !task.Opened {
+					task.Desc = ""
+				}
+
 				tInfo := TaskInfo{
 					ID:         task.ID,
 					Name:       task.Name,

@@ -33,9 +33,12 @@ var (
 )
 
 var (
-	COMMIT_ID  string
-	BUILD_DATE string
-	BUILD_TIME string
+	// CommitID fill in ./build.sh
+	CommitID string
+	// BuildDate fill in ./build.sh
+	BuildDate string
+	// BuildTime fill in ./build.sh
+	BuildTime string
 )
 
 func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
@@ -129,11 +132,11 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 
 func main() {
 
-	if len(COMMIT_ID) > 7 {
-		COMMIT_ID = COMMIT_ID[:7] // abbreviated commit hash
+	if len(CommitID) > 7 {
+		CommitID = CommitID[:7] // abbreviated commit hash
 	}
 
-	version := BUILD_DATE + " " + COMMIT_ID +
+	version := BuildDate + " " + CommitID +
 		" (Mikhail Klementyev <jollheef@riseup.net>)"
 
 	kingpin.Version(version)

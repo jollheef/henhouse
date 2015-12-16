@@ -55,9 +55,12 @@ var (
 )
 
 var (
-	COMMIT_ID  string
-	BUILD_DATE string
-	BUILD_TIME string
+	// CommitID fill in ./build.sh
+	CommitID string
+	// BuildDate fill in ./build.sh
+	BuildDate string
+	// BuildTime fill in ./build.sh
+	BuildTime string
 )
 
 func getCategoryByID(categoryID int, categories []db.Category) string {
@@ -129,11 +132,11 @@ var cfgFiles = []string{"/etc/henhouse/cli.toml", "cli.toml", "henhouse.toml"}
 
 func main() {
 
-	if len(COMMIT_ID) > 7 {
-		COMMIT_ID = COMMIT_ID[:7] // abbreviated commit hash
+	if len(CommitID) > 7 {
+		CommitID = CommitID[:7] // abbreviated commit hash
 	}
 
-	kingpin.Version(BUILD_DATE + " " + COMMIT_ID +
+	kingpin.Version(BuildDate + " " + CommitID +
 		" (Mikhail Klementyev <jollheef@riseup.net>)")
 
 	kingpin.Parse()
