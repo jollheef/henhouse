@@ -114,6 +114,8 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("auth ip: %s, access_token: %s", r.RemoteAddr, token)
+
 	teamID, err := db.GetTeamIDByToken(database, token)
 	if err != nil {
 		fmt.Fprint(w, `<!DOCTYPE html><html><body>`+
@@ -127,6 +129,8 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 		log.Println("Set session id fail:", err)
 		return
 	}
+
+	log.Printf("Success auth ip: %s team ID: %d", r.RemoteAddr, teamID)
 
 	// Success auth
 	http.Redirect(w, r, "/", 303)
