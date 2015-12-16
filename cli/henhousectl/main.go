@@ -54,6 +54,12 @@ var (
 	categoryName = categoryAdd.Arg("name", "Name.").Required().String()
 )
 
+var (
+	COMMIT_ID  string
+	BUILD_DATE string
+	BUILD_TIME string
+)
+
 func getCategoryByID(categoryID int, categories []db.Category) string {
 	for _, cat := range categories {
 		if cat.ID == categoryID {
@@ -122,6 +128,13 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 var cfgFiles = []string{"/etc/henhouse/cli.toml", "cli.toml", "henhouse.toml"}
 
 func main() {
+
+	if len(COMMIT_ID) > 7 {
+		COMMIT_ID = COMMIT_ID[:7] // abbreviated commit hash
+	}
+
+	kingpin.Version(BUILD_DATE + " " + COMMIT_ID +
+		" (Mikhail Klementyev <jollheef@riseup.net>)")
 
 	kingpin.Parse()
 

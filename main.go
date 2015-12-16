@@ -12,6 +12,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"github.com/jollheef/henhouse/config"
 	"github.com/jollheef/henhouse/db"
 	"github.com/jollheef/henhouse/game"
@@ -29,6 +30,12 @@ var (
 		"Path to configuration file.").Required().String()
 
 	dbReinit = kingpin.Flag("reinit", "Reinit database.").Bool()
+)
+
+var (
+	COMMIT_ID  string
+	BUILD_DATE string
+	BUILD_TIME string
 )
 
 func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
@@ -122,7 +129,18 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 
 func main() {
 
+	if len(COMMIT_ID) > 7 {
+		COMMIT_ID = COMMIT_ID[:7] // abbreviated commit hash
+	}
+
+	version := BUILD_DATE + " " + COMMIT_ID +
+		" (Mikhail Klementyev <jollheef@riseup.net>)"
+
+	kingpin.Version(version)
+
 	kingpin.Parse()
+
+	fmt.Println(version)
 
 	cfg, err := config.ReadConfig(*configPath)
 	if err != nil {
@@ -136,6 +154,8 @@ func main() {
 	}
 	defer logFile.Close()
 	log.SetOutput(logFile)
+
+	log.Println(version)
 
 	var rlim syscall.Rlimit
 	err = syscall.Getrlimit(syscall.RLIMIT_NOFILE, &rlim)
