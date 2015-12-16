@@ -234,7 +234,7 @@ func main() {
 			log.Fatalln("Error:", err)
 		}
 
-		os.Stdout.Write(output)
+		fmt.Fprintln(os.Stdout, string(output))
 
 	case "category add":
 		err = db.AddCategory(database, &db.Category{Name: *categoryName})
