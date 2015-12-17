@@ -144,7 +144,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 func scoreboardHTML(teamID int) (result string) {
 
 	result = "<thead>" +
-		"<th>#</th>" + "<th>Team</th>" + "<th>Description</th>" +
+		"<th>#</th>" + "<th>Team</th>" +
 		"<th>Score</th>" +
 		"</thead>"
 
@@ -164,8 +164,8 @@ func scoreboardHTML(teamID int) (result string) {
 		}
 
 		result += fmt.Sprintf(
-			"<td>%d</td><td>%s</td><td>%s</td><td>%d</td></tr>",
-			n, teamScore.Name, teamScore.Desc, teamScore.Score)
+			"<td>%d</td><td>%s</td><td>%d</td></tr>",
+			n, teamScore.Name, teamScore.Score)
 
 	}
 

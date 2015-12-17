@@ -230,14 +230,7 @@ func TestScoreboard(*testing.T) {
 
 	originURL := "http://localhost/"
 
-	cats, err := game.Tasks()
-	if err != nil {
-		panic(err)
-	}
-
 	authEnabled = false
-
-	matchBody("http://"+addr+"/task?id=1", cats[0].TasksInfo[0].Desc)
 
 	// Invalid id => get the fu^W scoreboard
 	matchBody("http://"+addr+"/task?id=kekeke", "Scoreboard")
@@ -301,11 +294,11 @@ func TestScoreboard(*testing.T) {
 	testMatch("Team", string(msg))
 
 	for i := 1; i < nteams; i++ {
-		testMatch(fmt.Sprintf("<td>team%d</td><td>d</td><td>0</td>", i),
+		testMatch(fmt.Sprintf("<td>team%d</td><td>0</td>", i),
 			string(msg))
 	}
 
-	testMatch("<td>0</td><td>team0</td><td>d</td><td>500</td>", string(msg))
+	testMatch("<td>0</td><td>team0</td><td>500</td>", string(msg))
 
 	ws.Close()
 
