@@ -298,7 +298,7 @@ func TestScoreboard(*testing.T) {
 			string(msg))
 	}
 
-	testMatch("<td>0</td><td>team0</td><td>500</td>", string(msg))
+	testMatch("<td>1</td><td>team0</td><td>500</td>", string(msg))
 
 	ws.Close()
 

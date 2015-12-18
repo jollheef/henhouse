@@ -167,7 +167,7 @@ func scoreboardHTML(teamID int) (result string) {
 
 		result += fmt.Sprintf(
 			"<td>%d</td><td>%s</td><td>%d</td></tr>",
-			n, teamScore.Name, teamScore.Score)
+			n+1, teamScore.Name, teamScore.Score)
 
 	}
 
