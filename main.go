@@ -278,6 +278,12 @@ func main() {
 	}
 	log.Println("Flag timeout:", scoreboard.FlagTimeout)
 
+	scoreboardRecalcD := cfg.Scoreboard.RecalcTimeout.Duration
+	if scoreboardRecalcD != 0 {
+		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
+	}
+	log.Println("Score recalc timeout:", scoreboard.ScoreboardRecalcTimeout)
+
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
 	log.Println("Listen at", cfg.Scoreboard.Addr)
 	err = scoreboard.Scoreboard(database, &game, cfg.Scoreboard.WwwPath,

@@ -42,6 +42,8 @@ var (
 	TasksTimeout = time.Second
 	// FlagTimeout timeout between send flags
 	FlagTimeout = time.Second
+	// ScoreboardRecalcTimeout timeout between update scoreboard
+	ScoreboardRecalcTimeout = time.Second
 )
 
 func durationToHMS(d time.Duration) string {
@@ -397,7 +399,7 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 	contestStatus = contestStateNotAvailable
 	gameShim = game
 
-	go scoreboardUpdater(game, time.Second)
+	go scoreboardUpdater(game, ScoreboardRecalcTimeout)
 
 	// Static files
 	handleStaticFileSimple("/css/style.css", wwwPath)

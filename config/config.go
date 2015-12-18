@@ -31,8 +31,9 @@ type Config struct {
 	}
 
 	Scoreboard struct {
-		WwwPath string
-		Addr    string
+		WwwPath       string
+		Addr          string
+		RecalcTimeout _duration
 	}
 
 	WebsocketTimeout struct {
