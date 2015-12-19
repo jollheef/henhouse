@@ -45,7 +45,7 @@ func staticScoreboard(w http.ResponseWriter, r *http.Request) {
     <div style="padding: 15px;">
       <div id="info">%s</div>
       <br>
-      <center><table id="scoreboard-table" class="table table-hover h2">%s</table></center>
+      <center><table id="scoreboard-table" class="table table-hover h4">%s</table></center>
       <center><img id="juniorstext" src="/images/juniors_ctf_txt.png"></center>
     </div>
   </body>
