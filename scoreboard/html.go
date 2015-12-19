@@ -32,7 +32,7 @@ func taskToHTML(teamID int, task game.TaskInfo) (html string) {
 		buttonClass = "default"
 	}
 
-	html = fmt.Sprintf(`<p><button class="btn btn-%s btn-lg"`, buttonClass)
+	html = fmt.Sprintf(`<p><button class="btn btn-%s"`, buttonClass)
 
 	if task.Opened {
 		html += fmt.Sprintf(`title="%s" onclick="window.location=`+
