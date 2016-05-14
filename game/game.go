@@ -13,12 +13,13 @@ package game
 import (
 	"database/sql"
 	"errors"
-	"github.com/jollheef/henhouse/db"
 	"log"
 	"regexp"
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/jollheef/henhouse/db"
 )
 
 // Game struct
@@ -29,7 +30,7 @@ type Game struct {
 	OpenTimeout     time.Duration // after solve task
 	AutoOpen        bool
 	AutoOpenTimeout time.Duration // if task does not solved
-	scoreboardLock  sync.Mutex
+	scoreboardLock  *sync.Mutex
 	TaskPrice       struct {
 		TeamsBase              float64
 		P500, P400, P300, P200 float64
@@ -89,6 +90,8 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 	g.TaskPrice.P300 = 0.30
 	g.TaskPrice.P400 = 0.15
 	g.TaskPrice.P500 = 0.10
+
+	g.scoreboardLock = &sync.Mutex{}
 
 	tasks, err := db.GetTasks(g.db)
 	if err != nil {
