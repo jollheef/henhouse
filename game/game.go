@@ -290,6 +290,7 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 
 	g.scoreboardLock.Lock()
+	defer g.scoreboardLock.Unlock()
 
 	teams, err := db.GetTeams(g.db)
 	if err != nil {
@@ -314,8 +315,6 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 
 	sort.Sort(byScore(scores))
 
-	g.scoreboardLock.Unlock()
-
 	return
 }
 
@@ -323,6 +322,7 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 func (g Game) RecalcScoreboard() (err error) {
 
 	g.scoreboardLock.Lock()
+	defer g.scoreboardLock.Unlock()
 
 	teams, err := db.GetTeams(g.db)
 	if err != nil {
@@ -366,8 +366,6 @@ func (g Game) RecalcScoreboard() (err error) {
 			return
 		}
 	}
-
-	g.scoreboardLock.Unlock()
 
 	return
 }
