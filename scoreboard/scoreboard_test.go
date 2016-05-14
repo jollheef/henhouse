@@ -10,14 +10,15 @@ package scoreboard
 
 import (
 	"fmt"
-	"github.com/jollheef/henhouse/db"
-	"github.com/jollheef/henhouse/game"
-	"golang.org/x/net/websocket"
 	"io/ioutil"
 	"net/http"
 	"regexp"
 	"testing"
 	"time"
+
+	"github.com/jollheef/henhouse/db"
+	"github.com/jollheef/henhouse/game"
+	"golang.org/x/net/websocket"
 )
 
 const dbPath = "user=postgres dbname=henhouse_test sslmode=disable"
@@ -344,7 +345,7 @@ func TestScoreboard(*testing.T) {
 
 	ws.Close()
 
-	// Check availablity after close database
+	// Check availability after close database
 
 	database.Close()
 
