@@ -11,10 +11,11 @@ package game
 import (
 	"database/sql"
 	"fmt"
-	"github.com/jollheef/henhouse/db"
 	"log"
 	"testing"
 	"time"
+
+	"github.com/jollheef/henhouse/db"
 )
 
 const dbPath string = "user=postgres dbname=henhouse_test sslmode=disable"
@@ -89,6 +90,9 @@ func TestTasks(*testing.T) {
 	}
 
 	cats, err := game.Tasks()
+	if err != nil {
+		panic(err)
+	}
 
 	ntasksReal := 0
 

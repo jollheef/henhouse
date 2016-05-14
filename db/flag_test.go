@@ -201,6 +201,9 @@ func TestIsSolved(*testing.T) {
 		panic("Solved task unsolved")
 	}
 
+	if err != nil {
+		panic(err)
+	}
 }
 
 // Test is task solved with closed database
