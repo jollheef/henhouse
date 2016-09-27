@@ -245,6 +245,29 @@ func teamListCmd(database *sql.DB, categories []db.Category) (err error) {
 	return
 }
 
+func runCommandLine(database *sql.DB, categories []db.Category) (err error) {
+	switch kingpin.Parse() {
+	case "task update":
+		err = taskUpdateCmd(database, categories)
+	case "task list":
+		err = taskListCmd(database, categories)
+	case "task open":
+		err = db.SetOpened(database, *taskOpenID, true)
+	case "task close":
+		err = db.SetOpened(database, *taskCloseID, false)
+	case "task dump":
+		err = taskDumpCmd(database, categories)
+	case "category add":
+		err = db.AddCategory(database, &db.Category{Name: *categoryName})
+	case "category list":
+		err = categoryListCmd(database)
+	case "team list":
+		err = teamListCmd(database, categories)
+	}
+
+	return
+}
+
 func main() {
 
 	if len(CommitID) > 7 {
@@ -294,53 +317,8 @@ func main() {
 		log.Fatalln("Error:", err)
 	}
 
-	switch kingpin.Parse() {
-	case "task update":
-		err = taskUpdateCmd(database, categories)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-	case "task list":
-		err = taskListCmd(database, categories)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-	case "task open":
-		err = db.SetOpened(database, *taskOpenID, true)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-	case "task close":
-		err = db.SetOpened(database, *taskCloseID, false)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-	case "task dump":
-		err = taskDumpCmd(database, categories)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-	case "category add":
-		err = db.AddCategory(database, &db.Category{Name: *categoryName})
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-	case "category list":
-		err = categoryListCmd(database)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-	case "team list":
-		err = teamListCmd(database, categories)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
+	err = runCommandLine(database, categories)
+	if err != nil {
+		log.Fatalln("Error:", err)
 	}
 }
