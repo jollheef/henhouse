@@ -107,7 +107,7 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 }
 
 // SetTaskPrice convert and set price of tasks
-func (g Game) SetTaskPrice(p500, p400, p300, p200 int) {
+func (g *Game) SetTaskPrice(p500, p400, p300, p200 int) {
 	g.TaskPrice.P200 = float64(p200) / 100
 	g.TaskPrice.P300 = float64(p300) / 100
 	g.TaskPrice.P400 = float64(p400) / 100
