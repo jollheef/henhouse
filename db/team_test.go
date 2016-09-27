@@ -120,3 +120,32 @@ func TestFailGetTeams(*testing.T) {
 		panic(err)
 	}
 }
+
+func TestGetTeamIDByToken(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	token := "TOKEN_TOKEN_TOKEN"
+
+	team := Team{ID: 255, Name: "n", Email: "e", Desc: "d",
+		Token: token, Test: false}
+
+	err = AddTeam(db, &team)
+	if err != nil {
+		panic(err)
+	}
+
+	teamID, err := GetTeamIDByToken(db, token)
+	if err != nil {
+		panic(err)
+	}
+
+	if teamID != team.ID {
+		panic("team id mismatch")
+	}
+}
