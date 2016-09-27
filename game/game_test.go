@@ -294,7 +294,8 @@ func testSolveTask(database *sql.DB, game *Game, teamID, taskID int,
 		return
 	}
 	if !solved {
-		errors.New("solve task failed")
+		err = errors.New("solve task failed")
+		return
 	}
 
 	solved, err = db.IsSolved(database, teamID, taskID)
@@ -302,7 +303,8 @@ func testSolveTask(database *sql.DB, game *Game, teamID, taskID int,
 		return
 	}
 	if solved {
-		errors.New("task solved before game start")
+		err = errors.New("task solved before game start")
+		return
 	}
 
 	return
