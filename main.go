@@ -12,17 +12,19 @@ package main
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
-	"github.com/jollheef/henhouse/config"
-	"github.com/jollheef/henhouse/db"
-	"github.com/jollheef/henhouse/game"
-	"github.com/jollheef/henhouse/scoreboard"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"syscall"
 	"time"
+
+	"github.com/jollheef/henhouse/config"
+	"github.com/jollheef/henhouse/db"
+	"github.com/jollheef/henhouse/game"
+	"github.com/jollheef/henhouse/scoreboard"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
@@ -130,6 +132,94 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 	return
 }
 
+func initGame(database *sql.DB, cfg config.Config) (err error) {
+
+	log.Println("Start game at", cfg.Game.Start.Time)
+	log.Println("End game at", cfg.Game.End.Time)
+	game, err := game.NewGame(database, cfg.Game.Start.Time,
+		cfg.Game.End.Time)
+	if err != nil {
+		return
+	}
+
+	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
+		cfg.TaskPrice.P400 == 0 || cfg.TaskPrice.P500 == 0 {
+		err = errors.New("Error: Task price not setted")
+		return
+	}
+
+	fmt := "Set task price %d if solved less than %d%%\n"
+	log.Printf(fmt, 200, cfg.TaskPrice.P200)
+	log.Printf(fmt, 300, cfg.TaskPrice.P300)
+	log.Printf(fmt, 400, cfg.TaskPrice.P400)
+	log.Printf(fmt, 500, cfg.TaskPrice.P500)
+
+	game.SetTaskPrice(cfg.TaskPrice.P500, cfg.TaskPrice.P400,
+		cfg.TaskPrice.P300, cfg.TaskPrice.P200)
+
+	if cfg.TaskPrice.UseTeamsBase {
+		game.SetTeamsBase(cfg.TaskPrice.TeamsBase)
+		log.Println("Set teams base to", cfg.TaskPrice.TeamsBase)
+	} else {
+		log.Println("Use teams amount as teams base")
+	}
+
+	log.Println("Set task open timeout to", cfg.Task.OpenTimeout.Duration)
+	game.OpenTimeout = cfg.Task.OpenTimeout.Duration
+
+	if cfg.Task.AutoOpen {
+		log.Println("Auto open tasks after",
+			cfg.Task.AutoOpenTimeout.Duration)
+	} else {
+		log.Println("Auto open tasks disabled")
+	}
+
+	game.AutoOpen = cfg.Task.AutoOpen
+	game.AutoOpenTimeout = cfg.Task.AutoOpenTimeout.Duration
+
+	go game.Run()
+
+	infoD := cfg.WebsocketTimeout.Info.Duration
+	if infoD != 0 {
+		scoreboard.InfoTimeout = infoD
+	}
+	log.Println("Update info timeout:", scoreboard.InfoTimeout)
+
+	scoreboardD := cfg.WebsocketTimeout.Scoreboard.Duration
+	if scoreboardD != 0 {
+		scoreboard.ScoreboardTimeout = scoreboardD
+	}
+	log.Println("Update scoreboard timeout:", scoreboard.ScoreboardTimeout)
+
+	tasksD := cfg.WebsocketTimeout.Tasks.Duration
+	if tasksD != 0 {
+		scoreboard.TasksTimeout = tasksD
+	}
+	log.Println("Update tasks timeout:", scoreboard.TasksTimeout)
+
+	flagSendD := cfg.Flag.SendTimeout.Duration
+	if flagSendD != 0 {
+		scoreboard.FlagTimeout = flagSendD
+	}
+	log.Println("Flag timeout:", scoreboard.FlagTimeout)
+
+	scoreboardRecalcD := cfg.Scoreboard.RecalcTimeout.Duration
+	if scoreboardRecalcD != 0 {
+		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
+	}
+	log.Println("Score recalc timeout:", scoreboard.ScoreboardRecalcTimeout)
+
+	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
+	log.Println("Listen at", cfg.Scoreboard.Addr)
+	err = scoreboard.Scoreboard(database, &game, cfg.Scoreboard.WwwPath,
+		cfg.Scoreboard.Addr)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func main() {
 
 	if len(CommitID) > 7 {
@@ -210,84 +300,7 @@ func main() {
 	log.Println("Set max db connections to", cfg.Database.MaxConnections)
 	database.SetMaxOpenConns(cfg.Database.MaxConnections)
 
-	log.Println("Start game at", cfg.Game.Start.Time)
-	log.Println("End game at", cfg.Game.End.Time)
-	game, err := game.NewGame(database, cfg.Game.Start.Time,
-		cfg.Game.End.Time)
-	if err != nil {
-		log.Fatalln("Error:", err)
-	}
-
-	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
-		cfg.TaskPrice.P400 == 0 || cfg.TaskPrice.P500 == 0 {
-		log.Fatalln("Error: Task price not setted")
-	}
-
-	fmt := "Set task price %d if solved less than %d%%\n"
-	log.Printf(fmt, 200, cfg.TaskPrice.P200)
-	log.Printf(fmt, 300, cfg.TaskPrice.P300)
-	log.Printf(fmt, 400, cfg.TaskPrice.P400)
-	log.Printf(fmt, 500, cfg.TaskPrice.P500)
-
-	game.SetTaskPrice(cfg.TaskPrice.P500, cfg.TaskPrice.P400,
-		cfg.TaskPrice.P300, cfg.TaskPrice.P200)
-
-	if cfg.TaskPrice.UseTeamsBase {
-		game.SetTeamsBase(cfg.TaskPrice.TeamsBase)
-		log.Println("Set teams base to", cfg.TaskPrice.TeamsBase)
-	} else {
-		log.Println("Use teams amount as teams base")
-	}
-
-	log.Println("Set task open timeout to", cfg.Task.OpenTimeout.Duration)
-	game.OpenTimeout = cfg.Task.OpenTimeout.Duration
-
-	if cfg.Task.AutoOpen {
-		log.Println("Auto open tasks after",
-			cfg.Task.AutoOpenTimeout.Duration)
-	} else {
-		log.Println("Auto open tasks disabled")
-	}
-
-	game.AutoOpen = cfg.Task.AutoOpen
-	game.AutoOpenTimeout = cfg.Task.AutoOpenTimeout.Duration
-
-	go game.Run()
-
-	infoD := cfg.WebsocketTimeout.Info.Duration
-	if infoD != 0 {
-		scoreboard.InfoTimeout = infoD
-	}
-	log.Println("Update info timeout:", scoreboard.InfoTimeout)
-
-	scoreboardD := cfg.WebsocketTimeout.Scoreboard.Duration
-	if scoreboardD != 0 {
-		scoreboard.ScoreboardTimeout = scoreboardD
-	}
-	log.Println("Update scoreboard timeout:", scoreboard.ScoreboardTimeout)
-
-	tasksD := cfg.WebsocketTimeout.Tasks.Duration
-	if tasksD != 0 {
-		scoreboard.TasksTimeout = tasksD
-	}
-	log.Println("Update tasks timeout:", scoreboard.TasksTimeout)
-
-	flagSendD := cfg.Flag.SendTimeout.Duration
-	if flagSendD != 0 {
-		scoreboard.FlagTimeout = flagSendD
-	}
-	log.Println("Flag timeout:", scoreboard.FlagTimeout)
-
-	scoreboardRecalcD := cfg.Scoreboard.RecalcTimeout.Duration
-	if scoreboardRecalcD != 0 {
-		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
-	}
-	log.Println("Score recalc timeout:", scoreboard.ScoreboardRecalcTimeout)
-
-	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
-	log.Println("Listen at", cfg.Scoreboard.Addr)
-	err = scoreboard.Scoreboard(database, &game, cfg.Scoreboard.WwwPath,
-		cfg.Scoreboard.Addr)
+	err = initGame(database, cfg)
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
