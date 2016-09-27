@@ -10,6 +10,7 @@ package game
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"testing"
@@ -276,6 +277,26 @@ func fillTestDB(database *sql.DB, validFlag string) (err error) {
 	return
 }
 
+func testSolveTask(game *game.Game, teamID, taskID int,
+	validFlag string) (err error) {
+
+	solved, err := game.Solve(teamID, taskID, validFlag)
+	if err != nil {
+		return
+	}
+	if !solved {
+		errors.New("solve task failed")
+	}
+
+	solved, err = db.IsSolved(database, teamID, taskID)
+	if err != nil {
+		return
+	}
+	if solved {
+		errors.New("task solved before game start")
+	}
+}
+
 func TestSolve(*testing.T) {
 
 	database, err := db.InitDatabase(dbPath)
@@ -301,62 +322,25 @@ func TestSolve(*testing.T) {
 	}
 
 	// Try to solve task before game start
-
-	solved, err := game.Solve(1, 1, validFlag)
+	err = testSolveTask(game, 1, 1, validFlag)
 	if err != nil {
 		panic(err)
 	}
-	if !solved {
-		panic("solve task failed")
-	}
-
-	solved, err = db.IsSolved(database, 1, 1)
-	if err != nil {
-		panic(err)
-	}
-	if solved {
-		panic("task solved before game start")
-	}
-
 	time.Sleep(time.Second)
 
 	// Try to solve task after game start
-
-	solved, err = game.Solve(2, 2, validFlag)
+	err = testSolveTask(game, 2, 2, validFlag)
 	if err != nil {
 		panic(err)
 	}
-	if !solved {
-		panic("solve task failed")
-	}
-
-	solved, err = db.IsSolved(database, 2, 2)
-	if err != nil {
-		panic(err)
-	}
-	if !solved {
-		panic("task unsolved after game start")
-	}
-
 	time.Sleep(time.Second)
 
 	// Try to solve task after game end
-
-	solved, err = game.Solve(3, 3, validFlag)
+	err = testSolveTask(game, 3, 3, validFlag)
 	if err != nil {
 		panic(err)
 	}
-	if !solved {
-		panic("solve task failed")
-	}
-
-	solved, err = db.IsSolved(database, 3, 3)
-	if err != nil {
-		panic(err)
-	}
-	if solved {
-		panic("task solved after game end")
-	}
+	time.Sleep(time.Second)
 }
 
 func TestFirstOpen(*testing.T) {
