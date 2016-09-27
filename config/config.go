@@ -11,9 +11,10 @@
 package config
 
 import (
-	"github.com/naoina/toml"
 	"io/ioutil"
 	"os"
+
+	"github.com/naoina/toml"
 )
 
 // Config is a configuration of henhouse

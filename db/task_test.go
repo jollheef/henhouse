@@ -50,8 +50,8 @@ func TestAddTask(*testing.T) {
 	}
 }
 
-// Test add task with closed database
-func TestFailAddTask(*testing.T) {
+// Test work with task at closed database
+func TestOnClosedDatabase(*testing.T) {
 
 	db, err := InitDatabase(dbPath)
 	if err != nil {
@@ -61,6 +61,21 @@ func TestFailAddTask(*testing.T) {
 	db.Close()
 
 	err = AddTask(db, &Task{})
+	if err == nil {
+		panic(err)
+	}
+
+	err = UpdateTask(db, &Task{})
+	if err == nil {
+		panic(err)
+	}
+
+	_, err = GetTask(db, 0)
+	if err == nil {
+		panic(err)
+	}
+
+	err = SetOpened(db, 0, false)
 	if err == nil {
 		panic(err)
 	}
