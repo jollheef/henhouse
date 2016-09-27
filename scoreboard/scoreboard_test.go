@@ -339,7 +339,8 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 		return
 	}
 	if !solved {
-		errors.New("solve task failed")
+		err = errors.New("solve task failed")
+		return
 	}
 
 	time.Sleep(time.Second)
