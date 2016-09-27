@@ -12,6 +12,7 @@ package db
 
 import (
 	"database/sql"
+
 	_ "github.com/lib/pq" // import postgresql db engine
 )
 
@@ -125,10 +126,7 @@ func InitDatabase(path string) (db *sql.DB, err error) {
 		return
 	}
 
-	err = dropSchema(db)
-	if err != nil {
-		// No schema not good, but ok
-	}
+	dropSchema(db) // No error checking because no schema not good, but ok
 
 	err = createSchema(db)
 	if err != nil {
