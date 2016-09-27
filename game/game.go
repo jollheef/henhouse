@@ -143,6 +143,10 @@ func (g Game) Run() (err error) {
 		}
 	}
 
+	if !g.AutoOpen {
+		return
+	}
+
 	go func() {
 		for {
 			time.Sleep(time.Second)
