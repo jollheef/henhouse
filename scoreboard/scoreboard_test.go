@@ -229,49 +229,8 @@ func checkAvailability(database *sql.DB, scoreboardURL, originURL,
 	return
 }
 
-func TestScoreboard(*testing.T) {
-
-	database, err := db.InitDatabase(dbPath)
-	if err != nil {
-		panic(err)
-	}
-
-	defer database.Close()
-
-	validFlag := "testflag"
-
-	nteams := 20
-	ncategories := 5
-	ntasks := 5
-
-	err = addTestData(database, nteams, ncategories, ntasks, validFlag)
-	if err != nil {
-		panic(err)
-	}
-
-	start := time.Now()
-	end := start.Add(time.Hour)
-
-	game, err := game.NewGame(database, start, end)
-	if err != nil {
-		panic(err)
-	}
-
-	addr := "localhost:8080"
-
-	err = game.Run()
-	if err != nil {
-		panic(err)
-	}
-
-	go func() {
-		err = Scoreboard(database, &game, "", addr)
-		if err != nil {
-			panic(err)
-		}
-	}()
-
-	time.Sleep(time.Second) // wait for start listening
+func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
+	nteams, ncategories, ntasks int) (err error) {
 
 	originURL := "http://localhost/"
 
@@ -396,6 +355,59 @@ func TestScoreboard(*testing.T) {
 	time.Sleep(time.Second * 2)
 
 	err = checkAvailability(database, scoreboardURL, originURL, infoURL)
+	if err != nil {
+		panic(err)
+	}
+
+	return
+}
+
+func TestScoreboard(*testing.T) {
+
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer database.Close()
+
+	validFlag := "testflag"
+
+	nteams := 20
+	ncategories := 5
+	ntasks := 5
+
+	err = addTestData(database, nteams, ncategories, ntasks, validFlag)
+	if err != nil {
+		panic(err)
+	}
+
+	start := time.Now()
+	end := start.Add(time.Hour)
+
+	game, err := game.NewGame(database, start, end)
+	if err != nil {
+		panic(err)
+	}
+
+	addr := "localhost:8080"
+
+	err = game.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	go func() {
+		err = Scoreboard(database, &game, "", addr)
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	time.Sleep(time.Second) // wait for start listening
+
+	err = checkScoreboard(database, &game,
+		addr, validFlag, nteams, ncategories, ntasks)
 	if err != nil {
 		panic(err)
 	}
