@@ -10,6 +10,7 @@ package config
 
 import (
 	"errors"
+	"io/ioutil"
 	"testing"
 )
 
@@ -43,5 +44,20 @@ func TestFailReadConfig(*testing.T) {
 	_, err := ReadConfig("/dev/ololo/pewpew")
 	if err == nil {
 		panic(errors.New("Ok read non exist config"))
+	}
+}
+
+func TestReadInvalidConfig(*testing.T) {
+
+	configPath := "/tmp/invalid-config"
+
+	err := ioutil.WriteFile(configPath, []byte("non toml blabla%%["), 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = ReadConfig(configPath)
+	if err == nil {
+		panic(errors.New("Ok read invalid config"))
 	}
 }
