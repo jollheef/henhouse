@@ -396,3 +396,77 @@ func TestFirstOpen(*testing.T) {
 		}
 	}
 }
+
+func initGame(teamID, taskID int, flag string) (database *sql.DB, game Game) {
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	err = fillTestDB(database, flag)
+	if err != nil {
+		panic(err)
+	}
+
+	start := time.Now().Add(time.Second)
+	end := start.Add(time.Second)
+
+	game, err = NewGame(database, start, end)
+	if err != nil {
+		panic(err)
+	}
+
+	game.SetTeamsBase(5)
+
+	return
+}
+
+func TestTaskPriceDefaultValues(*testing.T) {
+	teamID := 1
+	taskID := 1
+	validFlag := "testflag"
+
+	database, game := initGame(teamID, taskID, validFlag)
+	defer database.Close()
+
+	game.Run()
+
+	game.Solve(teamID, taskID, validFlag)
+	game.Solve(teamID, taskID, validFlag)
+	game.Solve(teamID, taskID, validFlag)
+
+	price, err := game.taskPrice(database, taskID)
+	if err != nil {
+		panic(err)
+	}
+
+	if price != 300 {
+		panic("price mismatch")
+	}
+}
+
+func TestTaskPriceFixedValues(*testing.T) {
+	teamID := 1
+	taskID := 1
+	validFlag := "testflag"
+
+	database, game := initGame(teamID, taskID, validFlag)
+	defer database.Close()
+
+	game.SetTaskPrice(100, 100, 100, 100)
+
+	game.Run()
+
+	game.Solve(teamID, taskID, validFlag)
+	game.Solve(teamID, taskID, validFlag)
+	game.Solve(teamID, taskID, validFlag)
+
+	price, err := game.taskPrice(database, taskID)
+	if err != nil {
+		panic(err)
+	}
+
+	if price != 500 { // max
+		panic("price mismatch")
+	}
+}
