@@ -15,10 +15,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"regexp"
 	"testing"
 	"time"
 
+	"github.com/gorilla/context"
 	"github.com/jollheef/henhouse/db"
 	"github.com/jollheef/henhouse/game"
 	"golang.org/x/net/websocket"
@@ -452,6 +454,8 @@ func TestTaskHandler(*testing.T) {
 		panic(err)
 	}
 
+	context.Set(r, contextTeamIDName, 1)
+
 	taskHandler(w, r)
 
 	if w.Code != http.StatusTemporaryRedirect {
@@ -469,6 +473,69 @@ func TestTaskHandler(*testing.T) {
 	w = httptest.NewRecorder()
 
 	taskHandler(w, r)
+
+	if w.Code != http.StatusOK {
+		panic("wrong status")
+	}
+}
+
+func TestFlagHandler(*testing.T) {
+	database := testDB()
+	defer database.Close()
+
+	// 1
+	r := httptest.NewRequest("POST", "http://localhost/?id=1", nil)
+	w := httptest.NewRecorder()
+
+	start := time.Now()
+	end := start.Add(time.Hour)
+
+	game, err := game.NewGame(database, start, end)
+	if err != nil {
+		panic(err)
+	}
+
+	flagHandler(w, r)
+
+	if w.Code != http.StatusOK {
+		panic("wrong status")
+	}
+
+	// 2
+	r = httptest.NewRequest("GET", "http://localhost/?id=1", nil)
+	w = httptest.NewRecorder()
+
+	flagHandler(w, r)
+
+	if w.Code != http.StatusTemporaryRedirect {
+		panic("wrong status")
+	}
+
+	// 3
+	r = httptest.NewRequest("POST", "http://localhost/?id=NOT_INTEGER", nil)
+	w = httptest.NewRecorder()
+
+	flagHandler(w, r)
+
+	if w.Code != http.StatusTemporaryRedirect {
+		panic("wrong status")
+	}
+
+	// 4
+	err = game.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	gameShim = &game
+
+	r = httptest.NewRequest("POST", "http://localhost/?id=1", nil)
+	w = httptest.NewRecorder()
+
+	r.Form = url.Values{}
+	r.Form.Set("flag", "testFlag") // correct flag, see auth.go
+
+	flagHandler(w, r)
 
 	if w.Code != http.StatusOK {
 		panic("wrong status")
