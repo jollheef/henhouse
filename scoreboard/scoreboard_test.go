@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"regexp"
 	"testing"
 	"time"
@@ -433,5 +434,43 @@ func TestScoreboard(*testing.T) {
 		addr, validFlag, nteams, ncategories, ntasks)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func TestTaskHandler(*testing.T) {
+	database := testDB()
+	defer database.Close()
+
+	r := httptest.NewRequest("POST", "http://localhost/?id=1", nil)
+	w := httptest.NewRecorder()
+
+	start := time.Now()
+	end := start.Add(time.Hour)
+
+	game, err := game.NewGame(database, start, end)
+	if err != nil {
+		panic(err)
+	}
+
+	taskHandler(w, r)
+
+	if w.Code != http.StatusTemporaryRedirect {
+		panic("wrong status")
+	}
+
+	err = game.Run()
+	if err != nil {
+		panic(err)
+	}
+
+	gameShim = &game
+
+	r = httptest.NewRequest("POST", "http://localhost/?id=1", nil)
+	w = httptest.NewRecorder()
+
+	taskHandler(w, r)
+
+	if w.Code != http.StatusOK {
+		panic("wrong status")
 	}
 }
