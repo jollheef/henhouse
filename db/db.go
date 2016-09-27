@@ -20,44 +20,29 @@ import (
 var tables = [...]string{"category", "flag", "score", "session", "task", "team"}
 
 // Create tables
-func createSchema(db *sql.DB) (err error) {
+func createSchema(db *sql.DB) error {
 
-	_, err = db.Exec("CREATE SCHEMA IF NOT EXISTS public")
+	_, err := db.Exec("CREATE SCHEMA IF NOT EXISTS public")
 	if err != nil {
-		return
+		return err
 	}
 
-	err = createCategoryTable(db)
-	if err != nil {
-		return
+	var errs []error
+
+	errs = append(errs, createCategoryTable(db))
+	errs = append(errs, createFlagTable(db))
+	errs = append(errs, createScoreTable(db))
+	errs = append(errs, createSessionTable(db))
+	errs = append(errs, createTaskTable(db))
+	errs = append(errs, createTeamTable(db))
+
+	for _, e := range errs {
+		if e != nil {
+			return e
+		}
 	}
 
-	err = createFlagTable(db)
-	if err != nil {
-		return
-	}
-
-	err = createScoreTable(db)
-	if err != nil {
-		return
-	}
-
-	err = createSessionTable(db)
-	if err != nil {
-		return
-	}
-
-	err = createTaskTable(db)
-	if err != nil {
-		return
-	}
-
-	err = createTeamTable(db)
-	if err != nil {
-		return
-	}
-
-	return
+	return nil
 }
 
 // OpenDatabase need defer db.Close() after open
