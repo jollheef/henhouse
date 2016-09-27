@@ -9,6 +9,7 @@
 package scoreboard
 
 import (
+	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -148,18 +149,8 @@ func matchBody(url, pattern string) {
 	testMatch(pattern, string(body))
 }
 
-func TestScoreboard(*testing.T) {
-
-	database, err := db.InitDatabase(dbPath)
-	if err != nil {
-		panic(err)
-	}
-
-	defer database.Close()
-
-	validFlag := "testflag"
-
-	nteams := 20
+func addTestData(database *sql.DB, nteams, ncategories, ntasks int,
+	validFlag string) (err error) {
 
 	for i := 0; i < nteams; i++ {
 
@@ -172,18 +163,14 @@ func TestScoreboard(*testing.T) {
 		}
 	}
 
-	ncategories := 5
-
 	for i := 0; i < ncategories; i++ {
 
 		category := db.Category{Name: fmt.Sprintf("category%d", i)}
 
 		err = db.AddCategory(database, &category)
 		if err != nil {
-			panic(err)
+			return
 		}
-
-		ntasks := 5
 
 		for i := 0; i < ntasks; i++ {
 
@@ -200,9 +187,66 @@ func TestScoreboard(*testing.T) {
 
 			err = db.AddTask(database, &task)
 			if err != nil {
-				panic(err)
+				return
 			}
 		}
+	}
+
+	return
+}
+
+func checkAvailability(database *sql.DB, scoreboardURL, originURL,
+	infoURL string) (err error) {
+
+	var msg = make([]byte, 4096)
+
+	ws, err := websocket.Dial(scoreboardURL, "", originURL)
+	if err != nil {
+		return
+	}
+
+	if _, err = ws.Read(msg); err != nil {
+		return
+	}
+
+	testMatch("Team", string(msg))
+
+	ws.Close()
+
+	ws, err = websocket.Dial(infoURL, "", originURL)
+	if err != nil {
+		return
+	}
+
+	if _, err = ws.Read(msg); err != nil {
+		return
+	}
+
+	testMatch(contestRunning, string(msg))
+
+	ws.Close()
+
+	return
+}
+
+func TestScoreboard(*testing.T) {
+
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer database.Close()
+
+	validFlag := "testflag"
+
+	nteams := 20
+	ncategories := 5
+	ntasks := 5
+
+	err = addTestData(database, nteams, ncategories, ntasks, validFlag)
+	if err != nil {
+		panic(err)
 	}
 
 	start := time.Now()
@@ -351,29 +395,8 @@ func TestScoreboard(*testing.T) {
 
 	time.Sleep(time.Second * 2)
 
-	ws, err = websocket.Dial(scoreboardURL, "", originURL)
+	err = checkAvailability(database, scoreboardURL, originURL, infoURL)
 	if err != nil {
 		panic(err)
 	}
-
-	if _, err = ws.Read(msg); err != nil {
-		panic(err)
-	}
-
-	testMatch("Team", string(msg))
-
-	ws.Close()
-
-	ws, err = websocket.Dial(infoURL, "", originURL)
-	if err != nil {
-		panic(err)
-	}
-
-	if _, err = ws.Read(msg); err != nil {
-		panic(err)
-	}
-
-	testMatch(contestRunning, string(msg))
-
-	ws.Close()
 }
