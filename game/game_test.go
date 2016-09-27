@@ -299,11 +299,8 @@ func testSolveTask(database *sql.DB, game *Game, teamID, taskID int,
 	}
 
 	solved, err = db.IsSolved(database, teamID, taskID)
-	if err != nil {
-		return
-	}
-	if solved {
-		err = errors.New("task solved before game start")
+	if !solved {
+		err = errors.New("is solved task check failed: unsolved")
 		return
 	}
 
@@ -336,8 +333,8 @@ func TestSolve(*testing.T) {
 
 	// Try to solve task before game start
 	err = testSolveTask(database, &game, 1, 1, validFlag)
-	if err != nil {
-		panic(err)
+	if err == nil {
+		panic("task solved before game start")
 	}
 	time.Sleep(time.Second)
 
@@ -350,8 +347,8 @@ func TestSolve(*testing.T) {
 
 	// Try to solve task after game end
 	err = testSolveTask(database, &game, 3, 3, validFlag)
-	if err != nil {
-		panic(err)
+	if err == nil {
+		panic("task solved after game end")
 	}
 	time.Sleep(time.Second)
 }
