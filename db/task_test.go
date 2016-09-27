@@ -170,3 +170,66 @@ func TestSetOpened(*testing.T) {
 		panic("closed task opened")
 	}
 }
+
+func TestUpdateTask(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	taskName := "__rand_task_100"
+
+	task := Task{ID: 255, Name: taskName}
+
+	err = AddTask(db, &task)
+	if err != nil {
+		panic(err)
+	}
+
+	newTaskName := "100__rand_task"
+
+	err = UpdateTask(db, &Task{ID: task.ID, Name: newTaskName})
+	if err != nil {
+		panic(err)
+	}
+
+	t, err := GetTask(db, task.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	if t.Name != newTaskName {
+		panic("invalid task name")
+	}
+}
+
+func TestGetTask(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	taskName := "__rand_task_1"
+
+	task := Task{ID: 255, Name: taskName}
+
+	err = AddTask(db, &task)
+	if err != nil {
+		panic(err)
+	}
+
+	t, err := GetTask(db, task.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	if t.Name != taskName {
+		panic("invalid task name")
+	}
+}
