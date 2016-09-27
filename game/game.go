@@ -12,7 +12,6 @@ package game
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 	"regexp"
 	"sort"
@@ -118,20 +117,6 @@ func (g Game) SetTaskPrice(p500, p400, p300, p200 int) {
 // SetTeamsBase force set amount of teams for calc price task
 func (g *Game) SetTeamsBase(teams int) {
 	g.TaskPrice.TeamsBase = float64(teams)
-}
-
-func (g Game) findTaskByID(id int, tasks []db.Task) (t db.Task, err error) {
-
-	for _, task := range tasks {
-		if task.ID == id {
-			t = task
-			return
-		}
-	}
-
-	err = errors.New("task no found")
-
-	return
 }
 
 // Run open first level tasks and start auto open routine
