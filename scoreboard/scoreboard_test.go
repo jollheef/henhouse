@@ -477,6 +477,16 @@ func TestTaskHandler(*testing.T) {
 	if w.Code != http.StatusOK {
 		panic("wrong status")
 	}
+
+	// 5*5 == 25 => 20 is closed task because it at 4-5 level
+	r = httptest.NewRequest("POST", "http://localhost/?id=20", nil)
+	w = httptest.NewRecorder()
+
+	taskHandler(w, r)
+
+	if w.Code != http.StatusTemporaryRedirect {
+		panic("wrong status")
+	}
 }
 
 func TestFlagHandler(*testing.T) {
