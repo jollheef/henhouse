@@ -118,18 +118,8 @@ func TestTasks(*testing.T) {
 	}
 }
 
-func TestScoreboard(*testing.T) {
-
-	database, err := db.InitDatabase(dbPath)
-	if err != nil {
-		panic(err)
-	}
-
-	defer database.Close()
-
-	validFlag := "testflag"
-
-	nteams := 20
+func addTestData(database *sql.DB, nteams, ncategories, ntasks int,
+	validFlag string) (err error) {
 
 	for i := 0; i < nteams; i++ {
 
@@ -138,11 +128,9 @@ func TestScoreboard(*testing.T) {
 
 		err = db.AddTeam(database, &team)
 		if err != nil {
-			panic(err)
+			return (err)
 		}
 	}
-
-	ncategories := 5
 
 	for i := 0; i < ncategories; i++ {
 
@@ -150,10 +138,8 @@ func TestScoreboard(*testing.T) {
 
 		err = db.AddCategory(database, &category)
 		if err != nil {
-			panic(err)
+			return
 		}
-
-		ntasks := 5
 
 		for i := 0; i < ntasks; i++ {
 
@@ -171,9 +157,32 @@ func TestScoreboard(*testing.T) {
 
 			err = db.AddTask(database, &task)
 			if err != nil {
-				panic(err)
+				return
 			}
 		}
+	}
+
+	return
+}
+
+func TestScoreboard(*testing.T) {
+
+	database, err := db.InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer database.Close()
+
+	validFlag := "testflag"
+
+	nteams := 20
+	ncategories := 5
+	ntasks := 5
+
+	err = addTestData(database, nteams, ncategories, ntasks, validFlag)
+	if err != nil {
+		panic(err)
 	}
 
 	game, err := NewGame(database, time.Now().Add(time.Second),
@@ -277,7 +286,7 @@ func fillTestDB(database *sql.DB, validFlag string) (err error) {
 	return
 }
 
-func testSolveTask(game *game.Game, teamID, taskID int,
+func testSolveTask(database *sql.DB, game *Game, teamID, taskID int,
 	validFlag string) (err error) {
 
 	solved, err := game.Solve(teamID, taskID, validFlag)
@@ -295,6 +304,8 @@ func testSolveTask(game *game.Game, teamID, taskID int,
 	if solved {
 		errors.New("task solved before game start")
 	}
+
+	return
 }
 
 func TestSolve(*testing.T) {
@@ -322,21 +333,21 @@ func TestSolve(*testing.T) {
 	}
 
 	// Try to solve task before game start
-	err = testSolveTask(game, 1, 1, validFlag)
+	err = testSolveTask(database, &game, 1, 1, validFlag)
 	if err != nil {
 		panic(err)
 	}
 	time.Sleep(time.Second)
 
 	// Try to solve task after game start
-	err = testSolveTask(game, 2, 2, validFlag)
+	err = testSolveTask(database, &game, 2, 2, validFlag)
 	if err != nil {
 		panic(err)
 	}
 	time.Sleep(time.Second)
 
 	// Try to solve task after game end
-	err = testSolveTask(game, 3, 3, validFlag)
+	err = testSolveTask(database, &game, 3, 3, validFlag)
 	if err != nil {
 		panic(err)
 	}
