@@ -59,8 +59,6 @@ func TestSessionTeamID(*testing.T) {
 	req := &http.Request{Header: http.Header{
 		"Cookie": w.HeaderMap["Set-Cookie"]}}
 
-	// set cookie to request
-
 	teamID, err := getSessionTeamID(database, req)
 	if err != nil {
 		panic(err)
