@@ -470,3 +470,51 @@ func TestTaskPriceFixedValues(*testing.T) {
 		panic("price mismatch")
 	}
 }
+
+func TestAutoOpenTimeoutDisabled(*testing.T) {
+	database, game := initGame(0, 0, "")
+	defer database.Close()
+
+	game.AutoOpen = false
+	game.AutoOpenTimeout = time.Nanosecond
+
+	game.Run()
+
+	time.Sleep(time.Second * 2)
+
+	tasks, err := db.GetTasks(database)
+	if err != nil {
+		return
+	}
+
+	for _, t := range tasks {
+		if t.Level > 1 && t.Opened {
+			panic("auto open disabled but level >1 opened")
+		} else if t.Level == 1 && !t.Opened {
+			panic("level one not opened")
+		}
+	}
+}
+
+func TestAutoOpenTimeoutEnabled(*testing.T) {
+	database, game := initGame(0, 0, "")
+	defer database.Close()
+
+	game.AutoOpen = true
+	game.AutoOpenTimeout = time.Nanosecond
+
+	game.Run()
+
+	time.Sleep(time.Second * 2)
+
+	tasks, err := db.GetTasks(database)
+	if err != nil {
+		return
+	}
+
+	for _, t := range tasks {
+		if (t.Level == 1 || t.Level == 2) && !t.Opened {
+			panic("levels 1, 2 not opened")
+		}
+	}
+}
