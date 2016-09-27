@@ -246,6 +246,42 @@ func solveTasks(game *game.Game, validFlag string, start, end int) (err error) {
 	return
 }
 
+func checkTasksPage(addr, originURL string) (err error) {
+	var msg = make([]byte, 4096)
+
+	tasksInfoURL := "ws://" + addr + "/tasks"
+
+	ws, err := websocket.Dial(tasksInfoURL, "", originURL)
+	if err != nil {
+		return
+	}
+
+	if _, err = ws.Read(msg); err != nil {
+		return
+	}
+
+	testMatch("category", string(msg))
+
+	ws.Close()
+
+	tasksURL := "ws://" + addr + "/info"
+
+	ws, err = websocket.Dial(tasksURL, "", originURL)
+	if err != nil {
+		return
+	}
+
+	if _, err = ws.Read(msg); err != nil {
+		return
+	}
+
+	testMatch(contestRunning, string(msg))
+
+	ws.Close()
+
+	return
+}
+
 func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 	nteams, ncategories, ntasks int) (err error) {
 
@@ -267,12 +303,12 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 
 	ws, err := websocket.Dial(infoURL, "", originURL)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	var msg = make([]byte, 4096)
 	if _, err = ws.Read(msg); err != nil {
-		panic(err)
+		return
 	}
 
 	testMatch(contestRunning, string(msg))
@@ -285,11 +321,11 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 
 	ws, err = websocket.Dial(scoreboardURL, "", originURL)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	if _, err = ws.Read(msg); err != nil {
-		panic(err)
+		return
 	}
 
 	testMatch("Team", string(msg))
@@ -300,16 +336,16 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 
 	solved, err := game.Solve(1, 1, validFlag)
 	if err != nil {
-		panic(err)
+		return
 	}
 	if !solved {
-		panic("solve task failed")
+		errors.New("solve task failed")
 	}
 
 	time.Sleep(time.Second)
 
 	if _, err = ws.Read(msg); err != nil {
-		panic(err)
+		return
 	}
 
 	testMatch("Team", string(msg))
@@ -325,39 +361,14 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 
 	err = solveTasks(game, validFlag, 10, 15)
 	if err != nil {
-		panic(err)
+		return
 	}
 
-	// tasks page
-	tasksInfoURL := "ws://" + addr + "/tasks"
-
-	ws, err = websocket.Dial(tasksInfoURL, "", originURL)
+	// Chech tasks page
+	err = checkTasksPage(addr, originURL)
 	if err != nil {
-		panic(err)
+		return
 	}
-
-	if _, err = ws.Read(msg); err != nil {
-		panic(err)
-	}
-
-	testMatch("category", string(msg))
-
-	ws.Close()
-
-	tasksURL := "ws://" + addr + "/info"
-
-	ws, err = websocket.Dial(tasksURL, "", originURL)
-	if err != nil {
-		panic(err)
-	}
-
-	if _, err = ws.Read(msg); err != nil {
-		panic(err)
-	}
-
-	testMatch(contestRunning, string(msg))
-
-	ws.Close()
 
 	// Check availability after close database
 
@@ -367,7 +378,7 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 
 	err = checkAvailability(database, scoreboardURL, originURL, infoURL)
 	if err != nil {
-		panic(err)
+		return
 	}
 
 	return
