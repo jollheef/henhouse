@@ -12,10 +12,11 @@ import (
 	"crypto/rand"
 	"database/sql"
 	"fmt"
-	"github.com/gorilla/context"
-	"github.com/jollheef/henhouse/db"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/context"
+	"github.com/jollheef/henhouse/db"
 )
 
 const (
@@ -118,6 +119,7 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 
 	teamID, err := db.GetTeamIDByToken(database, token)
 	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, `<!DOCTYPE html><html><body>`+
 			`<img src="/images/401.jpg">`+
 			`</body></html>`)
