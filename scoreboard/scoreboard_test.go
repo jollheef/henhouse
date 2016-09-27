@@ -10,6 +10,7 @@ package scoreboard
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -229,6 +230,22 @@ func checkAvailability(database *sql.DB, scoreboardURL, originURL,
 	return
 }
 
+func solveTasks(game *game.Game, validFlag string, start, end int) (err error) {
+	var solved bool
+	for i := start; i < end; i++ {
+		solved, err = game.Solve(i, i, validFlag)
+		if err != nil {
+			return
+		}
+		if !solved {
+			err = errors.New("solve task failed")
+			return
+		}
+		time.Sleep(time.Second)
+	}
+	return
+}
+
 func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 	nteams, ncategories, ntasks int) (err error) {
 
@@ -306,15 +323,9 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 
 	ws.Close()
 
-	for i := 10; i < 15; i++ {
-		solved, err = game.Solve(i, i, validFlag)
-		if err != nil {
-			panic(err)
-		}
-		if !solved {
-			panic("solve task failed")
-		}
-		time.Sleep(time.Second)
+	err = solveTasks(game, validFlag, 10, 15)
+	if err != nil {
+		panic(err)
 	}
 
 	// tasks page
