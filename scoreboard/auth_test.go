@@ -10,7 +10,6 @@ package scoreboard
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -120,5 +119,39 @@ func TestAuthHandlerWithWrongToken(*testing.T) {
 
 	authHandler(database, w, r)
 
-	log.Println(w.Code)
+	if w.Code != http.StatusUnauthorized {
+		panic("wrong status")
+	}
+}
+
+func TestLogonLogout(*testing.T) {
+
+	database := testDB()
+	defer database.Close()
+
+	r := httptest.NewRequest("POST", "http://localhost", nil)
+	w := httptest.NewRecorder()
+
+	r.Form = url.Values{}
+	r.Form.Set("token", "l") // TODO Fix hardcoded valid token
+
+	authHandler(database, w, r)
+
+	if w.Code != http.StatusSeeOther { // success
+		panic("wrong status")
+	}
+
+	r2 := httptest.NewRequest("POST", "http://localhost", nil)
+	r2.Header = http.Header{"Cookie": w.HeaderMap["Set-Cookie"]}
+	w2 := httptest.NewRecorder()
+
+	logoutHandler(w2, r2)
+
+	if w2.Code != http.StatusTemporaryRedirect {
+		panic("wrong status")
+	}
+
+	if w2.HeaderMap["Set-Cookie"][0] != "session=" { // empty session
+		panic("logout does not remove cookies")
+	}
 }
