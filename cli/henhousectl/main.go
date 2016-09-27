@@ -11,17 +11,19 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/jollheef/henhouse/config"
-	"github.com/jollheef/henhouse/db"
-	"github.com/olekukonko/tablewriter"
-	"gopkg.in/alecthomas/kingpin.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"sort"
+
+	"github.com/jollheef/henhouse/config"
+	"github.com/jollheef/henhouse/db"
+	"github.com/olekukonko/tablewriter"
+	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
 
 var (
@@ -135,6 +137,114 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 
 var cfgFiles = []string{"/etc/henhouse/cli.toml", "cli.toml", "henhouse.toml"}
 
+func taskUpdateCmd(database *sql.DB, categories []db.Category) (err error) {
+	task, err := db.GetTask(database, *taskUpdateID)
+	if err != nil {
+		return
+	}
+
+	id := task.ID
+
+	task, err = parseTask(*taskUpdateXML, categories)
+	if err != nil {
+		return
+	}
+
+	task.ID = id
+
+	err = db.UpdateTask(database, &task)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func taskListCmd(database *sql.DB, categories []db.Category) (err error) {
+	tasks, err := db.GetTasks(database)
+	if err != nil {
+		return
+	}
+
+	sort.Sort(byID(tasks))
+
+	table := tablewriter.NewWriter(os.Stdout)
+	header := []string{"ID", "Name", "Category", "Flag", "Opened"}
+	table.SetHeader(header)
+
+	for _, task := range tasks {
+		table.Append(taskRow(task, categories))
+	}
+
+	table.Render()
+
+	return
+}
+
+func taskDumpCmd(database *sql.DB, categories []db.Category) (err error) {
+	task, err := db.GetTask(database, *taskDumpID)
+	if err != nil {
+		return
+	}
+
+	xmlTask := config.Task{
+		Name:        task.Name,
+		Description: task.Desc,
+		Category:    getCategoryByID(task.CategoryID, categories),
+		Level:       task.Level,
+		Flag:        task.Flag,
+		Author:      task.Author,
+	}
+
+	output, err := xml.MarshalIndent(xmlTask, "", "	")
+	if err != nil {
+		return
+
+	}
+
+	fmt.Fprintln(os.Stdout, string(output))
+
+	return
+}
+
+func categoryListCmd(database *sql.DB) (err error) {
+	categories, err := db.GetCategories(database)
+	if err != nil {
+		return
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Name"})
+
+	for _, cat := range categories {
+		row := []string{fmt.Sprintf("%d", cat.ID), cat.Name}
+		table.Append(row)
+	}
+
+	table.Render()
+
+	return
+}
+
+func teamListCmd(database *sql.DB, categories []db.Category) (err error) {
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"ID", "Name"})
+
+	for _, t := range teams {
+		row := []string{fmt.Sprintf("%d", t.ID), t.Name}
+		table.Append(row)
+	}
+
+	table.Render()
+
+	return
+}
+
 func main() {
 
 	if len(CommitID) > 7 {
@@ -186,42 +296,16 @@ func main() {
 
 	switch kingpin.Parse() {
 	case "task update":
-		task, err := db.GetTask(database, *taskUpdateID)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-		id := task.ID
-
-		task, err = parseTask(*taskUpdateXML, categories)
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-		task.ID = id
-
-		err = db.UpdateTask(database, &task)
+		err = taskUpdateCmd(database, categories)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
 
 	case "task list":
-		tasks, err := db.GetTasks(database)
+		err = taskListCmd(database, categories)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
-
-		sort.Sort(byID(tasks))
-
-		table := tablewriter.NewWriter(os.Stdout)
-		header := []string{"ID", "Name", "Category", "Flag", "Opened"}
-		table.SetHeader(header)
-
-		for _, task := range tasks {
-			table.Append(taskRow(task, categories))
-		}
-
-		table.Render()
 
 	case "task open":
 		err = db.SetOpened(database, *taskOpenID, true)
@@ -236,26 +320,10 @@ func main() {
 		}
 
 	case "task dump":
-		task, err := db.GetTask(database, *taskDumpID)
+		err = taskDumpCmd(database, categories)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
-
-		xmlTask := config.Task{
-			Name:        task.Name,
-			Description: task.Desc,
-			Category:    getCategoryByID(task.CategoryID, categories),
-			Level:       task.Level,
-			Flag:        task.Flag,
-			Author:      task.Author,
-		}
-
-		output, err := xml.MarshalIndent(xmlTask, "", "	")
-		if err != nil {
-			log.Fatalln("Error:", err)
-		}
-
-		fmt.Fprintln(os.Stdout, string(output))
 
 	case "category add":
 		err = db.AddCategory(database, &db.Category{Name: *categoryName})
@@ -264,35 +332,15 @@ func main() {
 		}
 
 	case "category list":
-		categories, err := db.GetCategories(database)
+		err = categoryListCmd(database)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
-
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name"})
-
-		for _, cat := range categories {
-			row := []string{fmt.Sprintf("%d", cat.ID), cat.Name}
-			table.Append(row)
-		}
-
-		table.Render()
 
 	case "team list":
-		teams, err := db.GetTeams(database)
+		err = teamListCmd(database, categories)
 		if err != nil {
 			log.Fatalln("Error:", err)
 		}
-
-		table := tablewriter.NewWriter(os.Stdout)
-		table.SetHeader([]string{"ID", "Name"})
-
-		for _, t := range teams {
-			row := []string{fmt.Sprintf("%d", t.ID), t.Name}
-			table.Append(row)
-		}
-
-		table.Render()
 	}
 }
