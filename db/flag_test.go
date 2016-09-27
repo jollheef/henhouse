@@ -241,3 +241,36 @@ func TestFailIsSolved2(*testing.T) {
 		panic("Unsolved task solved")
 	}
 }
+
+func TestGetSolvedBy(*testing.T) {
+
+	db, err := InitDatabase(dbPath)
+	if err != nil {
+		panic(err)
+	}
+
+	defer db.Close()
+
+	teamID := 10
+	taskID := 15
+
+	flag := Flag{TeamID: teamID, TaskID: taskID, Solved: true}
+
+	err = AddFlag(db, &flag)
+	if err != nil {
+		panic(err)
+	}
+
+	teamIDs, err := GetSolvedBy(db, taskID)
+	if err != nil {
+		panic(err)
+	}
+
+	if len(teamIDs) != 1 {
+		panic("legnth of solved by mismatch")
+	}
+
+	if teamIDs[0] != teamID {
+		panic("team id mismatch")
+	}
+}
