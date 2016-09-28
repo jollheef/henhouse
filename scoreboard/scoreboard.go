@@ -434,10 +434,5 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 
 	log.Println("Launching scoreboard at", addr)
 
-	err = http.ListenAndServe(addr, nil)
-	if err != nil {
-		return
-	}
-
-	return
+	return http.ListenAndServe(addr, nil)
 }
