@@ -11,9 +11,9 @@ cd ${RUNDIR}
 BUILD_DATE=`date -u +%d.%m.%Y`
 BUILD_TIME=`date -u +%H:%M:%S`
 
-LDFLAGS="-X main.CommitID ${COMMIT_ID}"
-LDFLAGS+=" -X main.BuildDate ${BUILD_DATE}"
-LDFLAGS+=" -X main.BuildTime ${BUILD_TIME}"
+LDFLAGS="-X main.CommitID=${COMMIT_ID}"
+LDFLAGS+=" -X main.BuildDate=${BUILD_DATE}"
+LDFLAGS+=" -X main.BuildTime=${BUILD_TIME}"
 
 mkdir -p ${GOPATH}/bin
 
