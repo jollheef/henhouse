@@ -1,0 +1,20 @@
+diff --git a/main.go b/main.go
+index c3faaf2..86edd8f 100644
+--- a/main.go
++++ b/main.go
+@@ -24,6 +24,7 @@ import (
+ 	"github.com/jollheef/henhouse/db"
+ 	"github.com/jollheef/henhouse/game"
+ 	"github.com/jollheef/henhouse/scoreboard"
++	"github.com/pkg/profile"
+ 	kingpin "gopkg.in/alecthomas/kingpin.v2"
+ )
+ 
+@@ -221,6 +222,7 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
+ }
+ 
+ func main() {
++	defer profile.Start().Stop()
+ 
+ 	if len(CommitID) > 7 {
+ 		CommitID = CommitID[:7] // abbreviated commit hash
