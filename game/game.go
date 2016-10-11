@@ -415,7 +415,7 @@ func (g Game) Solve(teamID, taskID int, flag string) (solved bool, err error) {
 	for _, task := range tasks {
 		if task.ID == taskID {
 
-			solved, err = regexp.MatchString("^"+task.Flag+"$", flag)
+			solved, err = regexp.MatchString("^("+task.Flag+")$", flag)
 			if err != nil {
 				log.Println("Match regex fail:", err)
 				return
