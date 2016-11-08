@@ -276,9 +276,9 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 
 	flagSubmitFormat := `<br>` +
 		`<form class="input-group" action="/flag?id=%d" method="post">` +
-		`<input class="form-control" name="flag" value="" placeholder="Flag">` +
+		`<input class="form-control float-left" name="flag" value="" placeholder="Flag">` +
 		`<span class="input-group-btn">` +
-		`<button class="btn btn-default">Submit</button>` +
+		`<button class="btn btn-submit">Submit</button>` +
 		`</span>` +
 		`</form>`
 
@@ -292,34 +292,36 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `<!DOCTYPE html>
 <html class="full" lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="images/favicon.png" type="image/png">
     <title>Juniors CTF</title>
 
-    <link rel="stylesheet" href="https://bootswatch.com/yeti/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css" class="--apng-checked">
+    
+    <script type="text/javascript" src="js/scoreboard.js"></script>
 
   </head>
   <body>
-    <ul class="nav nav-tabs h4">
-      <li><a href="index.html">Scoreboard</a></li>
-      <li><a href="tasks.html">Tasks</a></li>
-      <li><a href="news.html">News</a></li>
-      <li><a href="sponsors.html">Sponsors</a></li>
+    <ul id="header">
+      <li class="header_link"><a href="scoreboard.html">Scoreboard</a></li>
+      <li class="header_link"><a href="tasks.html">Tasks</a></li>
+      <li class="header_link"><a href="news.html">News</a></li>
+      <li class="header_link"><a href="sponsors.html">Sponsors</a></li>
+      <li id="info"></li>
     </ul>
-    <div class="page-header"><center><h1>%s</h1></center></div>
-    <div style="padding: 15px;">
-      <center>
-        <div id="task">
+    <div id="content">
+      <div id="white_block">
+	<div id="task_header">%s</div>
+        %s
+        <br>
+	%s<br><br>
+	<div id="task_footer">
           %s
-          <br><br>
-          Автор: %s
-          <br>
-          %s
-          <br>
-        </div>
-      </center>
+	</div>
+      </div>
     </div>
   </body>
 </html>`, task.Name, task.Desc, task.Author, submitForm)
