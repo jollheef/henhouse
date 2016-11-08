@@ -350,9 +350,9 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 
 	var solvedMsg string
 	if solved {
-		solvedMsg = "Solved"
+		solvedMsg = `<div class="flag_status solved">Solved</div>`
 	} else {
-		solvedMsg = "Invalid flag"
+		solvedMsg = `<div class="flag_status invalid">Invalid flag</div>`
 	}
 
 	log.Printf("Team ID: %d, Task ID: %d, Flag: %s, Result: %s\n",
@@ -363,23 +363,27 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `<!DOCTYPE html>
 <html class="full" lang="en">
   <head>
-    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="images/favicon.png" type="image/png">
     <title>Juniors CTF</title>
 
-    <link rel="stylesheet" href="https://bootswatch.com/yeti/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css" class="--apng-checked">
+    
+    <script type="text/javascript" src="js/scoreboard.js"></script>
 
   </head>
   <body>
-    <ul class="nav nav-tabs h4">
-      <li><a href="index.html">Scoreboard</a></li>
-      <li><a href="tasks.html">Tasks</a></li>
-      <li><a href="news.html">News</a></li>
-      <li><a href="sponsors.html">Sponsors</a></li>
+    <ul id="header">
+      <li class="header_link"><a href="scoreboard.html">Scoreboard</a></li>
+      <li class="header_link"><a href="tasks.html">Tasks</a></li>
+      <li class="header_link"><a href="news.html">News</a></li>
+      <li class="header_link"><a href="sponsors.html">Sponsors</a></li>
+      <li id="info"></li>
     </ul>
-    <div class="page-header"><center><h1>%s</h1></center></div>
+    <div id="content">%s</div>
   </body>
 </html>`, solvedMsg)
 }
