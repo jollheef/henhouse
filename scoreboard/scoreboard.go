@@ -417,6 +417,8 @@ func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
 	handleStaticFileSimple("/news.html", wwwPath)
 	handleStaticFileSimple("/sponsors.html", wwwPath)
 	handleStaticFileSimple("/images/bg.jpg", wwwPath)
+	handleStaticFileSimple("/images/favicon.ico", wwwPath)
+	handleStaticFileSimple("/images/favicon.png", wwwPath)
 	handleStaticFileSimple("/images/401.jpg", wwwPath)
 	handleStaticFileSimple("/images/juniors_ctf_txt.png", wwwPath)
 	handleStaticFileSimple("/auth.html", wwwPath)
