@@ -121,7 +121,7 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		fmt.Fprint(w, `<!DOCTYPE html><html><body>`+
-			`<img src="/images/401.jpg">`+
+			`<div style="text-align: center;"><img src="/images/401.jpg"></div>`+
 			`</body></html>`)
 		return
 	}
