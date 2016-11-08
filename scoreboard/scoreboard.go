@@ -13,12 +13,13 @@ package scoreboard
 import (
 	"database/sql"
 	"fmt"
-	"github.com/jollheef/henhouse/game"
-	"golang.org/x/net/websocket"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/jollheef/henhouse/game"
+	"golang.org/x/net/websocket"
 )
 
 const (
@@ -70,25 +71,25 @@ func getInfo() string {
 
 		contestStatus = contestNotStarted
 		left = gameShim.Start.Sub(now)
-		btnType = "warning"
+		btnType = "stop"
 
 	} else if now.Before(gameShim.End) {
 
 		contestStatus = contestRunning
 		left = gameShim.End.Sub(now)
-		btnType = "success"
+		btnType = "run"
 
 	} else {
 		contestStatus = contestCompleted
 		left = 0
-		btnType = "primary"
+		btnType = "stop"
 	}
 
-	info := fmt.Sprintf(`<span class="btn btn-%s">contest %s</span>`,
+	info := fmt.Sprintf(`<span id="game_status-%s">contest %s</span>`,
 		btnType, contestStatus)
 
 	if left != 0 {
-		info += fmt.Sprintf(`<span class="btn btn-info">Left %s</span>`,
+		info += fmt.Sprintf(`<span id="timer">Left %s</span>`,
 			durationToHMS(left))
 	}
 
@@ -166,7 +167,9 @@ func scoreboardHTML(teamID int) (result string) {
 		}
 
 		result += fmt.Sprintf(
-			"<td>%d</td><td>%s</td><td>%d</td></tr>",
+			`<td class="team_index">%d</td>`+
+				`<td class="team_name">%s</td>`+
+				`<td class="team_score">%d</td></tr>`,
 			n+1, teamScore.Name, teamScore.Score)
 
 	}
