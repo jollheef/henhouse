@@ -355,11 +355,11 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 	testMatch("Team", string(msg))
 
 	for i := 1; i < nteams; i++ {
-		testMatch(fmt.Sprintf("<td>team%d</td><td>0</td>", i),
+		testMatch(fmt.Sprintf("<td.*>team%d</td.*><td.*>0</td>", i),
 			string(msg))
 	}
 
-	testMatch("<td>1</td><td>team0</td><td>500</td>", string(msg))
+	testMatch("<td.*>1</td><td.*>team0</td><td.*>500</td>", string(msg))
 
 	ws.Close()
 

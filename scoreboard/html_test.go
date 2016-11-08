@@ -9,16 +9,17 @@
 package scoreboard
 
 import (
-	"github.com/jollheef/henhouse/game"
 	"testing"
+
+	"github.com/jollheef/henhouse/game"
 )
 
 func TestTaskToHTML(*testing.T) {
 	html := taskToHTML(1, game.TaskInfo{})
-	testMatch("Task is closed", html)
+	testMatch("closed", html)
 
 	html = taskToHTML(1, game.TaskInfo{Opened: true})
-	testNotMatch("Task is closed", html)
+	testNotMatch("closed", html)
 }
 
 func TestCategoryToHTML(*testing.T) {
@@ -29,5 +30,5 @@ func TestCategoryToHTML(*testing.T) {
 
 	html := categoryToHTML(0, cat)
 
-	testMatch("Task is closed", html)
+	testMatch("closed", html)
 }
