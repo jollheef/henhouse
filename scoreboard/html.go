@@ -10,6 +10,7 @@ package scoreboard
 
 import (
 	"fmt"
+
 	"github.com/jollheef/henhouse/game"
 )
 
@@ -24,27 +25,31 @@ func taskSolvedBy(task game.TaskInfo, teamID int) bool {
 
 func taskToHTML(teamID int, task game.TaskInfo) (html string) {
 
-	buttonClass := "primary"
+	buttonClass := "closed"
 
 	if len(task.SolvedBy) == 0 && task.Opened {
-		buttonClass = "warning"
+		buttonClass = "opened"
 	} else if taskSolvedBy(task, teamID) {
-		buttonClass = "default"
+		buttonClass = "success"
 	}
-
-	html = fmt.Sprintf(`<p><button class="btn btn-%s"`, buttonClass)
 
 	if task.Opened {
-		html += fmt.Sprintf(`title="%s" onclick="window.location=`+
-			`'task?id=%d';">%d. %s `,
-			task.Name, task.ID, task.Price, task.Name)
+		html = fmt.Sprintf(`<a href="/task?id=%d" `+
+			`class="task_block task_block-%s">`,
+			task.ID, buttonClass)
 	} else {
-		html += fmt.Sprintf(`disabled="disabled" `+
-			`title="Task is closed">%d. %s`,
-			task.Price, task.Name)
+		html = fmt.Sprintf(`<a class="task_block task_block-%s">`, buttonClass)
 	}
 
-	html += "</button></p>"
+	html += fmt.Sprintf(`
+          <div class="task_block-header">
+	    <span class="task_block-name">%s</span>
+	  </div>
+	  <div class="task_block-body">%d</div>
+	  <div class="task_block-footer">
+	    <span class="task_block-tags">%s</span>
+	  </div>
+	</a>`, task.Name, task.Price, "todo tags")
 
 	return
 }
