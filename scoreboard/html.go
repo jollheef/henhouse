@@ -56,8 +56,7 @@ func taskToHTML(teamID int, task game.TaskInfo) (html string) {
 
 func categoryToHTML(teamID int, category game.CategoryInfo) (html string) {
 
-	html = fmt.Sprintf(`<div class="col-xs-3"> <h1>%s</h1> `,
-		category.Name)
+	html = `<div class="col-xs-3">`
 
 	for _, task := range category.TasksInfo {
 		html += taskToHTML(teamID, task)

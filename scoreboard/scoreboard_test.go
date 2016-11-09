@@ -263,7 +263,8 @@ func checkTasksPage(addr, originURL string) (err error) {
 		return
 	}
 
-	testMatch("category", string(msg))
+	// not required if category not shown
+	//testMatch("category", string(msg))
 
 	ws.Close()
 
