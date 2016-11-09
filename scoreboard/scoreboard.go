@@ -293,14 +293,14 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 <html class="full" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="images/favicon.png" type="image/png">
     <title>Juniors CTF</title>
 
     <link rel="stylesheet" href="css/style.css" class="--apng-checked">
-    
+
     <script type="text/javascript" src="js/scoreboard.js"></script>
 
   </head>
@@ -313,15 +313,17 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
       <li id="info"></li>
     </ul>
     <div id="content">
-      <div id="white_block">
-	<div id="task_header">%s</div>
-        %s
-        <br>
-	%s<br><br>
-	<div id="task_footer">
+      <center>
+        <div id="white_block">
+          <div id="task_header">%s</div>
           %s
-	</div>
-      </div>
+          <br>
+          %s<br><br>
+          <div id="task_footer">
+            %s
+          </div>
+        </div>
+      </center>
     </div>
   </body>
 </html>`, task.Name, task.Desc, task.Author, submitForm)
