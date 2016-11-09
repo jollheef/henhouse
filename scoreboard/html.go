@@ -49,7 +49,7 @@ func taskToHTML(teamID int, task game.TaskInfo) (html string) {
 	  <div class="task_block-footer">
 	    <span class="task_block-tags">%s</span>
 	  </div>
-	</a>`, task.Name, task.Price, "todo tags")
+	</a>`, task.Name, task.Price, task.Tags)
 
 	return
 }

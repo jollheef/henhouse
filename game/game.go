@@ -41,6 +41,7 @@ type TaskInfo struct {
 	ID         int
 	Name       string
 	Desc       string
+	Tags       string
 	Author     string
 	Price      int
 	Opened     bool
@@ -255,6 +256,7 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 					ID:         task.ID,
 					Name:       task.Name,
 					Desc:       task.Desc,
+					Tags:       task.Tags,
 					Price:      price,
 					Opened:     task.Opened,
 					SolvedBy:   solvedBy,

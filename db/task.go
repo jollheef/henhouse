@@ -18,6 +18,7 @@ type Task struct {
 	ID            int
 	Name          string
 	Desc          string
+	Tags          string
 	CategoryID    int
 	Level         int
 	Price         int
@@ -37,6 +38,7 @@ func createTaskTable(db *sql.DB) (err error) {
 		id		SERIAL PRIMARY KEY,
 		name		TEXT NOT NULL,
 		description	TEXT NOT NULL,
+		tags		TEXT NOT NULL,
 		category_id	INTEGER NOT NULL,
 		level		INTEGER NOT NULL,
 		price		INTEGER NOT NULL,
@@ -55,19 +57,19 @@ func createTaskTable(db *sql.DB) (err error) {
 // AddTask add task and fill id
 func AddTask(db *sql.DB, t *Task) (err error) {
 
-	stmt, err := db.Prepare("INSERT INTO task (name, description, " +
+	stmt, err := db.Prepare("INSERT INTO task (name, description, tags, " +
 		"category_id, level, price, shared, flag, max_share_price, " +
 		"min_share_price, opened, author, opened_time) " +
 		"VALUES ($1, $2, $3, $4, " +
-		"$5, $6, $7, $8, $9, $10, $11, $12) RETURNING id")
+		"$5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id")
 	if err != nil {
 		return
 	}
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(t.Name, t.Desc, t.CategoryID, t.Level, t.Price,
-		t.Shared, t.Flag, t.MaxSharePrice, t.MinSharePrice,
+	err = stmt.QueryRow(t.Name, t.Desc, t.Tags, t.CategoryID, t.Level,
+		t.Price, t.Shared, t.Flag, t.MaxSharePrice, t.MinSharePrice,
 		t.Opened, t.Author, t.OpenedTime).Scan(&t.ID)
 	if err != nil {
 		return
@@ -79,7 +81,7 @@ func AddTask(db *sql.DB, t *Task) (err error) {
 // GetTasks get all tasks in tasks table
 func GetTasks(db *sql.DB) (tasks []Task, err error) {
 
-	rows, err := db.Query("SELECT id, name, description, category_id, " +
+	rows, err := db.Query("SELECT id, name, description, tags, category_id, " +
 		"level, price, shared, flag, max_share_price, " +
 		"min_share_price, opened, author, opened_time FROM task")
 	if err != nil {
@@ -91,7 +93,7 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 	for rows.Next() {
 		var t Task
 
-		err = rows.Scan(&t.ID, &t.Name, &t.Desc, &t.CategoryID,
+		err = rows.Scan(&t.ID, &t.Name, &t.Desc, &t.Tags, &t.CategoryID,
 			&t.Level, &t.Price, &t.Shared, &t.Flag,
 			&t.MaxSharePrice, &t.MinSharePrice, &t.Opened,
 			&t.Author, &t.OpenedTime)
@@ -128,16 +130,16 @@ func SetOpened(db *sql.DB, taskID int, opened bool) (err error) {
 func UpdateTask(db *sql.DB, t *Task) (err error) {
 
 	stmt, err := db.Prepare("UPDATE task SET name=$1, description=$2, " +
-		"category_id=$3, level=$4, price=$5, shared=$6, flag=$7, " +
-		"max_share_price=$8, min_share_price=$9, opened=$10, " +
-		"author=$11, opened_time=$12 WHERE id=$13")
+		"tags=$3, category_id=$4, level=$5, price=$6, shared=$7, flag=$8, " +
+		"max_share_price=$9, min_share_price=$10, opened=$11, " +
+		"author=$12, opened_time=$13 WHERE id=$14")
 	if err != nil {
 		return
 	}
 
 	defer stmt.Close()
 
-	_, err = stmt.Exec(t.Name, t.Desc, t.CategoryID, t.Level, t.Price,
+	_, err = stmt.Exec(t.Name, t.Desc, t.Tags, t.CategoryID, t.Level, t.Price,
 		t.Shared, t.Flag, t.MaxSharePrice, t.MinSharePrice, t.Opened,
 		t.Author, t.OpenedTime, t.ID)
 	if err != nil {
@@ -150,7 +152,7 @@ func UpdateTask(db *sql.DB, t *Task) (err error) {
 // GetTask get task by id
 func GetTask(db *sql.DB, taskID int) (t Task, err error) {
 
-	stmt, err := db.Prepare("SELECT id, name, description, category_id, " +
+	stmt, err := db.Prepare("SELECT id, name, description, tags, category_id, " +
 		"level, price, shared, flag, max_share_price, " +
 		"min_share_price, opened, author, opened_time " +
 		"FROM task WHERE id=$1")
@@ -160,7 +162,7 @@ func GetTask(db *sql.DB, taskID int) (t Task, err error) {
 
 	defer stmt.Close()
 
-	err = stmt.QueryRow(taskID).Scan(&t.ID, &t.Name, &t.Desc,
+	err = stmt.QueryRow(taskID).Scan(&t.ID, &t.Name, &t.Desc, &t.Tags,
 		&t.CategoryID, &t.Level, &t.Price, &t.Shared, &t.Flag,
 		&t.MaxSharePrice, &t.MinSharePrice, &t.Opened,
 		&t.Author, &t.OpenedTime)

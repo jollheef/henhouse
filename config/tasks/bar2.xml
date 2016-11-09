@@ -1,6 +1,7 @@
 <Task>
   <Name>bar2</Name>                           <!--отображаемое имя-->
   <description>bar2 description</description> <!--описание-->
+  <Tags>forensic ppc</Tags>                   <!--тэги-->
   <Category>bar</Category>                    <!--категория с учетом регистра-->
   <Level>2</Level>                            <!--последовательность при открытии-->
   <Flag>test</Flag>                           <!--флаг (строка или регулярным выражением)-->

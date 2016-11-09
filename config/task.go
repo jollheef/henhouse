@@ -19,6 +19,7 @@ type Task struct {
 	Name        string
 	Description string
 	Category    string
+	Tags        string
 	Level       int
 	Flag        string
 	Author      string

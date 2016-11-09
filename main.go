@@ -111,6 +111,7 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 		err = db.AddTask(database, &db.Task{
 			Name:          task.Name,
 			Desc:          task.Description,
+			Tags:          task.Tags,
 			CategoryID:    taskCategory.ID,
 			Level:         task.Level,
 			Flag:          task.Flag,
