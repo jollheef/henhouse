@@ -313,17 +313,17 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
       <li id="info"></li>
     </ul>
     <div id="content">
-      <center>
-        <div id="white_block">
-          <div id="task_header">%s</div>
+      <div id="white_block">
+        <div id="task_header">%s</div>
+        <center>
+        %s
+        <br>
+        %s<br><br>
+        </center>
+        <div id="task_footer">
           %s
-          <br>
-          %s<br><br>
-          <div id="task_footer">
-            %s
-          </div>
         </div>
-      </center>
+        </div>
     </div>
   </body>
 </html>`, task.Name, task.Desc, task.Author, submitForm)
