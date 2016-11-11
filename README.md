@@ -35,7 +35,7 @@ After you need download and build henhouse with depends.
 
     $ sudo psql -U postgres
     postgres=# CREATE DATABASE henhouse;
-    postgres=# CREATE USER henhouse WITH password 'STRENGTH_PASSWORD'
+    postgres=# CREATE USER henhouse WITH password 'STRENGTH_PASSWORD';
     postgres=# GRANT ALL privileges ON DATABASE henhouse TO henhouse;
 
 After that you need to fix 'connection' parameter in configuration file.
