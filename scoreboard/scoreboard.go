@@ -289,44 +289,14 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		submitForm = fmt.Sprintf(flagSubmitFormat, task.ID)
 	}
 
-	fmt.Fprintf(w, `<!DOCTYPE html>
-<html class="full" lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	tmpl, err := getTmpl("task")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="images/favicon.png" type="image/png">
-    <title>Juniors CTF</title>
-
-    <link rel="stylesheet" href="css/style.css" class="--apng-checked">
-
-    <script type="text/javascript" src="js/scoreboard.js"></script>
-
-  </head>
-  <body>
-    <ul id="header">
-      <li class="header_link"><a href="scoreboard.html">Scoreboard</a></li>
-      <li class="header_link"><a href="tasks.html">Tasks</a></li>
-      <li class="header_link"><a href="news.html">News</a></li>
-      <li class="header_link"><a href="sponsors.html">Sponsors</a></li>
-      <li id="info"></li>
-    </ul>
-    <div id="content">
-      <div id="white_block">
-        <div id="task_header">%s</div>
-        <center>
-        %s
-        <br>
-        %s<br><br>
-        </center>
-        <div id="task_footer">
-          %s
-        </div>
-        </div>
-    </div>
-  </body>
-</html>`, task.Name, task.Desc, task.Author, submitForm)
+	fmt.Fprintf(w, tmpl, task.Name, task.Desc,
+		task.Author, submitForm)
 }
 
 func flagHandler(w http.ResponseWriter, r *http.Request) {
@@ -364,32 +334,13 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 
 	time.Sleep(FlagTimeout)
 
-	fmt.Fprintf(w, `<!DOCTYPE html>
-<html class="full" lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="images/favicon.png" type="image/png">
-    <title>Juniors CTF</title>
+	tmpl, err := getTmpl("flag")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-    <link rel="stylesheet" href="css/style.css" class="--apng-checked">
-    
-    <script type="text/javascript" src="js/scoreboard.js"></script>
-
-  </head>
-  <body>
-    <ul id="header">
-      <li class="header_link"><a href="scoreboard.html">Scoreboard</a></li>
-      <li class="header_link"><a href="tasks.html">Tasks</a></li>
-      <li class="header_link"><a href="news.html">News</a></li>
-      <li class="header_link"><a href="sponsors.html">Sponsors</a></li>
-      <li id="info"></li>
-    </ul>
-    <div id="content">%s</div>
-  </body>
-</html>`, solvedMsg)
+	fmt.Fprintf(w, tmpl, solvedMsg)
 }
 
 func handleStaticFile(pattern, file string) {

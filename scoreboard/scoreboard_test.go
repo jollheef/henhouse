@@ -16,7 +16,9 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"path/filepath"
 	"regexp"
+	"runtime"
 	"testing"
 	"time"
 
@@ -300,8 +302,7 @@ func checkScoreboard(database *sql.DB, game *game.Game, addr, validFlag string,
 
 	matchBody("http://"+addr+"/tasks.html", "DOCTYPE html")
 
-	// Scoreboard wwwPath is "" => must be not found
-	matchBody("http://"+addr+"/news.html", "not found")
+	matchBody("http://"+addr+"/news.html", "DOCTYPE html")
 
 	infoURL := "ws://" + addr + "/info"
 
@@ -425,7 +426,9 @@ func TestScoreboard(*testing.T) {
 	}
 
 	go func() {
-		err = Scoreboard(database, &game, "", "", addr)
+		_, filename, _, _ := runtime.Caller(0)
+		err = Scoreboard(database, &game, filepath.Dir(filename)+"/www",
+			filepath.Dir(filename)+"/templates", addr)
 		if err != nil {
 			panic(err)
 		}
