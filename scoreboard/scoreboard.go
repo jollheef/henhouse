@@ -18,6 +18,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fiam/gounidecode/unidecode"
 	"github.com/jollheef/henhouse/game"
 	"golang.org/x/net/websocket"
 )
@@ -295,17 +296,19 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var name, desc string
+	var name, desc, author string
 	if isAcceptRussian(r) {
 		name = task.Name
 		desc = task.Desc
+		author = task.Author
 	} else {
 		name = task.NameEn
 		desc = task.DescEn
+		author = unidecode.Unidecode(task.Author)
 	}
 
 	fmt.Fprintf(w, tmpl, name, desc,
-		task.Author, submitForm)
+		author, submitForm)
 }
 
 func flagHandler(w http.ResponseWriter, r *http.Request) {
