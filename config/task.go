@@ -16,13 +16,15 @@ import (
 
 // Task is xml task data model
 type Task struct {
-	Name        string
-	Description string
-	Category    string
-	Tags        string
-	Level       int
-	Flag        string
-	Author      string
+	Name          string
+	Description   string
+	NameEn        string
+	DescriptionEn string
+	Category      string
+	Tags          string
+	Level         int
+	Flag          string
+	Author        string
 }
 
 // ParseXMLTask parse xml task

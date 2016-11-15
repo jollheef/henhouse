@@ -17,6 +17,8 @@ func TestParseXML(*testing.T) {
 
 	name := "bar"
 	description := "fofofo"
+	nameEn := "бар"
+	descriptionEn := "фофофо"
 	category := "test"
 	level := 1
 	flag := "justflag"
@@ -25,10 +27,13 @@ func TestParseXML(*testing.T) {
 	<Task>
 	  <Name>%s</Name>
 	  <Description>%s</Description>
+	  <NameEn>%s</NameEn>
+	  <DescriptionEn>%s</DescriptionEn>
 	  <Category>%s</Category>
 	  <Level>%d</Level>
 	  <Flag>%s</Flag>
-	</Task>`, name, description, category, level, flag)
+	</Task>`, name, description, nameEn, descriptionEn,
+		category, level, flag)
 
 	task, err := ParseXMLTask([]byte(xml))
 	if err != nil {
@@ -40,6 +45,14 @@ func TestParseXML(*testing.T) {
 	}
 
 	if task.Description != description {
+		panic("invalid parse")
+	}
+
+	if task.NameEn != nameEn {
+		panic("invalid parse")
+	}
+
+	if task.DescriptionEn != descriptionEn {
 		panic("invalid parse")
 	}
 
