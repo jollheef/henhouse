@@ -13,6 +13,7 @@ safe_reinit = false # disallow reinit after game start
 
 [Scoreboard]
 www_path = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/scoreboard/www"
+template_path = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/scoreboard/templates"
 addr = ":8000"
 recalc_timeout = "1m"
 
