@@ -404,11 +404,12 @@ func handleStaticFileSimple(file, wwwPath string) {
 }
 
 // Scoreboard implements web scoreboard
-func Scoreboard(database *sql.DB, game *game.Game, wwwPath,
-	addr string) (err error) {
+func Scoreboard(database *sql.DB, game *game.Game,
+	wwwPath, templatePath, addr string) (err error) {
 
 	contestStatus = contestStateNotAvailable
 	gameShim = game
+	templatePath = templatePath
 
 	go scoreboardUpdater(game, ScoreboardRecalcTimeout)
 

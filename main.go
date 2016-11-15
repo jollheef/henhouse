@@ -212,7 +212,9 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
 	log.Println("Listen at", cfg.Scoreboard.Addr)
-	err = scoreboard.Scoreboard(database, &game, cfg.Scoreboard.WwwPath,
+	err = scoreboard.Scoreboard(database, &game,
+		cfg.Scoreboard.WwwPath,
+		cfg.Scoreboard.TemplatePath,
 		cfg.Scoreboard.Addr)
 	if err != nil {
 		return

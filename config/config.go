@@ -33,6 +33,7 @@ type Config struct {
 
 	Scoreboard struct {
 		WwwPath       string
+		TemplatePath  string
 		Addr          string
 		RecalcTimeout _duration
 	}

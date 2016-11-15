@@ -425,7 +425,7 @@ func TestScoreboard(*testing.T) {
 	}
 
 	go func() {
-		err = Scoreboard(database, &game, "", addr)
+		err = Scoreboard(database, &game, "", "", addr)
 		if err != nil {
 			panic(err)
 		}
