@@ -32,6 +32,9 @@ var l10nMap = map[string]string{
 
 	"Access token": "Токен доступа",
 	"Sign in":      "Войти",
+
+	"Solved":       "Флаг принят",
+	"Invalid flag": "Неправильный флаг",
 }
 
 var supported = []language.Tag{
