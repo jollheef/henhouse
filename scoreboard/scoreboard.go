@@ -295,7 +295,16 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, tmpl, task.Name, task.Desc,
+	var name, desc string
+	if isAcceptRussian(r) {
+		name = task.Name
+		desc = task.Desc
+	} else {
+		name = task.NameEn
+		desc = task.DescEn
+	}
+
+	fmt.Fprintf(w, tmpl, name, desc,
 		task.Author, submitForm)
 }
 
