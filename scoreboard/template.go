@@ -29,3 +29,12 @@ func getTmpl(name string) (s string, err error) {
 	cache[name] = s
 	return
 }
+
+func getTmplWoCache(name string) (s string, err error) {
+	b, err := ioutil.ReadFile(templatePath + "/" + name + ".htmlf")
+	if err != nil {
+		return
+	}
+	s = string(b)
+	return
+}

@@ -100,7 +100,7 @@ func infoHandler(ws *websocket.Conn) {
 
 	defer ws.Close()
 	for {
-		_, err := fmt.Fprint(ws, getInfo())
+		_, err := fmt.Fprint(ws, l10n(ws.Request(), getInfo()))
 		if err != nil {
 			//log.Println("Socket closed:", err)
 			return
@@ -118,7 +118,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 
 	currentResult := scoreboardHTML(teamID)
 
-	fmt.Fprint(ws, currentResult)
+	fmt.Fprint(ws, l10n(ws.Request(), currentResult))
 
 	sendedResult := currentResult
 
@@ -133,7 +133,7 @@ func scoreboardHandler(ws *websocket.Conn) {
 			sendedResult = currentResult
 			lastUpdate = time.Now()
 
-			_, err := fmt.Fprint(ws, currentResult)
+			_, err := fmt.Fprint(ws, l10n(ws.Request(), currentResult))
 			if err != nil {
 				//log.Println("Socket closed:", err)
 				return
@@ -213,7 +213,7 @@ func tasksHandler(ws *websocket.Conn) {
 
 	currentTasks := tasksHTML(teamID)
 
-	fmt.Fprint(ws, currentTasks)
+	fmt.Fprint(ws, l10n(ws.Request(), currentTasks))
 
 	sendedTasks := currentTasks
 
@@ -228,7 +228,7 @@ func tasksHandler(ws *websocket.Conn) {
 			sendedTasks = currentTasks
 			lastUpdate = time.Now()
 
-			_, err := fmt.Fprint(ws, currentTasks)
+			_, err := fmt.Fprint(ws, l10n(ws.Request(), currentTasks))
 			if err != nil {
 				//log.Println("Socket closed:", err)
 				return
@@ -354,6 +354,45 @@ func handleStaticFileSimple(file, wwwPath string) {
 	handleStaticFile(file, wwwPath+file)
 }
 
+func signinHandler(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := getTmpl("auth")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	fmt.Fprint(w, l10n(r, tmpl))
+}
+
+func newsHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	var tmpl string
+	if isAcceptRussian(r) {
+		tmpl, err = getTmplWoCache("news.ru")
+	} else {
+		tmpl, err = getTmplWoCache("news.en")
+	}
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	fmt.Fprint(w, l10n(r, tmpl))
+}
+
+func sponsorsHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	var tmpl string
+	if isAcceptRussian(r) {
+		tmpl, err = getTmpl("sponsors.ru")
+	} else {
+		tmpl, err = getTmpl("sponsors.en")
+	}
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	fmt.Fprint(w, l10n(r, tmpl))
+}
+
 // Scoreboard implements web scoreboard
 func Scoreboard(database *sql.DB, game *game.Game,
 	wwwPath, tmpltsPath, addr string) (err error) {
@@ -368,20 +407,22 @@ func Scoreboard(database *sql.DB, game *game.Game,
 	handleStaticFileSimple("/css/style.css", wwwPath)
 	handleStaticFileSimple("/js/scoreboard.js", wwwPath)
 	handleStaticFileSimple("/js/tasks.js", wwwPath)
-	handleStaticFileSimple("/news.html", wwwPath)
-	handleStaticFileSimple("/sponsors.html", wwwPath)
 	handleStaticFileSimple("/images/bg.jpg", wwwPath)
 	handleStaticFileSimple("/images/favicon.ico", wwwPath)
 	handleStaticFileSimple("/images/favicon.png", wwwPath)
 	handleStaticFileSimple("/images/401.jpg", wwwPath)
 	handleStaticFileSimple("/images/juniors_ctf_txt.png", wwwPath)
-	handleStaticFileSimple("/auth.html", wwwPath)
 
 	// Get
+	http.HandleFunc("/auth.html", signinHandler)
+
+	// Get only for authenticated
 	http.Handle("/", authorized(database, http.HandlerFunc(staticScoreboard)))
 	http.Handle("/index.html", authorized(database, http.HandlerFunc(staticScoreboard)))
 	http.Handle("/tasks.html", authorized(database, http.HandlerFunc(staticTasks)))
 	http.Handle("/logout", authorized(database, http.HandlerFunc(logoutHandler)))
+	http.Handle("/news.html", authorized(database, http.HandlerFunc(newsHandler)))
+	http.Handle("/sponsors.html", authorized(database, http.HandlerFunc(sponsorsHandler)))
 
 	// Websocket
 	http.Handle("/scoreboard", authorized(database, websocket.Handler(scoreboardHandler)))

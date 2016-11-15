@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html class="full" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="./images/favicon.png" type="image/png">
+    <title>Juniors CTF</title>
+
+    <link rel="stylesheet" href="./css/style.css" class="--apng-checked">
+
+    <script type="text/javascript" src="./js/tasks.js"></script>
+
+  </head>
+  <body>
+    <ul id="header">
+      <li class="header_link"><a href="scoreboard.html">Scoreboard</a></li>
+      <li class="header_link"><a href="tasks.html">Tasks</a></li>
+      <li class="header_link"><a href="news.html">News</a></li>
+      <li class="header_link active"><a href="#">Sponsors</a></li>
+      <li id="info"></li>
+    </ul>
+    <div id="content">
+      <div id="white_block">
+        <div class="white_block-text">
+          Спонсоры
+        </div>
+      </div>
+    </div>
+    <div class="center">
+      <img id="juniorstext" src="./images/juniors_ctf_txt.png">
+    </div>
+  </body>
+</html>
