@@ -120,9 +120,12 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 	teamID, err := db.GetTeamIDByToken(database, token)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		fmt.Fprint(w, `<!DOCTYPE html><html><body>`+
-			`<div style="text-align: center;"><img src="/images/401.jpg"></div>`+
-			`</body></html>`)
+		tmpl, err := getTmpl("auth_error")
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		fmt.Fprint(w, tmpl)
 		return
 	}
 
