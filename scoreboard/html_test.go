@@ -15,10 +15,10 @@ import (
 )
 
 func TestTaskToHTML(*testing.T) {
-	html := taskToHTML(1, game.TaskInfo{})
+	html := taskToHTML(1, game.TaskInfo{}, true)
 	testMatch("closed", html)
 
-	html = taskToHTML(1, game.TaskInfo{Opened: true})
+	html = taskToHTML(1, game.TaskInfo{Opened: true}, true)
 	testNotMatch("closed", html)
 }
 
@@ -28,7 +28,7 @@ func TestCategoryToHTML(*testing.T) {
 
 	cat.TasksInfo = append(cat.TasksInfo, game.TaskInfo{})
 
-	html := categoryToHTML(0, cat)
+	html := categoryToHTML(0, cat, true)
 
 	testMatch("closed", html)
 }

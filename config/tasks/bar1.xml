@@ -1,6 +1,8 @@
 <Task>
-  <Name>bar1</Name>                           <!--отображаемое имя-->
-  <Description>bar1 description</Description> <!--описание-->
+  <Name>Задание</Name>                           <!--отображаемое имя-->
+  <Description>Описание задания</Description> <!--описание-->
+  <NameEn>bar1</NameEn>                           <!--отображаемое имя на английском-->
+  <DescriptionEn>bar1 description</DescriptionEn> <!--описание на английском-->
   <Tags>trivial crypto</Tags>                 <!--тэги-->
   <Category>bar</Category>                    <!--категория с учетом регистра-->
   <Level>1</Level>                            <!--последовательность при открытии-->

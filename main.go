@@ -108,9 +108,27 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 			log.Println("Add category", taskCategory.Name)
 		}
 
+		if task.NameEn == "" {
+			task.NameEn = task.Name
+		}
+
+		if task.Name == "" {
+			task.Name = task.NameEn
+		}
+
+		if task.DescriptionEn == "" {
+			task.DescriptionEn = task.Description
+		}
+
+		if task.Description == "" {
+			task.Description = task.DescriptionEn
+		}
+
 		err = db.AddTask(database, &db.Task{
 			Name:          task.Name,
 			Desc:          task.Description,
+			NameEn:        task.NameEn,
+			DescEn:        task.DescriptionEn,
 			Tags:          task.Tags,
 			CategoryID:    taskCategory.ID,
 			Level:         task.Level,

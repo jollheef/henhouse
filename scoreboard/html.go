@@ -23,7 +23,8 @@ func taskSolvedBy(task game.TaskInfo, teamID int) bool {
 	return false
 }
 
-func taskToHTML(teamID int, task game.TaskInfo) (html string) {
+func taskToHTML(teamID int, task game.TaskInfo,
+	ru bool) (html string) {
 
 	buttonClass := "closed"
 
@@ -41,6 +42,13 @@ func taskToHTML(teamID int, task game.TaskInfo) (html string) {
 		html = fmt.Sprintf(`<a class="task_block task_block-%s">`, buttonClass)
 	}
 
+	var name string
+	if ru {
+		name = task.Name
+	} else {
+		name = task.NameEn
+	}
+
 	html += fmt.Sprintf(`
           <div class="task_block-header">
 	    <span class="task_block-name">%s</span>
@@ -49,17 +57,18 @@ func taskToHTML(teamID int, task game.TaskInfo) (html string) {
 	  <div class="task_block-footer">
 	    <span class="task_block-tags">%s</span>
 	  </div>
-	</a>`, task.Name, task.Price, task.Tags)
+	</a>`, name, task.Price, task.Tags)
 
 	return
 }
 
-func categoryToHTML(teamID int, category game.CategoryInfo) (html string) {
+func categoryToHTML(teamID int, category game.CategoryInfo,
+	ru bool) (html string) {
 
 	html = `<div class="col-xs-3">`
 
 	for _, task := range category.TasksInfo {
-		html += taskToHTML(teamID, task)
+		html += taskToHTML(teamID, task, ru)
 	}
 
 	html += `</div>`

@@ -39,5 +39,5 @@ func staticTasks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, l10n(r, tmpl), getInfo(), l10n(r, tasksHTML(teamID)))
+	fmt.Fprintf(w, l10n(r, tmpl), getInfo(), l10n(r, tasksHTML(teamID, isAcceptRussian(r))))
 }

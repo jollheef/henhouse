@@ -191,7 +191,7 @@ func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 	}
 }
 
-func tasksHTML(teamID int) (result string) {
+func tasksHTML(teamID int, ru bool) (result string) {
 
 	cats, err := gameShim.Tasks()
 	if err != nil {
@@ -199,7 +199,7 @@ func tasksHTML(teamID int) (result string) {
 	}
 
 	for _, cat := range cats {
-		result += categoryToHTML(teamID, cat)
+		result += categoryToHTML(teamID, cat, ru)
 	}
 
 	return
@@ -211,7 +211,7 @@ func tasksHandler(ws *websocket.Conn) {
 
 	teamID := getTeamID(ws.Request())
 
-	currentTasks := tasksHTML(teamID)
+	currentTasks := tasksHTML(teamID, isAcceptRussian(ws.Request()))
 
 	fmt.Fprint(ws, l10n(ws.Request(), currentTasks))
 
@@ -220,7 +220,7 @@ func tasksHandler(ws *websocket.Conn) {
 	lastUpdate := time.Now()
 
 	for {
-		currentTasks := tasksHTML(teamID)
+		currentTasks := tasksHTML(teamID, isAcceptRussian(ws.Request()))
 
 		if sendedTasks != currentTasks ||
 			time.Now().After(lastUpdate.Add(time.Minute)) {
