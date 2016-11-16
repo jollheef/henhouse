@@ -9,6 +9,8 @@ Scoreboard for jeopardy-style CTFs.
 
 Fundamental principle: if henhouse is not helping you make jeopardy-style CTF easily, then there is a bug in henhouse.
 
+[![PackageCloud](https://packagecloud.io/assets/packagecloud-badge-fbea7fd09f5aab38e8d59fec16f2268c.png)](https://packagecloud.io/jollheef/henhouse)
+
 ## Deploy
 
 ### Depends
