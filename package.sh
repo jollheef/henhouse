@@ -16,11 +16,11 @@ cp ./deb/{control,postinst} ${PKGDIR}/DEBIAN/
 
 cp ./henhouse.service ${PKGDIR}/lib/systemd/system/
 
-cp ./config/tasks/bar1.xml ${PKGDIR}/etc/henhouse/task.xml.example
+cp ./config/tasks/bar1.xml ${PKGDIR}/var/lib/henhouse/task.xml.example
 
 cp -r ./scoreboard/www/* ${PKGDIR}/var/www/henhouse/
 
-cp ./config/henhouse.toml ${PKGDIR}/etc/henhouse.toml.default
+cp ./config/henhouse.toml ${PKGDIR}/var/lib/henhouse/henhouse.toml.example
 
 cp -r ./scoreboard/templates ${PKGDIR}/var/lib/henhouse/
 

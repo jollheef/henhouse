@@ -13,7 +13,7 @@ case "$1" in
         touch /var/log/henhouse.log
         chown henhouse:henhouse /var/log/henhouse.log
 
-        cp /etc/henhouse.toml.default /etc/henhouse.toml
+        cp /var/lib/henhouse/henhouse.toml.example /etc/henhouse.toml
 
         sed -i "s/PASSWORD_PLACEHOLDER/${PASSWORD}/" /etc/henhouse.toml
         chmod 600 /etc/henhouse.toml
