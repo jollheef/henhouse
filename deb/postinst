@@ -19,6 +19,9 @@ case "$1" in
         chmod 600 /etc/henhouse.toml
         setfacl -m user:henhouse:rw /etc/henhouse.toml
 
+        chmod 700 /etc/henhouse
+        setfacl -m user:henhouse:rwx /etc/henhouse
+
         PASSWORD="'${PASSWORD}'"
 
         su postgres -c "psql -c \"CREATE DATABASE henhouse;\""
