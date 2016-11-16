@@ -2,7 +2,8 @@
 
 ./build.sh
 
-VERSION="$(git tag | sed 's/v//')-$(git log --oneline $(git tag) | wc -l)"
+VER_POSTFIX="$(git log --oneline HEAD...$(git tag) | wc -l)"
+VERSION="$(git tag | sed 's/v//')-${VER_POSTFIX}"
 PKGDIR=/tmp/henhouse_${VERSION}
 
 rm -rf ${PKGDIR}
@@ -19,7 +20,7 @@ cp ./config/tasks/bar1.xml ${PKGDIR}/etc/henhouse/example.xml
 
 cp -r ./scoreboard/www/* ${PKGDIR}/var/www/henhouse/
 
-cp ./config/henhouse.toml ${PKGDIR}/etc/
+cp ./config/henhouse.toml ${PKGDIR}/etc/henhouse.toml
 
 cp -r ./scoreboard/templates ${PKGDIR}/var/lib/henhouse/
 
