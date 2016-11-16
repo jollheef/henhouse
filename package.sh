@@ -12,7 +12,7 @@ mkdir -p ${PKGDIR}/{DEBIAN,etc/henhouse,usr/bin,lib/systemd/system,var/lib/henho
 
 cp ${GOPATH}/bin/{henhouse,henhousectl} ${PKGDIR}/usr/bin/
 
-cp ./deb/{control,postinst} ${PKGDIR}/DEBIAN/
+cp ./deb/{control,postinst,rules} ${PKGDIR}/DEBIAN/
 
 cp ./henhouse.service ${PKGDIR}/lib/systemd/system/
 
