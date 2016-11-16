@@ -1,0 +1,13 @@
+[Unit]
+Description=Scoreboard for jeopardy-style CTF
+Requires=postgresql.service
+After=postgresql.service
+
+[Service]
+User=henhouse
+Group=henhouse
+WorkingDirectory=/var/lib/henhouse/
+ExecStart=/bin/bash -c '/usr/bin/henhouse /etc/henhouse.toml'
+
+[Install]
+WantedBy=multi-user.target

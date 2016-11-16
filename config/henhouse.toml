@@ -1,19 +1,19 @@
 # henhouse.toml: config file for henhouse
 # Please check all values before running henhouse.
 
-log_file = "/tmp/henhouse.log"
+log_file = "/var/log/henhouse.log"
 
 # Path to directory contains task xml files
-task_dir = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/config/tasks/"
+task_dir = "/etc/henhouse/"
 
 [Database]
-connection = "user=postgres dbname=henhouse sslmode=disable"
+connection = "user=henhouse password=PASSWORD_PLACEHOLDER dbname=henhouse sslmode=disable"
 max_connections = 90 # should be less than same value in postgresql.conf
 safe_reinit = false # disallow reinit after game start
 
 [Scoreboard]
-www_path = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/scoreboard/www"
-template_path = "/home/mikhail/dev/go/src/github.com/jollheef/henhouse/scoreboard/templates"
+www_path = "/var/www"
+template_path = "/var/lib/henhouse/templates"
 addr = ":8000"
 recalc_timeout = "1m"
 

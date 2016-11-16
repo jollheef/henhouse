@@ -7,15 +7,24 @@ PKGDIR=/tmp/henhouse_${VERSION}
 
 rm -rf ${PKGDIR}
 
-mkdir -p ${PKGDIR}/{DEBIAN,usr/bin}
+mkdir -p ${PKGDIR}/{DEBIAN,etc/henhouse,usr/bin,lib/systemd/system,var/lib/henhouse,var/www/henhouse}
 
-cp ${GOPATH}/bin/henhouse ${PKGDIR}/usr/bin/
-cp ${GOPATH}/bin/henhousectl ${PKGDIR}/usr/bin/
+cp ${GOPATH}/bin/{henhouse,henhousectl} ${PKGDIR}/usr/bin/
 
-cp ./deb/control ${PKGDIR}/DEBIAN/
+cp ./deb/{control,postinst} ${PKGDIR}/DEBIAN/
+
+cp ./henhouse.service ${PKGDIR}/lib/systemd/system/
+
+cp ./config/tasks/bar1.xml ${PKGDIR}/etc/henhouse/example.xml
+
+cp -r ./scoreboard/www/* ${PKGDIR}/var/www/henhouse/
+
+cp ./config/henhouse.toml ${PKGDIR}/etc/
+
+cp -r ./scoreboard/templates ${PKGDIR}/var/lib/henhouse/
 
 sed -i "s/VERSION_PLACEHOLDER/${VERSION}/" ${PKGDIR}/DEBIAN/control
 
-dpkg-deb --build ${PKGDIR}
+fakeroot dpkg-deb --build ${PKGDIR}
 
 package_cloud push jollheef/henhouse/ubuntu/xenial ${PKGDIR}.deb

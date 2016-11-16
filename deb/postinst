@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        cat /etc/passwd | grep henhouse && exit 0
+
+        PASSWORD=$(head /dev/urandom | md5sum | cut -d ' ' -f 1)
+
+        addgroup --system henhouse
+        adduser --system --no-create-home --home /var/lib/henhouse --ingroup henhouse henhouse
+
+        touch /var/log/henhouse.log
+        chown henhouse:henhouse /var/log/henhouse.log
+
+        sed -i "s/PASSWORD_PLACEHOLDER/${PASSWORD}/" /etc/henhouse.toml
+        chmod 600 /etc/henhouse.toml
+        setfacl -m user:henhouse:rw /etc/henhouse.toml
+
+        PASSWORD="'${PASSWORD}'"
+
+        su postgres -c "psql -c \"CREATE DATABASE henhouse;\""
+        su postgres -c "psql -c \"CREATE USER henhouse WITH password ${PASSWORD};\""
+        su postgres -c "psql -c \"GRANT ALL privileges ON DATABASE henhouse TO henhouse;\""
+        ;;
+esac
+
+exit 0
