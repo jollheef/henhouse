@@ -1,0 +1,8 @@
+Package: henhouse
+Version: VERSION_PLACEHOLDER
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: postgresql
+Maintainer: Mikhail Klementyev <jollheef@riseup.net>
+Description: Scoreboard for jeopardy-style CTFs.
