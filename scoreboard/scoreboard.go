@@ -427,10 +427,11 @@ func Scoreboard(database *sql.DB, game *game.Game,
 
 	// Get
 	http.HandleFunc("/auth.html", signinHandler)
+	http.HandleFunc("/outer-scoreboard", outerScoreboard)
 
 	// Get only for authenticated
-	http.Handle("/", authorized(database, http.HandlerFunc(staticScoreboard)))
-	http.Handle("/index.html", authorized(database, http.HandlerFunc(staticScoreboard)))
+	http.Handle("/", authorized(database, http.HandlerFunc(innerScoreboard)))
+	http.Handle("/index.html", authorized(database, http.HandlerFunc(innerScoreboard)))
 	http.Handle("/tasks.html", authorized(database, http.HandlerFunc(staticTasks)))
 	http.Handle("/logout", authorized(database, http.HandlerFunc(logoutHandler)))
 	http.Handle("/news.html", authorized(database, http.HandlerFunc(newsHandler)))

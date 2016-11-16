@@ -16,7 +16,17 @@ import (
 	"net/http"
 )
 
-func staticScoreboard(w http.ResponseWriter, r *http.Request) {
+func outerScoreboard(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := getTmpl("outer_scoreboard")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	fmt.Fprintf(w, l10n(r, tmpl), l10n(r, scoreboardHTML(-1)))
+}
+
+func innerScoreboard(w http.ResponseWriter, r *http.Request) {
 
 	teamID := getTeamID(r)
 
