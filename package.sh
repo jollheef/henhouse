@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo 'Warning: package is bit broken. TODO use dpkg-buildpackage'
+
 ./build.sh
 
 VER_POSTFIX="$(git log --oneline HEAD...$(git tag) | wc -l)"
