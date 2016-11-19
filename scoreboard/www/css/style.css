@@ -245,19 +245,42 @@ body {
     padding-bottom: 20px;
 }
 
-#white_block>table {
-    text-align: left;
-    padding: 0 10px 10px 10px;
-    font-size: 125%;
+#task_body {
+    text-align: center;
+    overflow-x: auto;
+    margin: 0 auto;
 }
 
-#white_block>table>tbody>tr>td {
+#task_body>table {
+    text-align: left;
+    padding: 0 10px 10px 10px;
+    margin:0 auto;
+}
+
+#task_body>table>tbody>tr>td {
+    vertical-align: middle;
+}
+
+@media screen and (max-width: 1110px) {
+    #task_body>table>tbody>tr>td {
+        vertical-align: top;
+        display: block;
+        width: 100%;
+    }
+}
+
+#white_block>table>table {
+    text-align: left;
+    padding: 0 10px 10px 10px;
+}
+
+#white_block>table>table>tbody>tr>td {
     vertical-align: middle;
 }
 
 
 @media screen and (max-width: 1110px) {
-    #white_block>table>tbody>tr>td {
+    #white_block>table>table>tbody>tr>td {
         vertical-align: top;
         display: block;
         width: 100%;

@@ -24,11 +24,11 @@
     <div id="content">
       <div id="white_block">
         <div id="task_header">%s</div>
-        <center>
+        <div id="task_body">
         %s
         <br>
         %s<br><br>
-        </center>
+        </div>
         <div id="task_footer">
           %s
         </div>
