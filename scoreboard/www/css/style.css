@@ -501,8 +501,7 @@ body {
     white-space: normal;
     word-break: break-all;
 
-    width: 100%;
-
+    padding: 8px 12px;
     margin-bottom: 0;
 
     display: inline-block;
@@ -539,11 +538,13 @@ body {
 
 .btn-lg {
     padding: 16px 20px;
+    width: 100%;
 }
 
 .btn-submit {
     padding: 8px 12px;
     height: 39px;
+    width: 100%;
 }
 
 
