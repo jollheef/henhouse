@@ -289,7 +289,7 @@ body {
 
 .code_block>details>pre {
     cursor: auto;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 .flag_status {
