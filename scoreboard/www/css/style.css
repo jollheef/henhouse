@@ -269,18 +269,18 @@ body {
     }
 }
 
-#white_block>table>table {
+#white_block>table {
     text-align: left;
     padding: 0 10px 10px 10px;
 }
 
-#white_block>table>table>tbody>tr>td {
+#white_block>table>tbody>tr>td {
     vertical-align: middle;
 }
 
 
 @media screen and (max-width: 1110px) {
-    #white_block>table>table>tbody>tr>td {
+    #white_block>table>tbody>tr>td {
         vertical-align: top;
         display: block;
         width: 100%;
