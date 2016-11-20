@@ -20,5 +20,5 @@ script:
   - go list ./... | while read pkg; do go test -v -covermode=count -coverprofile=$(basename ${pkg}).cover ${pkg} || return 1; done
   - ls | grep cover$ | xargs cat | sort -r | uniq >> coverage.out
   - goveralls -coverprofile=coverage.out -service travis-ci
-  - ./build.sh
-  - ./package.sh
+  - bash build.sh
+  - bash package.sh
