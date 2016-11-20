@@ -13,7 +13,7 @@ Fundamental principle: if henhouse is not helping you make jeopardy-style CTF ea
 
 ## Install
 
-Ubuntu 16.04 is required. If for any reason it is not acceptable to you, build it yourself as described in the «## Development» section.
+Ubuntu 16.04 is required. If for any reason it is not acceptable to you, build it yourself as described in «## Development» section.
 
     $ curl -s https://packagecloud.io/install/repositories/jollheef/henhouse/script.deb.sh | sudo bash
     $ sudo apt install henhouse
