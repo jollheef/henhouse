@@ -24,3 +24,4 @@ script:
   - git checkout ${TRAVIS_COMMIT}
   - cd henhouse
   - echo ${TRAVIS_GO_VERSION} | grep tip || ./package.sh
+  - echo ${TRAVIS_PULL_REQUEST} | grep false && package_cloud push jollheef/henhouse/ubuntu/xenial /tmp/*.deb

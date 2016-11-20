@@ -31,5 +31,3 @@ cp -r ./scoreboard/templates ${PKGDIR}/var/lib/henhouse/
 sed -i "s/VERSION_PLACEHOLDER/${VERSION}/" ${PKGDIR}/DEBIAN/control
 
 fakeroot dpkg-deb --build ${PKGDIR}
-
-package_cloud push jollheef/henhouse/ubuntu/xenial ${PKGDIR}.deb
