@@ -16,6 +16,14 @@ case "$1" in
         cp /var/lib/henhouse/henhouse.toml.example /etc/henhouse.toml
 
         sed -i "s/PASSWORD_PLACEHOLDER/${PASSWORD}/" /etc/henhouse.toml
+        chmod 600 /etc/henhouse.toml
+        setfacl -m user:henhouse:rw /etc/henhouse.toml
+
+        chmod 700 /etc/henhouse
+        setfacl -m user:henhouse:rwx /etc/henhouse
+
+        setfacl -m user:henhouse:rwx /var/run/henhouse
+        setfacl -m user:henhouse:rw /var/run/henhouse/extra
 
         PASSWORD="'${PASSWORD}'"
 
