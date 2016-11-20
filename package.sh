@@ -16,7 +16,7 @@ echo 'EXTRA=--reinit' > ${PKGDIR}/var/run/henhouse/extra
 
 cp ${GOPATH}/bin/{henhouse,henhousectl} ${PKGDIR}/usr/bin/
 
-cp ./deb/{control,postinst,rules} ${PKGDIR}/DEBIAN/
+cp ./deb/{control,postinst} ${PKGDIR}/DEBIAN/
 
 cp ./{henhouse,henhouse-reinit}.service ${PKGDIR}/lib/systemd/system/
 
@@ -31,3 +31,7 @@ cp -r ./scoreboard/templates ${PKGDIR}/var/lib/henhouse/
 sed -i "s/VERSION_PLACEHOLDER/${VERSION}/" ${PKGDIR}/DEBIAN/control
 
 fakeroot dpkg-deb --build ${PKGDIR}
+
+if [[ "${TRAVIS_GO_VERSION}" != "tip" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]]; then
+    package_cloud push jollheef/henhouse/ubuntu/xenial ${PKGDIR}.deb
+fi
