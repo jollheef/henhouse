@@ -279,8 +279,6 @@ func main() {
 
 	log.Println("RLIMIT_NOFILE CUR:", rlim.Cur, "MAX:", rlim.Max)
 
-	log.Println("Use db connection", cfg.Database.Connection)
-
 	var database *sql.DB
 
 	if *dbReinit {
