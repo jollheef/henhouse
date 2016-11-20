@@ -20,4 +20,7 @@ script:
   - go list ./... | while read pkg; do go test -v -covermode=count -coverprofile=$(basename ${pkg}).cover ${pkg} || return 1; done
   - ls | grep cover$ | xargs cat | sort -r | uniq >> coverage.out
   - goveralls -coverprofile=coverage.out -service travis-ci
-  - cd ${TRAVIS_BUILD_DIR} && ./package.sh
+  - git clone https://github.com/jollheef/henhouse
+  - git checkout ${TRAVIS_COMMIT}
+  - cd henhouse
+  - ./package.sh
