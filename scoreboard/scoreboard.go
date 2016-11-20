@@ -307,7 +307,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 		author = unidecode.Unidecode(task.Author)
 	}
 
-	fmt.Fprintf(w, tmpl, name, desc,
+	fmt.Fprintf(w, l10n(r, tmpl), name, desc,
 		author, submitForm)
 }
 
