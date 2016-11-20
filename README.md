@@ -11,7 +11,14 @@ Fundamental principle: if henhouse is not helping you make jeopardy-style CTF ea
 
 [![PackageCloud](https://packagecloud.io/assets/packagecloud-badge-fbea7fd09f5aab38e8d59fec16f2268c.png)](https://packagecloud.io/jollheef/henhouse)
 
-## Deploy
+## Install
+
+Ubuntu 16.04 is required. If for any reason it is not acceptable to you, build it yourself as described in the «## Development» section.
+
+    $ curl -s https://packagecloud.io/install/repositories/jollheef/henhouse/script.deb.sh | sudo bash
+    $ sudo apt install henhouse
+
+## Development
 
 ### Depends
 
@@ -33,7 +40,7 @@ After you need download and build henhouse with depends.
 
     $ go get github.com/jollheef/henhouse
 
-## Run
+### Run
 
     $ sudo psql -U postgres
     postgres=# CREATE DATABASE henhouse;
