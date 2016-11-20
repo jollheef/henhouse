@@ -25,9 +25,11 @@
       <div id="white_block">
         <div id="task_header">%s</div>
         <div id="task_body">
-        %s
-        <br>
-        %s<br><br>
+          <center>
+            %s
+            <br>
+            %s<br><br>
+          </center>
         </div>
         <div id="task_footer">
           %s

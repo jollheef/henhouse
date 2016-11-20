@@ -257,6 +257,10 @@ body {
     margin:0 auto;
 }
 
+#task_body>div {
+    margin:0 auto;
+}
+
 #task_body>table>tbody>tr>td {
     vertical-align: middle;
 }
