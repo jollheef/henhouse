@@ -162,7 +162,7 @@ func scoreboardHTML(teamID int) (result string) {
 
 	for n, teamScore := range scores {
 		if teamScore.ID == teamID {
-			result += `<tr class="self-team">`
+			result += `<tr class="self_team">`
 		} else {
 			result += `<tr>`
 		}

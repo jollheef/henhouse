@@ -245,10 +245,33 @@ body {
     padding-bottom: 20px;
 }
 
+#task_body {
+    text-align: center;
+    overflow-x: auto;
+    margin: 0 auto;
+}
+
+#task_body>table {
+    text-align: left;
+    padding: 0 10px 10px 10px;
+    margin:0 auto;
+}
+
+#task_body>table>tbody>tr>td {
+    vertical-align: middle;
+}
+
+@media screen and (max-width: 1110px) {
+    #task_body>table>tbody>tr>td {
+        vertical-align: top;
+        display: block;
+        width: 100%;
+    }
+}
+
 #white_block>table {
     text-align: left;
     padding: 0 10px 10px 10px;
-    font-size: 125%;
 }
 
 #white_block>table>tbody>tr>td {
@@ -289,7 +312,7 @@ body {
 
 .code_block>details>pre {
     cursor: auto;
-    overflow-x: scroll;
+    overflow-x: auto;
 }
 
 .flag_status {
@@ -478,8 +501,7 @@ body {
     white-space: normal;
     word-break: break-all;
 
-    width: 100%;
-
+    padding: 8px 12px;
     margin-bottom: 0;
 
     display: inline-block;
@@ -516,11 +538,13 @@ body {
 
 .btn-lg {
     padding: 16px 20px;
+    width: 100%;
 }
 
 .btn-submit {
     padding: 8px 12px;
     height: 39px;
+    width: 100%;
 }
 
 
