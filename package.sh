@@ -12,7 +12,7 @@ rm -rf ${PKGDIR}
 
 mkdir -p ${PKGDIR}/{DEBIAN,etc/henhouse,usr/bin,lib/systemd/system,var/lib/henhouse,var/www/henhouse,var/run/henhouse}
 
-echo 'EXTRA=""' > ${PKGDIR}/var/run/henhouse/extra
+echo 'EXTRA=--reinit' > ${PKGDIR}/var/run/henhouse/extra
 
 cp ${GOPATH}/bin/{henhouse,henhousectl} ${PKGDIR}/usr/bin/
 
