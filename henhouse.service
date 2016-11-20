@@ -7,7 +7,6 @@ After=postgresql.service
 User=henhouse
 Group=henhouse
 WorkingDirectory=/var/lib/henhouse/
-ExecStartPre=/bin/mkdir -p /var/run/henhouse/
 ExecStart=/bin/bash -c "/usr/bin/henhouse /etc/henhouse.toml ${EXTRA}"
 ExecStartPost=/bin/rm -f /run/henhouse/extra
 EnvironmentFile=/run/henhouse/extra
