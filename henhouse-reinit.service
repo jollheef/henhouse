@@ -2,5 +2,5 @@
 Type=oneshot
 User=henhouse
 Group=henhouse
-ExecStart=/bin/sh -c "echo EXTRA=--reinit > /run/henhouse/extra"
+ExecStart=/bin/sh -c "echo EXTRA=--reinit > /var/run/henhouse/extra"
 ExecStart=/bin/systemctl restart henhouse
