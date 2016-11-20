@@ -135,7 +135,8 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 	return
 }
 
-var cfgFiles = []string{"/etc/henhouse/cli.toml", "cli.toml", "henhouse.toml"}
+var cfgFiles = []string{"/etc/henhouse/cli.toml", "/etc/henhouse.toml",
+	"cli.toml", "henhouse.toml"}
 
 func taskUpdateCmd(database *sql.DB, categories []db.Category) (err error) {
 	task, err := db.GetTask(database, *taskUpdateID)
