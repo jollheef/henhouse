@@ -23,4 +23,4 @@ script:
   - git clone https://github.com/jollheef/henhouse
   - git checkout ${TRAVIS_COMMIT}
   - cd henhouse
-  - ./package.sh
+  - echo ${TRAVIS_GO_VERSION} | grep tip || ./package.sh
