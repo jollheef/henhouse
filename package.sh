@@ -16,7 +16,7 @@ cp ${GOPATH}/bin/{henhouse,henhousectl} ${PKGDIR}/usr/bin/
 
 cp ./deb/{control,postinst,rules} ${PKGDIR}/DEBIAN/
 
-cp ./henhouse.service ${PKGDIR}/lib/systemd/system/
+cp ./{henhouse,henhouse-reinit}.service ${PKGDIR}/lib/systemd/system/
 
 cp ./config/tasks/bar1.xml ${PKGDIR}/var/lib/henhouse/task.xml.example
 

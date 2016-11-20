@@ -1,0 +1,4 @@
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "echo EXTRA=--reinit > /run/mydaemon/extra"
+ExecStart=/bin/systemctl restart mydaemon

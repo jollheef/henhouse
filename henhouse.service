@@ -8,6 +8,8 @@ User=henhouse
 Group=henhouse
 WorkingDirectory=/var/lib/henhouse/
 ExecStart=/bin/bash -c '/usr/bin/henhouse /etc/henhouse.toml'
+ExecStartPost=/bin/rm -f /run/henhouse/extra
+EnvironmentFile=/run/henhouse/extra
 
 [Install]
 WantedBy=multi-user.target
