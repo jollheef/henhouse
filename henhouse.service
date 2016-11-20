@@ -10,6 +10,7 @@ WorkingDirectory=/var/lib/henhouse/
 ExecStart=/bin/bash -c "/usr/bin/henhouse /etc/henhouse.toml ${EXTRA}"
 ExecStartPost=/bin/sh -c 'echo EXTRA="" > /var/run/henhouse/extra'
 EnvironmentFile=/var/run/henhouse/extra
+LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
