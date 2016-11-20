@@ -22,6 +22,9 @@ case "$1" in
         chmod 700 /etc/henhouse
         setfacl -m user:henhouse:rwx /etc/henhouse
 
+        setfacl -m user:henhouse:rwx /var/run/henhouse
+        setfacl -m user:henhouse:rwx /var/run/henhouse/extra
+
         PASSWORD="'${PASSWORD}'"
 
         su postgres -c "psql -c \"CREATE DATABASE henhouse;\""
