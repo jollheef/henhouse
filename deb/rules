@@ -7,4 +7,4 @@ override_dh_fixperms:
     setfacl -m user:henhouse:rwx /etc/henhouse
 
     setfacl -m user:henhouse:rwx /var/run/henhouse
-    setfacl -m user:henhouse:rwx /var/run/henhouse/extra
+    setfacl -m user:henhouse:rw /var/run/henhouse/extra
