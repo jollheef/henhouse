@@ -3,10 +3,11 @@ set -e
 
 case "$1" in
     configure)
-        setfacl -m user:henhouse:rwx /var/run/henhouse
-        setfacl -m user:henhouse:rw /var/run/henhouse/extra
-
-        cat /etc/passwd | grep henhouse && exit 0
+        cat /etc/passwd | grep henhouse && {
+            setfacl -m user:henhouse:rwx /var/run/henhouse
+            setfacl -m user:henhouse:rw /var/run/henhouse/extra
+            exit 0
+        }
 
         PASSWORD=$(head /dev/urandom | md5sum | cut -d ' ' -f 1)
 
@@ -24,6 +25,9 @@ case "$1" in
 
         chmod 700 /etc/henhouse
         setfacl -m user:henhouse:rwx /etc/henhouse
+
+        setfacl -m user:henhouse:rwx /var/run/henhouse
+        setfacl -m user:henhouse:rw /var/run/henhouse/extra
 
         PASSWORD="'${PASSWORD}'"
 
