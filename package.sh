@@ -33,5 +33,6 @@ sed -i "s/VERSION_PLACEHOLDER/${VERSION}/" ${PKGDIR}/DEBIAN/control
 fakeroot dpkg-deb --build ${PKGDIR}
 
 if [[ "${TRAVIS_GO_VERSION}" != "tip" ]] && [[ "${TRAVIS_PULL_REQUEST}" == "false" ]] && [[ "${TRAVIS_BRANCH}" == "master" ]]; then
+    ./clean_packages.py
     package_cloud push jollheef/henhouse/ubuntu/xenial ${PKGDIR}.deb
 fi
