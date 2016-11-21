@@ -618,11 +618,11 @@ body {
 }
 
 .task_block-opened {
-    background-color: #3394B3;
+    background-color: #2C7F99;
 }
 
 .task_block-opened:hover {
-    background-color: #2C7F99;
+    background-color: #256A80;
 }
 
 .task_block-success {
