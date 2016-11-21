@@ -145,14 +145,14 @@ body {
 
 .header_link>a:hover, .header_link>a:focus {
                           text-decoration: none;
-                          background-color: #000000;
-                          color: #fff;
+                          background-color: #333333;
+                          color: #c5c5c5;
                           outline: 0;
                       }
 
 .header_link.active>a, .header_link.active>a:hover, .header_link.active>a:focus {
                                                         color: #ffffff;
-                                                        background-color: #9ec37c;
+                                                        background-color: #333333;
                                                         border-bottom-color: transparent;
                                                         cursor: default;
                                                     }
@@ -618,11 +618,11 @@ body {
 }
 
 .task_block-opened {
-    background-color: #3A5FAA;
+    background-color: #3394B3;
 }
 
 .task_block-opened:hover {
-    background-color: #1D2F66;
+    background-color: #2C7F99;
 }
 
 .task_block-success {
@@ -636,10 +636,9 @@ body {
 }
 
 .task_block-solved {
-    background-color: #3AAACD;
+    background-color: #8394B3;
 }
 
 .task_block-solved:hover {
-    background-color: #1D5566
-
+    background-color: #707F99
 }
