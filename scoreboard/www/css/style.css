@@ -618,22 +618,28 @@ body {
 }
 
 .task_block-opened {
-    background-color: #4c4c4c;
+    background-color: #3A5FCD;
 }
 
 .task_block-opened:hover {
-    background-color: #000;
+    background-color: #1D2F66;
 }
 
 .task_block-success {
-    background-color: #9ec37c;
-}
-
-.task_block-success:hover {
-    background-color: #96d45d;
+    background-color: #82AA82;
+    cursor: not-allowed;
 }
 
 .task_block-closed {
     background-color: #828282;
     cursor: not-allowed;
+}
+
+.task_block-solved {
+    background-color: #3AAACD;
+}
+
+.task_block-solved:hover {
+    background-color: #1D5566
+
 }

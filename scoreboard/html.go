@@ -28,10 +28,12 @@ func taskToHTML(teamID int, task game.TaskInfo,
 
 	buttonClass := "closed"
 
-	if len(task.SolvedBy) == 0 && task.Opened {
-		buttonClass = "opened"
-	} else if taskSolvedBy(task, teamID) {
+	if taskSolvedBy(task, teamID) {
 		buttonClass = "success"
+	} else if len(task.SolvedBy) > 0 {
+		buttonClass = "solved"
+	} else if task.Opened {
+		buttonClass = "opened"
 	}
 
 	if task.Opened {
