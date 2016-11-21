@@ -35,6 +35,9 @@ var l10nMap = map[string]string{
 
 	"Solved":       "Флаг принят",
 	"Invalid flag": "Неправильный флаг",
+
+	`btn-submit">Submit</button`: `btn-submit">Отправить</button`,
+	`placeholder="Flag"`:         `placeholder="Флаг"`,
 }
 
 var supported = []language.Tag{

@@ -36,7 +36,9 @@ func innerScoreboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, l10n(r, tmpl), getInfo(), l10n(r, scoreboardHTML(teamID)))
+	fmt.Fprintf(w, l10n(r, tmpl),
+		l10n(r, getInfo()),
+		l10n(r, scoreboardHTML(teamID)))
 }
 
 func staticTasks(w http.ResponseWriter, r *http.Request) {
@@ -49,5 +51,7 @@ func staticTasks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, l10n(r, tmpl), getInfo(), l10n(r, tasksHTML(teamID, isAcceptRussian(r))))
+	fmt.Fprintf(w, l10n(r, tmpl),
+		l10n(r, getInfo()),
+		l10n(r, tasksHTML(teamID, isAcceptRussian(r))))
 }

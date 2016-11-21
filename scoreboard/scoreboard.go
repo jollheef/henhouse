@@ -90,7 +90,7 @@ func getInfo() string {
 		btnType, contestStatus)
 
 	if left != 0 {
-		info += fmt.Sprintf(`<span id="timer">Left %s</span>`,
+		info += fmt.Sprintf(`<span id="timer">%s</span>`,
 			durationToHMS(left))
 	}
 
@@ -308,7 +308,7 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, l10n(r, tmpl), name, desc,
-		author, submitForm)
+		author, l10n(r, submitForm))
 }
 
 func flagHandler(w http.ResponseWriter, r *http.Request) {
