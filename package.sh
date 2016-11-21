@@ -5,7 +5,7 @@ echo 'Warning: package is bit broken. TODO use dpkg-buildpackage'
 ./build.sh
 
 VER_POSTFIX="$(git log --oneline HEAD...$(git tag) | wc -l)"
-VERSION="$(git tag | sed 's/v//')-${VER_POSTFIX}"
+VERSION="$(git tag | sed 's/v//' | tail -n 1)-${VER_POSTFIX}"
 PKGDIR=/tmp/henhouse_${VERSION}
 
 rm -rf ${PKGDIR}
