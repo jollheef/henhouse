@@ -352,7 +352,7 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprintf(w, tmpl, l10n(r, solvedMsg))
+	fmt.Fprintf(w, l10n(r, tmpl), l10n(r, solvedMsg))
 }
 
 func handleStaticFile(pattern, file string) {
