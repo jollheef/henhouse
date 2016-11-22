@@ -30,7 +30,7 @@ cp -r ./scoreboard/templates ${PKGDIR}/var/lib/henhouse/
 
 sed -i "s/VERSION_PLACEHOLDER/${VERSION}/" ${PKGDIR}/DEBIAN/control
 
-fakeroot dpkg-deb --build ${PKGDIR}
+fakeroot dpkg-deb --build ${PKGDIR} || exit 1
 
 echo "TRAVIS_GO_VERSION" ${TRAVIS_GO_VERSION}
 echo "TRAVIS_PULL_REQUEST" ${TRAVIS_PULL_REQUEST}
@@ -42,5 +42,5 @@ if [[ "${TRAVIS_GO_VERSION}" != "tip" ]] \
        && [[ "${TRAVIS_BRANCH}" == "master" || "${TRAVIS_TAG}" != "" ]]
 then
     ./clean_packages.py
-    package_cloud push jollheef/henhouse/ubuntu/xenial ${PKGDIR}.deb
+    package_cloud push jollheef/henhouse/ubuntu/xenial ${PKGDIR}.deb || true
 fi
