@@ -1,4 +1,4 @@
 [Service]
 Type=oneshot
-ExecStart=/bin/sh -c "echo EXTRA=--reinit > /var/run/henhouse/extra"
+ExecStart=/bin/sh -c "echo EXTRA=--reinit > /var/lib/henhouse/extra"
 ExecStart=/bin/systemctl restart henhouse

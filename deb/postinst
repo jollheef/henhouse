@@ -4,8 +4,8 @@ set -e
 case "$1" in
     configure)
         cat /etc/passwd | grep henhouse && {
-            setfacl -m user:henhouse:rwx /var/run/henhouse
-            setfacl -m user:henhouse:rw /var/run/henhouse/extra
+            setfacl -m user:henhouse:rwx /var/lib/henhouse
+            setfacl -m user:henhouse:rw /var/lib/henhouse/extra
             exit 0
         }
 
@@ -26,8 +26,8 @@ case "$1" in
         chmod 700 /etc/henhouse
         setfacl -m user:henhouse:rwx /etc/henhouse
 
-        setfacl -m user:henhouse:rwx /var/run/henhouse
-        setfacl -m user:henhouse:rw /var/run/henhouse/extra
+        setfacl -m user:henhouse:rwx /var/lib/henhouse
+        setfacl -m user:henhouse:rw /var/lib/henhouse/extra
 
         PASSWORD="'${PASSWORD}'"
 
