@@ -9,14 +9,21 @@ Scoreboard for jeopardy-style CTFs.
 
 Fundamental principle: if henhouse is not helping you make jeopardy-style CTF easily, then there is a bug in henhouse.
 
-[![PackageCloud](https://packagecloud.io/assets/packagecloud-badge-fbea7fd09f5aab38e8d59fec16f2268c.png)](https://packagecloud.io/jollheef/henhouse)
-
 ## Install
 
-Ubuntu 16.04 is required. If for any reason it is not acceptable to you, build it yourself as described in «## Development» section.
+### PackageCloud
+
+Built for Ubuntu 16.04. Service may not be available because free plan.
 
     $ curl -s https://packagecloud.io/install/repositories/jollheef/henhouse/script.deb.sh | sudo bash
     $ sudo apt install henhouse
+
+### Build deb package from source
+
+    $ apt install golang build-essential
+    $ export GOPATH=$(realpath ./) && go get github.com/jollheef/henhouse/...
+    $ cd ${GOPATH}/src/github.com/jollheef/henhouse
+    $ ./package.sh
 
 ## Development
 
