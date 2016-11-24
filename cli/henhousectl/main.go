@@ -202,6 +202,7 @@ func taskDumpCmd(database *sql.DB, categories []db.Category) (err error) {
 		Flag:          task.Flag,
 		Author:        task.Author,
 		ForceClosed:   task.ForceClosed,
+		Tags:          task.Tags,
 	}
 
 	output, err := xml.MarshalIndent(xmlTask, "", "	")
