@@ -139,6 +139,7 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 			MinSharePrice: 100,   // TODO support value from xml
 			Opened:        false, // by default task is closed
 			Author:        task.Author,
+			ForceClosed:   task.ForceClosed,
 		})
 
 		log.Println("Add task", task.Name)
