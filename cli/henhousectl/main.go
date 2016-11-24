@@ -133,6 +133,7 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 	t.MinSharePrice = 100 // TODO support value from xml
 	t.Opened = false      // by default task is closed
 	t.Author = task.Author
+	t.Tags = task.Tags
 	t.ForceClosed = task.ForceClosed
 
 	return
