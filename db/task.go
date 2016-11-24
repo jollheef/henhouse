@@ -23,6 +23,7 @@ type Task struct {
 	Tags          string
 	CategoryID    int
 	Level         int
+	ForceClosed   bool
 	Price         int
 	Shared        bool
 	Flag          string
@@ -52,7 +53,8 @@ func createTaskTable(db *sql.DB) (err error) {
 		min_share_price	INTEGER NOT NULL,
 		opened		BOOLEAN NOT NULL,
 		author		TEXT NOT NULL,
-		opened_time	TIMESTAMP with time zone
+		opened_time	TIMESTAMP with time zone,
+		force_closed	BOOLEAN NOT NULL
 	)`)
 
 	return
@@ -64,9 +66,9 @@ func AddTask(db *sql.DB, t *Task) (err error) {
 	stmt, err := db.Prepare("INSERT INTO task (name, description, " +
 		"name_en, description_en, tags, " +
 		"category_id, level, price, shared, flag, max_share_price, " +
-		"min_share_price, opened, author, opened_time) " +
+		"min_share_price, opened, author, opened_time, force_closed) " +
 		"VALUES ($1, $2, $3, $4, $5, " +
-		"$6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id")
+		"$6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id")
 	if err != nil {
 		return
 	}
@@ -76,7 +78,7 @@ func AddTask(db *sql.DB, t *Task) (err error) {
 	err = stmt.QueryRow(t.Name, t.Desc, t.NameEn, t.DescEn, t.Tags,
 		t.CategoryID, t.Level, t.Price, t.Shared, t.Flag,
 		t.MaxSharePrice, t.MinSharePrice,
-		t.Opened, t.Author, t.OpenedTime).Scan(&t.ID)
+		t.Opened, t.Author, t.OpenedTime, t.ForceClosed).Scan(&t.ID)
 	if err != nil {
 		return
 	}
@@ -90,7 +92,7 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 	rows, err := db.Query("SELECT id, name, description, name_en, " +
 		"description_en, tags, category_id, " +
 		"level, price, shared, flag, max_share_price, " +
-		"min_share_price, opened, author, opened_time FROM task")
+		"min_share_price, opened, author, opened_time, force_closed FROM task")
 	if err != nil {
 		return
 	}
@@ -104,7 +106,7 @@ func GetTasks(db *sql.DB) (tasks []Task, err error) {
 			&t.Tags, &t.CategoryID,
 			&t.Level, &t.Price, &t.Shared, &t.Flag,
 			&t.MaxSharePrice, &t.MinSharePrice, &t.Opened,
-			&t.Author, &t.OpenedTime)
+			&t.Author, &t.OpenedTime, &t.ForceClosed)
 		if err != nil {
 			return
 		}
@@ -141,7 +143,7 @@ func UpdateTask(db *sql.DB, t *Task) (err error) {
 		"name_en=$3, description_en=$4, " +
 		"tags=$5, category_id=$6, level=$7, price=$8, shared=$9, flag=$10, " +
 		"max_share_price=$11, min_share_price=$12, opened=$13, " +
-		"author=$14, opened_time=$15 WHERE id=$16")
+		"author=$14, opened_time=$15, force_closed=$16 WHERE id=$17")
 	if err != nil {
 		return
 	}
@@ -151,7 +153,7 @@ func UpdateTask(db *sql.DB, t *Task) (err error) {
 	_, err = stmt.Exec(t.Name, t.Desc, t.NameEn, t.DescEn, t.Tags,
 		t.CategoryID, t.Level, t.Price,
 		t.Shared, t.Flag, t.MaxSharePrice, t.MinSharePrice, t.Opened,
-		t.Author, t.OpenedTime, t.ID)
+		t.Author, t.OpenedTime, t.ForceClosed, t.ID)
 	if err != nil {
 		return
 	}
@@ -165,7 +167,7 @@ func GetTask(db *sql.DB, taskID int) (t Task, err error) {
 	stmt, err := db.Prepare("SELECT id, name, description, name_en, " +
 		"description_en, tags, category_id, " +
 		"level, price, shared, flag, max_share_price, " +
-		"min_share_price, opened, author, opened_time " +
+		"min_share_price, opened, author, opened_time, force_closed " +
 		"FROM task WHERE id=$1")
 	if err != nil {
 		return
@@ -177,7 +179,7 @@ func GetTask(db *sql.DB, taskID int) (t Task, err error) {
 		&t.NameEn, &t.DescEn, &t.Tags,
 		&t.CategoryID, &t.Level, &t.Price, &t.Shared, &t.Flag,
 		&t.MaxSharePrice, &t.MinSharePrice, &t.Opened,
-		&t.Author, &t.OpenedTime)
+		&t.Author, &t.OpenedTime, &t.ForceClosed)
 	if err != nil {
 		return
 	}

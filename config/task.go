@@ -23,6 +23,7 @@ type Task struct {
 	Category      string
 	Tags          string
 	Level         int
+	ForceClosed   bool
 	Flag          string
 	Author        string
 }

@@ -5,4 +5,5 @@
   <Category>bar</Category>                    <!--категория с учетом регистра-->
   <Level>5</Level>                            <!--последовательность при открытии-->
   <Flag>test</Flag>                           <!--флаг (строка или регулярным выражением)-->
+  <ForceClosed>true</ForceClosed>             <!--запрет открытия задачи (true/false, NOT True/False)-->
 </Task>

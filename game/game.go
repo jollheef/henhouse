@@ -38,18 +38,19 @@ type Game struct {
 
 // TaskInfo provide information about task
 type TaskInfo struct {
-	ID         int
-	Name       string
-	Desc       string
-	NameEn     string
-	DescEn     string
-	Tags       string
-	Author     string
-	Price      int
-	Opened     bool
-	Level      int
-	SolvedBy   []int
-	OpenedTime time.Time
+	ID          int
+	Name        string
+	Desc        string
+	NameEn      string
+	DescEn      string
+	Tags        string
+	Author      string
+	Price       int
+	Opened      bool
+	Level       int
+	ForceClosed bool
+	SolvedBy    []int
+	OpenedTime  time.Time
 }
 
 // CategoryInfo provide information about categories and tasks
@@ -136,6 +137,10 @@ func (g Game) Run() (err error) {
 
 	for _, c := range cats {
 		for _, t := range c.TasksInfo {
+			if t.ForceClosed {
+				continue
+			}
+
 			log.Println("Open task", t.Name, t.Level)
 			err = db.SetOpened(g.db, t.ID, true)
 			if err != nil {
@@ -175,7 +180,7 @@ func (g Game) autoOpenTasks() (err error) {
 	for _, c := range cats {
 		prev := TaskInfo{Opened: true}
 		for i, t := range c.TasksInfo {
-			if i == 0 || t.Opened || !prev.Opened {
+			if i == 0 || t.Opened || !prev.Opened || t.ForceClosed {
 				prev = t
 				continue
 			}
@@ -255,18 +260,19 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 				}
 
 				tInfo := TaskInfo{
-					ID:         task.ID,
-					Name:       task.Name,
-					Desc:       task.Desc,
-					NameEn:     task.NameEn,
-					DescEn:     task.DescEn,
-					Tags:       task.Tags,
-					Price:      price,
-					Opened:     task.Opened,
-					SolvedBy:   solvedBy,
-					Author:     task.Author,
-					Level:      task.Level,
-					OpenedTime: task.OpenedTime,
+					ID:          task.ID,
+					Name:        task.Name,
+					Desc:        task.Desc,
+					NameEn:      task.NameEn,
+					DescEn:      task.DescEn,
+					Tags:        task.Tags,
+					Price:       price,
+					Opened:      task.Opened,
+					SolvedBy:    solvedBy,
+					Author:      task.Author,
+					Level:       task.Level,
+					ForceClosed: task.ForceClosed,
+					OpenedTime:  task.OpenedTime,
 				}
 
 				cat.TasksInfo = append(cat.TasksInfo, tInfo)
@@ -379,7 +385,7 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 		// If same category and next level
 		if t.CategoryID == task.CategoryID && t.Level+1 == task.Level {
 			// If not already opened
-			if !task.Opened {
+			if !task.Opened && !task.ForceClosed {
 				// Open it!
 				log.Println("Open task", t.Name, t.Level)
 				err = db.SetOpened(g.db, task.ID, true)

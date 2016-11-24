@@ -118,6 +118,8 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 
 	t.Name = task.Name
 	t.Desc = task.Description
+	t.NameEn = task.NameEn
+	t.DescEn = task.DescriptionEn
 	t.CategoryID, err = getCategoryByName(task.Category, categories)
 	if err != nil {
 		return
@@ -131,6 +133,7 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 	t.MinSharePrice = 100 // TODO support value from xml
 	t.Opened = false      // by default task is closed
 	t.Author = task.Author
+	t.ForceClosed = task.ForceClosed
 
 	return
 }
@@ -189,12 +192,15 @@ func taskDumpCmd(database *sql.DB, categories []db.Category) (err error) {
 	}
 
 	xmlTask := config.Task{
-		Name:        task.Name,
-		Description: task.Desc,
-		Category:    getCategoryByID(task.CategoryID, categories),
-		Level:       task.Level,
-		Flag:        task.Flag,
-		Author:      task.Author,
+		Name:          task.Name,
+		NameEn:        task.NameEn,
+		Description:   task.Desc,
+		DescriptionEn: task.DescEn,
+		Category:      getCategoryByID(task.CategoryID, categories),
+		Level:         task.Level,
+		Flag:          task.Flag,
+		Author:        task.Author,
+		ForceClosed:   task.ForceClosed,
 	}
 
 	output, err := xml.MarshalIndent(xmlTask, "", "	")
