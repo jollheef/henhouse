@@ -33,6 +33,7 @@ const (
 var (
 	gameShim      *game.Game
 	contestStatus string
+	scoreCache    []game.TeamScoreInfo
 )
 
 var (
@@ -154,13 +155,7 @@ func scoreboardHTML(teamID int) (result string) {
 
 	result += "<tbody>"
 
-	scores, err := gameShim.Scoreboard()
-	if err != nil {
-		log.Println("Get scoreboard fail:", err)
-		return
-	}
-
-	for n, teamScore := range scores {
+	for n, teamScore := range scoreCache {
 		if teamScore.ID == teamID {
 			result += `<tr class="self_team">`
 		} else {
@@ -188,6 +183,12 @@ func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 		err := game.RecalcScoreboard()
 		if err != nil {
 			log.Println("Recalc scoreboard fail:", err)
+		}
+
+		scoreCache, err = gameShim.Scoreboard()
+		if err != nil {
+			log.Println("Get scoreboard fail:", err)
+			return
 		}
 	}
 }
