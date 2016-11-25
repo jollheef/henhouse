@@ -183,12 +183,13 @@ func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 		err := game.RecalcScoreboard()
 		if err != nil {
 			log.Println("Recalc scoreboard fail:", err)
+			continue
 		}
 
-		scoreCache, err = gameShim.Scoreboard()
+		scoreCache, err = game.Scoreboard()
 		if err != nil {
 			log.Println("Get scoreboard fail:", err)
-			return
+			continue
 		}
 	}
 }
@@ -413,6 +414,12 @@ func Scoreboard(database *sql.DB, game *game.Game,
 	contestStatus = contestStateNotAvailable
 	gameShim = game
 	templatePath = tmpltsPath
+
+	scoreCache, err = gameShim.Scoreboard()
+	if err != nil {
+		log.Println("Get scoreboard fail:", err)
+		return
+	}
 
 	go scoreboardUpdater(game, ScoreboardRecalcTimeout)
 
