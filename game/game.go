@@ -123,6 +123,22 @@ func (g *Game) SetTeamsBase(teams int) {
 	g.TaskPrice.TeamsBase = float64(teams)
 }
 
+// TeamsBaseUpdater auto update TeamsBase depends on all time logged teams
+func (g *Game) TeamsBaseUpdater(updateTimeout time.Duration) {
+	for {
+		time.Sleep(updateTimeout)
+
+		count, err := db.GetSessionCount(g.db)
+		if err != nil {
+			log.Println("Get session count fail:", err)
+			continue
+		}
+
+		g.SetTeamsBase(count)
+		log.Println("Set teams base to", count)
+	}
+}
+
 // Run open first level tasks and start auto open routine
 func (g Game) Run() (err error) {
 
@@ -201,7 +217,7 @@ func (g Game) autoOpenTasks() (err error) {
 	return
 }
 
-func (g Game) taskPrice(database *sql.DB, taskID int) (price int, err error) {
+func (g *Game) taskPrice(database *sql.DB, taskID int) (price int, err error) {
 
 	count, err := db.GetSolvedCount(database, taskID)
 
