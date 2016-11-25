@@ -35,6 +35,7 @@ p200 = 50
 # other 100
 
 [Game]
+# Europe/Moscow
 start = "Nov 17 10:00 2015"
 end = "Dec 31 23:59 2015"
 
