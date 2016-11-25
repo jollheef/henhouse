@@ -96,11 +96,11 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 
 	g.scoreboardLock = &sync.Mutex{}
 
-	tasks, err := db.GetTasks(g.db)
+	teams, err := db.GetTeams(g.db)
 	if err != nil {
 		return
 	}
-	g.TaskPrice.TeamsBase = float64(len(tasks))
+	g.TaskPrice.TeamsBase = float64(len(teams))
 
 	err = g.RecalcScoreboard()
 	if err != nil {
