@@ -45,6 +45,7 @@ type Config struct {
 	}
 
 	TaskPrice struct {
+		UseSessionCounter      bool
 		UseTeamsBase           bool
 		TeamsBase              int
 		P500, P400, P300, P200 int

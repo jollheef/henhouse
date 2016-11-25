@@ -23,8 +23,10 @@ scoreboard = "10s"
 tasks = "10s"
 
 [TaskPrice]
+# use amount of logged teams
+use_session_counter = false
 # for correct work with small amount of teams
-use_teams_base = true
+use_teams_base = false
 teams_base = 20
 # 500 if percent of solve less than value
 p500 = 10
