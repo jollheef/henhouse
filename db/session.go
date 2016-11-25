@@ -53,6 +53,12 @@ func AddSession(db *sql.DB, s *Session) (err error) {
 	return
 }
 
+// GetSessionCount returns count of logged teams for all time
+func GetSessionCount(db *sql.DB) (count int, err error) {
+	err = db.QueryRow("SELECT COUNT(DISTINCT team_id) FROM session;").Scan(&count)
+	return
+}
+
 // GetSessionTeam get team id for session
 func GetSessionTeam(db *sql.DB, session string) (teamID int, err error) {
 
