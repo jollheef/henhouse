@@ -32,7 +32,8 @@ var (
 	// Task
 	task = kingpin.Command("task", "Work with tasks.")
 
-	taskList = task.Command("list", "List tasks.")
+	taskList        = task.Command("list", "List tasks.")
+	taskListWOFlags = taskList.Flag("without-flags", "Do not include flags in output.").Bool()
 
 	taskAdd    = task.Command("add", "Add task.")
 	taskAddXML = taskAdd.Arg("xml", "Path to xml.").Required().String()
@@ -92,15 +93,6 @@ func getCategoryByName(name string, categories []db.Category) (id int, err error
 	return 0, errors.New("Category " + name + " not found")
 }
 
-func taskRow(task db.Task, categories []db.Category) (row []string) {
-	row = append(row, fmt.Sprintf("%d", task.ID))
-	row = append(row, task.Name)
-	row = append(row, getCategoryByID(task.CategoryID, categories))
-	row = append(row, task.Flag)
-	row = append(row, fmt.Sprintf("%v", task.Opened))
-	return
-}
-
 type byID []db.Task
 
 func (t byID) Len() int           { return len(t) }
@@ -125,6 +117,7 @@ func parseTask(path string, categories []db.Category) (t db.Task, err error) {
 	t.DescEn = task.DescriptionEn
 	t.CategoryID, err = getCategoryByName(task.Category, categories)
 	if err != nil {
+		log.Println("Cant find category")
 		return
 	}
 
@@ -191,11 +184,33 @@ func taskListCmd(database *sql.DB, categories []db.Category) (err error) {
 	sort.Sort(byID(tasks))
 
 	table := tablewriter.NewWriter(os.Stdout)
-	header := []string{"ID", "Name", "Category", "Flag", "Opened"}
+	var header []string
+	if *taskListWOFlags {
+		header = []string{"ID", "Name", "Category", "Opened", "Solved by"}
+	} else {
+		header = []string{"ID", "Name", "Category", "Flag", "Opened", "Solved by"}
+	}
 	table.SetHeader(header)
 
 	for _, task := range tasks {
-		table.Append(taskRow(task, categories))
+		var solvedBy int
+		solvedBy, err = db.GetSolvedCount(database, task.ID)
+		if err != nil {
+			return
+		}
+
+		var row []string
+
+		row = append(row, fmt.Sprintf("%d", task.ID))
+		row = append(row, task.Name)
+		row = append(row, getCategoryByID(task.CategoryID, categories))
+		if !*taskListWOFlags {
+			row = append(row, task.Flag)
+		}
+		row = append(row, fmt.Sprintf("%v", task.Opened))
+		row = append(row, fmt.Sprintf("%d", solvedBy))
+
+		table.Append(row)
 	}
 
 	table.Render()
