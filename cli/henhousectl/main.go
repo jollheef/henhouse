@@ -34,6 +34,9 @@ var (
 
 	taskList = task.Command("list", "List tasks.")
 
+	taskAdd    = task.Command("add", "Add task.")
+	taskAddXML = taskAdd.Arg("xml", "Path to xml.").Required().String()
+
 	taskUpdate    = task.Command("update", "Update task.")
 	taskUpdateID  = taskUpdate.Arg("id", "ID of task.").Required().Int()
 	taskUpdateXML = taskUpdate.Arg("xml", "Path to xml.").Required().String()
@@ -165,6 +168,20 @@ func taskUpdateCmd(database *sql.DB, categories []db.Category) (err error) {
 	return
 }
 
+func taskAddCmd(database *sql.DB, categories []db.Category) (err error) {
+	t, err := parseTask(*taskAddXML, categories)
+	if err != nil {
+		return
+	}
+
+	err = db.AddTask(database, &t)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
 func taskListCmd(database *sql.DB, categories []db.Category) (err error) {
 	tasks, err := db.GetTasks(database)
 	if err != nil {
@@ -256,6 +273,8 @@ func teamListCmd(database *sql.DB, categories []db.Category) (err error) {
 
 func runCommandLine(database *sql.DB, categories []db.Category) (err error) {
 	switch kingpin.Parse() {
+	case "task add":
+		err = taskAddCmd(database, categories)
 	case "task update":
 		err = taskUpdateCmd(database, categories)
 	case "task list":
