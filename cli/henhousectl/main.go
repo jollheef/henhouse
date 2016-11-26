@@ -275,8 +275,8 @@ func (t byScore) Len() int      { return len(t) }
 func (t byScore) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
 func (t byScore) Less(i, j int) bool {
 	var in, jn int
-	fmt.Sscanf(t[i][3], "%d", &in)
-	fmt.Sscanf(t[j][3], "%d", &jn)
+	fmt.Sscanf(t[i][2], "%d", &in)
+	fmt.Sscanf(t[j][2], "%d", &jn)
 	return in > jn
 }
 
