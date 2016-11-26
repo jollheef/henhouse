@@ -267,7 +267,7 @@ func categoryListCmd(database *sql.DB) (err error) {
 	return
 }
 
-func teamListCmd(database *sql.DB, categories []db.Category) (err error) {
+func teamListCmd(database *sql.DB) (err error) {
 	teams, err := db.GetTeams(database)
 	if err != nil {
 		return
@@ -305,7 +305,7 @@ func runCommandLine(database *sql.DB, categories []db.Category) (err error) {
 	case "category list":
 		err = categoryListCmd(database)
 	case "team list":
-		err = teamListCmd(database, categories)
+		err = teamListCmd(database)
 	}
 
 	return
