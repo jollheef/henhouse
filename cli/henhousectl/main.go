@@ -269,17 +269,63 @@ func categoryListCmd(database *sql.DB) (err error) {
 	return
 }
 
+type byScore [][]string
+
+func (t byScore) Len() int      { return len(t) }
+func (t byScore) Swap(i, j int) { t[i], t[j] = t[j], t[i] }
+func (t byScore) Less(i, j int) bool {
+	var in, jn int
+	fmt.Sscanf(t[i][3], "%d", &in)
+	fmt.Sscanf(t[j][3], "%d", &jn)
+	return in > jn
+}
+
 func teamListCmd(database *sql.DB) (err error) {
 	teams, err := db.GetTeams(database)
 	if err != nil {
 		return
 	}
 
+	flags, err := db.GetFlags(database)
+	if err != nil {
+		return
+	}
+
+	tasks, err := db.GetTasks(database)
+	if err != nil {
+		return
+	}
+
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"ID", "Name"})
+	table.SetHeader([]string{"ID", "Name", "Score", "Solved"})
+
+	rows := [][]string{}
 
 	for _, t := range teams {
 		row := []string{fmt.Sprintf("%d", t.ID), t.Name}
+
+		var score db.Score
+		score, err = db.GetLastScore(database, t.ID)
+		if err != nil {
+			return
+		}
+		row = append(row, fmt.Sprintf("%d", score.Score))
+
+		solvedCount := 0
+		for _, f := range flags {
+			if f.TeamID == t.ID {
+				solvedCount += 1
+			}
+		}
+
+		row = append(row, fmt.Sprintf("%d/%d", solvedCount, len(tasks)))
+
+		rows = append(rows, row)
+	}
+
+	sort.Sort(byScore(rows))
+
+	for _, row := range rows {
 		table.Append(row)
 	}
 
