@@ -307,7 +307,7 @@ func teamListCmd(database *sql.DB) (err error) {
 		var score db.Score
 		score, err = db.GetLastScore(database, t.ID)
 		if err != nil {
-			return
+			continue
 		}
 		row = append(row, fmt.Sprintf("%d", score.Score))
 
