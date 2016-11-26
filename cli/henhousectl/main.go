@@ -62,7 +62,9 @@ var (
 	// Team
 	team = kingpin.Command("team", "Work with teams.")
 
-	teamList = team.Command("list", "List teams.")
+	teamList   = team.Command("list", "List teams.")
+	teamInfo   = team.Command("info", "Information about team.")
+	teamInfoID = teamInfo.Arg("id", "ID of task").Required().Int()
 )
 
 var (
@@ -286,6 +288,51 @@ func teamListCmd(database *sql.DB) (err error) {
 	return
 }
 
+func teamInfoCmd(database *sql.DB) (err error) {
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	flags, err := db.GetFlags(database)
+	if err != nil {
+		return
+	}
+
+	tasks, err := db.GetTasks(database)
+	if err != nil {
+		return
+	}
+
+	for _, t := range teams {
+		if t.ID == *teamInfoID {
+			fmt.Println("ID:", t.ID)
+			fmt.Println("Name:", t.Name)
+			fmt.Println("Email:", t.Email)
+			fmt.Println("Description:", t.Desc)
+			fmt.Println("Token:", t.Token)
+			fmt.Println("Test:", t.Test)
+			fmt.Print("Solved: ")
+			solvedCount := 0
+			for _, f := range flags {
+				if f.TeamID == t.ID {
+					var task db.Task
+					task, err = db.GetTask(database, f.TaskID)
+					if err != nil {
+						return
+					}
+					solvedCount += 1
+					fmt.Printf("%s (%d), ", task.Name, task.ID)
+				}
+			}
+			fmt.Println()
+			fmt.Printf("Solved: %d/%d\n", solvedCount, len(tasks))
+		}
+	}
+
+	return
+}
+
 func runCommandLine(database *sql.DB, categories []db.Category) (err error) {
 	switch kingpin.Parse() {
 	case "task add":
@@ -306,6 +353,8 @@ func runCommandLine(database *sql.DB, categories []db.Category) (err error) {
 		err = categoryListCmd(database)
 	case "team list":
 		err = teamListCmd(database)
+	case "team info":
+		err = teamInfoCmd(database)
 	}
 
 	return
