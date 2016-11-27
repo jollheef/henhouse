@@ -212,9 +212,9 @@ func taskListCmd(database *sql.DB, categories []db.Category) (err error) {
 
 		row = append(row, fmt.Sprintf("%d", task.ID))
 		if *taskListEnglish {
-			row = append(row, task.Name)
-		} else {
 			row = append(row, task.NameEn)
+		} else {
+			row = append(row, task.Name)
 		}
 		row = append(row, getCategoryByID(task.CategoryID, categories))
 		if !*taskListWOFlags {
