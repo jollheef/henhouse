@@ -68,7 +68,8 @@ var (
 	teamInfoID = teamInfo.Arg("id", "ID of task").Required().Int()
 
 	// Export
-	export = kingpin.Command("export", "Export scoreboard for ctftime.")
+	export               = kingpin.Command("export", "Export scoreboard for ctftime.")
+	exportWithLastAccept = export.Flag("with-last-accept", "Add last-accept field.").Bool()
 )
 
 var (
@@ -423,8 +424,14 @@ func exportScoreboard(database *sql.DB) (err error) {
 
 	fmt.Println("{\n\t\"standings\": [")
 	for i, s := range scores {
-		fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\", \"score\": %d, \"lastAccept\" : %d }",
-			i+1, s.Name, s.Score, s.LastAccept)
+		if *exportWithLastAccept {
+			fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\","+
+				" \"score\": %d, \"lastAccept\" : %d }",
+				i+1, s.Name, s.Score, s.LastAccept)
+		} else {
+			fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\","+
+				" \"score\": %d }", i+1, s.Name, s.Score)
+		}
 		if i != len(scores)-1 {
 			fmt.Printf(",\n")
 		} else {
