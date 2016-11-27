@@ -23,7 +23,6 @@ import (
 
 	"github.com/jollheef/henhouse/config"
 	"github.com/jollheef/henhouse/db"
-	"github.com/jollheef/henhouse/game"
 	"github.com/olekukonko/tablewriter"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -394,9 +393,27 @@ func lastAttack(teamID int, flags []db.Flag) int64 {
 	return timestamp.Unix()
 }
 
+type ScoreInfo struct {
+	ID         int
+	Name       string
+	Score      int
+	LastAccept int64
+}
+
+type byScoreAndLastAccept []ScoreInfo
+
+func (tr byScoreAndLastAccept) Len() int      { return len(tr) }
+func (tr byScoreAndLastAccept) Swap(i, j int) { tr[i], tr[j] = tr[j], tr[i] }
+func (tr byScoreAndLastAccept) Less(i, j int) bool {
+	if tr[i].Score == tr[j].Score {
+		return tr[i].LastAccept > tr[j].LastAccept
+	}
+	return tr[i].Score > tr[j].Score
+}
+
 func exportScoreboard(database *sql.DB) (err error) {
 
-	scores := []game.TeamScoreInfo{}
+	scores := []ScoreInfo{}
 
 	teams, err := db.GetTeams(database)
 	if err != nil {
@@ -420,16 +437,22 @@ func exportScoreboard(database *sql.DB) (err error) {
 			return
 		}
 
-		scores = append(scores,
-			game.TeamScoreInfo{team.ID, team.Name, team.Desc, s.Score})
+		scoreInfo := ScoreInfo{
+			ID:         team.ID,
+			Name:       team.Name,
+			Score:      s.Score,
+			LastAccept: lastAttack(team.ID, flags),
+		}
+
+		scores = append(scores, scoreInfo)
 	}
 
-	sort.Sort(game.ByScore(scores))
+	sort.Sort(byScoreAndLastAccept(scores))
 
 	fmt.Println("{\n\t\"standings\": [")
 	for i, s := range scores {
 		fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\", \"score\": %d, \"lastAccept\" : %d }",
-			i+1, s.Name, s.Score, lastAttack(s.ID, flags))
+			i+1, s.Name, s.Score, s.LastAccept)
 		if i != len(scores)-1 {
 			fmt.Printf(",\n")
 		} else {
