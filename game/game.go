@@ -75,7 +75,7 @@ func (tr ByScoreAndLastAccept) Len() int      { return len(tr) }
 func (tr ByScoreAndLastAccept) Swap(i, j int) { tr[i], tr[j] = tr[j], tr[i] }
 func (tr ByScoreAndLastAccept) Less(i, j int) bool {
 	if tr[i].Score == tr[j].Score {
-		return tr[i].LastAccept > tr[j].LastAccept
+		return tr[i].LastAccept < tr[j].LastAccept
 	}
 	return tr[i].Score > tr[j].Score
 }
