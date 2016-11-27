@@ -19,10 +19,10 @@ import (
 	"log"
 	"os"
 	"sort"
-	"time"
 
 	"github.com/jollheef/henhouse/config"
 	"github.com/jollheef/henhouse/db"
+	"github.com/jollheef/henhouse/game"
 	"github.com/olekukonko/tablewriter"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -318,7 +318,7 @@ func teamListCmd(database *sql.DB) (err error) {
 		solvedCount := 0
 		for _, f := range flags {
 			if f.TeamID == t.ID {
-				solvedCount += 1
+				solvedCount++
 			}
 		}
 
@@ -371,7 +371,7 @@ func teamInfoCmd(database *sql.DB) (err error) {
 					if err != nil {
 						return
 					}
-					solvedCount += 1
+					solvedCount++
 					fmt.Printf("%s (%d), ", task.Name, task.ID)
 				}
 			}
@@ -383,37 +383,9 @@ func teamInfoCmd(database *sql.DB) (err error) {
 	return
 }
 
-func lastAttack(teamID int, flags []db.Flag) int64 {
-	timestamp := time.Unix(0, 0)
-	for _, f := range flags {
-		if f.TeamID == teamID && f.Timestamp.After(timestamp) {
-			timestamp = f.Timestamp
-		}
-	}
-	return timestamp.Unix()
-}
-
-type ScoreInfo struct {
-	ID         int
-	Name       string
-	Score      int
-	LastAccept int64
-}
-
-type byScoreAndLastAccept []ScoreInfo
-
-func (tr byScoreAndLastAccept) Len() int      { return len(tr) }
-func (tr byScoreAndLastAccept) Swap(i, j int) { tr[i], tr[j] = tr[j], tr[i] }
-func (tr byScoreAndLastAccept) Less(i, j int) bool {
-	if tr[i].Score == tr[j].Score {
-		return tr[i].LastAccept > tr[j].LastAccept
-	}
-	return tr[i].Score > tr[j].Score
-}
-
 func exportScoreboard(database *sql.DB) (err error) {
 
-	scores := []ScoreInfo{}
+	scores := []game.TeamScoreInfo{}
 
 	teams, err := db.GetTeams(database)
 	if err != nil {
@@ -437,17 +409,17 @@ func exportScoreboard(database *sql.DB) (err error) {
 			return
 		}
 
-		scoreInfo := ScoreInfo{
+		scoreInfo := game.TeamScoreInfo{
 			ID:         team.ID,
 			Name:       team.Name,
 			Score:      s.Score,
-			LastAccept: lastAttack(team.ID, flags),
+			LastAccept: game.LastAccept(team.ID, flags),
 		}
 
 		scores = append(scores, scoreInfo)
 	}
 
-	sort.Sort(byScoreAndLastAccept(scores))
+	sort.Sort(game.ByScoreAndLastAccept(scores))
 
 	fmt.Println("{\n\t\"standings\": [")
 	for i, s := range scores {

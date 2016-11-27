@@ -61,17 +61,24 @@ type CategoryInfo struct {
 
 // TeamScoreInfo provide information about team score
 type TeamScoreInfo struct {
-	ID    int
-	Name  string
-	Desc  string
-	Score int
+	ID         int
+	Name       string
+	Desc       string
+	Score      int
+	LastAccept int64
 }
 
-type byScore []TeamScoreInfo
+// ByScoreAndLastAccept sort by score and last accept
+type ByScoreAndLastAccept []TeamScoreInfo
 
-func (tr byScore) Len() int           { return len(tr) }
-func (tr byScore) Swap(i, j int)      { tr[i], tr[j] = tr[j], tr[i] }
-func (tr byScore) Less(i, j int) bool { return tr[i].Score > tr[j].Score }
+func (tr ByScoreAndLastAccept) Len() int      { return len(tr) }
+func (tr ByScoreAndLastAccept) Swap(i, j int) { tr[i], tr[j] = tr[j], tr[i] }
+func (tr ByScoreAndLastAccept) Less(i, j int) bool {
+	if tr[i].Score == tr[j].Score {
+		return tr[i].LastAccept > tr[j].LastAccept
+	}
+	return tr[i].Score > tr[j].Score
+}
 
 type byLevel []TaskInfo
 
@@ -303,6 +310,17 @@ func (g Game) Tasks() (cats []CategoryInfo, err error) {
 	return
 }
 
+// LastAccept returns last time of accepted flag for team
+func LastAccept(teamID int, flags []db.Flag) int64 {
+	timestamp := time.Unix(0, 0)
+	for _, f := range flags {
+		if f.TeamID == teamID && f.Timestamp.After(timestamp) {
+			timestamp = f.Timestamp
+		}
+	}
+	return timestamp.Unix()
+}
+
 // Scoreboard returns sorted scoreboard
 func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 
@@ -310,6 +328,11 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 	defer g.scoreboardLock.Unlock()
 
 	teams, err := db.GetTeams(g.db)
+	if err != nil {
+		return
+	}
+
+	flags, err := db.GetFlags(g.db)
 	if err != nil {
 		return
 	}
@@ -326,11 +349,16 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 			return
 		}
 
-		scores = append(scores,
-			TeamScoreInfo{team.ID, team.Name, team.Desc, s.Score})
+		scores = append(scores, TeamScoreInfo{
+			ID:         team.ID,
+			Name:       team.Name,
+			Desc:       team.Desc,
+			Score:      s.Score,
+			LastAccept: LastAccept(team.ID, flags),
+		})
 	}
 
-	sort.Sort(byScore(scores))
+	sort.Sort(ByScoreAndLastAccept(scores))
 
 	return
 }
