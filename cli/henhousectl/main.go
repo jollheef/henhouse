@@ -19,6 +19,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"time"
 
 	"github.com/jollheef/henhouse/config"
 	"github.com/jollheef/henhouse/db"
@@ -383,11 +384,26 @@ func teamInfoCmd(database *sql.DB) (err error) {
 	return
 }
 
+func lastAttack(teamID int, flags []db.Flag) int64 {
+	timestamp := time.Unix(0, 0)
+	for _, f := range flags {
+		if f.TeamID == teamID && f.Timestamp.After(timestamp) {
+			timestamp = f.Timestamp
+		}
+	}
+	return timestamp.Unix()
+}
+
 func exportScoreboard(database *sql.DB) (err error) {
 
 	scores := []game.TeamScoreInfo{}
 
 	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	flags, err := db.GetFlags(database)
 	if err != nil {
 		return
 	}
@@ -412,8 +428,8 @@ func exportScoreboard(database *sql.DB) (err error) {
 
 	fmt.Println("{\n\t\"standings\": [")
 	for i, s := range scores {
-		fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\", \"score\": %d }",
-			i, s.Name, s.Score)
+		fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\", \"score\": %d, \"lastAccept\" : %d }",
+			i+1, s.Name, s.Score, lastAttack(s.ID, flags))
 		if i != len(scores)-1 {
 			fmt.Printf(",\n")
 		} else {
