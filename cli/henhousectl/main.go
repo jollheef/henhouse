@@ -36,6 +36,7 @@ var (
 
 	taskList        = task.Command("list", "List tasks.")
 	taskListWOFlags = taskList.Flag("without-flags", "Do not include flags in output.").Bool()
+	taskListEnglish = taskList.Flag("en", "Use english names.").Bool()
 
 	taskAdd    = task.Command("add", "Add task.")
 	taskAddXML = taskAdd.Arg("xml", "Path to xml.").Required().String()
@@ -210,7 +211,11 @@ func taskListCmd(database *sql.DB, categories []db.Category) (err error) {
 		var row []string
 
 		row = append(row, fmt.Sprintf("%d", task.ID))
-		row = append(row, task.Name)
+		if *taskListEnglish {
+			row = append(row, task.Name)
+		} else {
+			row = append(row, task.NameEn)
+		}
 		row = append(row, getCategoryByID(task.CategoryID, categories))
 		if !*taskListWOFlags {
 			row = append(row, task.Flag)
