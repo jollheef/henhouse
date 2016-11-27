@@ -22,6 +22,7 @@ import (
 
 	"github.com/jollheef/henhouse/config"
 	"github.com/jollheef/henhouse/db"
+	"github.com/jollheef/henhouse/game"
 	"github.com/olekukonko/tablewriter"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -65,6 +66,9 @@ var (
 	teamList   = team.Command("list", "List teams.")
 	teamInfo   = team.Command("info", "Information about team.")
 	teamInfoID = teamInfo.Arg("id", "ID of task").Required().Int()
+
+	// Export
+	export = kingpin.Command("export", "Export scoreboard for ctftime.")
 )
 
 var (
@@ -379,6 +383,49 @@ func teamInfoCmd(database *sql.DB) (err error) {
 	return
 }
 
+func exportScoreboard(database *sql.DB) (err error) {
+
+	scores := []game.TeamScoreInfo{}
+
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	for _, team := range teams {
+
+		if team.Test {
+			continue
+		}
+
+		var s db.Score
+		s, err = db.GetLastScore(database, team.ID)
+		if err != nil {
+			return
+		}
+
+		scores = append(scores,
+			game.TeamScoreInfo{team.ID, team.Name, team.Desc, s.Score})
+	}
+
+	sort.Sort(game.ByScore(scores))
+
+	fmt.Println("{\n\t\"standings\": [")
+	for i, s := range scores {
+		fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\", \"score\": %d }",
+			i, s.Name, s.Score)
+		if i != len(scores)-1 {
+			fmt.Printf(",\n")
+		} else {
+			fmt.Printf("\n")
+		}
+
+	}
+	fmt.Println("\t]\n}")
+
+	return
+}
+
 func runCommandLine(database *sql.DB, categories []db.Category) (err error) {
 	switch kingpin.Parse() {
 	case "task add":
@@ -401,6 +448,8 @@ func runCommandLine(database *sql.DB, categories []db.Category) (err error) {
 		err = teamListCmd(database)
 	case "team info":
 		err = teamInfoCmd(database)
+	case "export":
+		err = exportScoreboard(database)
 	}
 
 	return
