@@ -67,12 +67,11 @@ type TeamScoreInfo struct {
 	Score int
 }
 
-// ByScore sort.Sort(ByScore(scores))
-type ByScore []TeamScoreInfo
+type byScore []TeamScoreInfo
 
-func (tr ByScore) Len() int           { return len(tr) }
-func (tr ByScore) Swap(i, j int)      { tr[i], tr[j] = tr[j], tr[i] }
-func (tr ByScore) Less(i, j int) bool { return tr[i].Score > tr[j].Score }
+func (tr byScore) Len() int           { return len(tr) }
+func (tr byScore) Swap(i, j int)      { tr[i], tr[j] = tr[j], tr[i] }
+func (tr byScore) Less(i, j int) bool { return tr[i].Score > tr[j].Score }
 
 type byLevel []TaskInfo
 
@@ -331,7 +330,7 @@ func (g Game) Scoreboard() (scores []TeamScoreInfo, err error) {
 			TeamScoreInfo{team.ID, team.Name, team.Desc, s.Score})
 	}
 
-	sort.Sort(ByScore(scores))
+	sort.Sort(byScore(scores))
 
 	return
 }
