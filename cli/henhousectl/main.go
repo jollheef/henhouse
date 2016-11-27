@@ -12,6 +12,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"encoding/xml"
 	"errors"
 	"fmt"
@@ -410,9 +411,16 @@ func exportScoreboard(database *sql.DB) (err error) {
 			return
 		}
 
+		var bName []byte
+
+		bName, err = json.Marshal(team.Name)
+		if err != nil {
+			return
+		}
+
 		scoreInfo := game.TeamScoreInfo{
 			ID:         team.ID,
-			Name:       team.Name,
+			Name:       string(bName),
 			Score:      s.Score,
 			LastAccept: game.LastAccept(team.ID, flags),
 		}
@@ -425,11 +433,11 @@ func exportScoreboard(database *sql.DB) (err error) {
 	fmt.Println("{\n\t\"standings\": [")
 	for i, s := range scores {
 		if *exportWithLastAccept {
-			fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\","+
+			fmt.Printf("\t\t{ \"pos\": %d, \"team\": %s,"+
 				" \"score\": %d, \"lastAccept\" : %d }",
 				i+1, s.Name, s.Score, s.LastAccept)
 		} else {
-			fmt.Printf("\t\t{ \"pos\": %d, \"team\": \"%s\","+
+			fmt.Printf("\t\t{ \"pos\": %d, \"team\": %s,"+
 				" \"score\": %d }", i+1, s.Name, s.Score)
 		}
 		if i != len(scores)-1 {
