@@ -13,6 +13,7 @@ package game
 import (
 	"database/sql"
 	"log"
+	"math"
 	"regexp"
 	"sort"
 	"sync"
@@ -87,6 +88,47 @@ func (ti byLevel) Swap(i, j int)      { ti[i], ti[j] = ti[j], ti[i] }
 func (ti byLevel) Less(i, j int) bool { return ti[i].Level < ti[j].Level }
 
 // TaskPrice provide task price info
+
+func calcTeamsBase(database *sql.DB) (z float64, err error) {
+
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	flags, err := db.GetFlags(database)
+	if err != nil {
+		return
+	}
+
+	k := []int{}
+	for _, t := range teams {
+		solvedCount := 0
+		for _, f := range flags {
+			if f.TeamID == t.ID {
+				solvedCount++
+			}
+		}
+		k = append(k, solvedCount)
+	}
+
+	max := 1
+	for _, ki := range k {
+		if ki > max {
+			max = ki
+		}
+	}
+
+	for _, ki := range k {
+		z += math.Sqrt(float64(ki) / float64(max))
+	}
+
+	if z < 21 {
+		z = 21
+	}
+
+	return
+}
 
 // NewGame create new game
 func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
