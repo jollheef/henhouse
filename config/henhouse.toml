@@ -23,8 +23,8 @@ scoreboard = "10s"
 tasks = "10s"
 
 [TaskPrice]
-# use amount of logged teams
-use_session_counter = false
+# use non linear function for calculate teams base
+use_non_linear = false
 # for correct work with small amount of teams
 use_teams_base = false
 teams_base = 20

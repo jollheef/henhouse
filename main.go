@@ -177,8 +177,9 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 	game.SetTaskPrice(cfg.TaskPrice.P500, cfg.TaskPrice.P400,
 		cfg.TaskPrice.P300, cfg.TaskPrice.P200)
 
-	if cfg.TaskPrice.UseSessionCounter {
-		go game.TeamsBaseUpdater(cfg.Scoreboard.RecalcTimeout.Duration)
+	if cfg.TaskPrice.UseNonLinear {
+		go game.TeamsBaseUpdater(database,
+			cfg.Scoreboard.RecalcTimeout.Duration)
 		log.Println("Use teams amount based on session counter")
 	} else if cfg.TaskPrice.UseTeamsBase {
 		game.SetTeamsBase(cfg.TaskPrice.TeamsBase)
