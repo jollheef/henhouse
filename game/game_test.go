@@ -31,7 +31,13 @@ func TestNewGame(*testing.T) {
 
 	defer database.Close()
 
-	_, err = NewGame(database, time.Now(), time.Now().Add(time.Hour))
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	_, err = NewGame(database, time.Now(),
+		time.Now().Add(time.Hour), float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +53,13 @@ func TestNewGameFail(*testing.T) {
 
 	database.Close()
 
-	_, err = NewGame(database, time.Now(), time.Now().Add(time.Hour))
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	_, err = NewGame(database, time.Now(),
+		time.Now().Add(time.Hour), float64(len(teams)))
 	if err == nil {
 		panic("work at closed database")
 	}
@@ -85,7 +97,13 @@ func TestTasks(*testing.T) {
 		}
 	}
 
-	game, err := NewGame(database, time.Now(), time.Now().Add(time.Hour))
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err := NewGame(database, time.Now(),
+		time.Now().Add(time.Hour), float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -185,8 +203,13 @@ func TestScoreboard(*testing.T) {
 		panic(err)
 	}
 
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
 	game, err := NewGame(database, time.Now().Add(time.Second),
-		time.Now().Add(time.Hour))
+		time.Now().Add(time.Hour), float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -326,7 +349,12 @@ func TestSolve(*testing.T) {
 	start := time.Now().Add(time.Second)
 	end := start.Add(time.Second)
 
-	game, err := NewGame(database, start, end)
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err := NewGame(database, start, end, float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -372,7 +400,12 @@ func TestFirstOpen(*testing.T) {
 	start := time.Now().Add(time.Second)
 	end := start.Add(time.Second)
 
-	game, err := NewGame(database, start, end)
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err := NewGame(database, start, end, float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -411,7 +444,12 @@ func initGame(teamID, taskID int, flag string) (database *sql.DB, game Game) {
 	start := time.Now().Add(time.Second)
 	end := start.Add(time.Second)
 
-	game, err = NewGame(database, start, end)
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err = NewGame(database, start, end, float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -516,5 +554,19 @@ func TestAutoOpenTimeoutEnabled(*testing.T) {
 		if (t.Level == 1 || t.Level == 2) && !t.Opened {
 			panic("levels 1, 2 not opened")
 		}
+	}
+}
+
+func TestCalcTeamsBase(*testing.T) {
+	database, _ := initGame(0, 0, "")
+	defer database.Close()
+
+	n, err := CalcTeamsBase(database)
+	if err != nil {
+		panic(err)
+	}
+
+	if n != 21 {
+		panic("Default abount of teams not equal to 21")
 	}
 }

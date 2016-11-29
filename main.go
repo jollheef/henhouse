@@ -154,12 +154,33 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 
 func initGame(database *sql.DB, cfg config.Config) (err error) {
 
+	var teamBase float64
+
+	if cfg.TaskPrice.UseNonLinear {
+		teamBase, err = game.CalcTeamsBase(database)
+		if err != nil {
+			return
+		}
+		log.Println("Use teams amount based on session counter")
+	} else if cfg.TaskPrice.UseTeamsBase {
+		teamBase = float64(cfg.TaskPrice.TeamsBase)
+		log.Println("Set teams base to", cfg.TaskPrice.TeamsBase)
+	} else {
+		teamBase = float64(len(cfg.Teams))
+		log.Println("Use teams amount as teams base")
+	}
+
 	log.Println("Start game at", cfg.Game.Start.Time)
 	log.Println("End game at", cfg.Game.End.Time)
-	game, err := game.NewGame(database, cfg.Game.Start.Time,
-		cfg.Game.End.Time)
+	g, err := game.NewGame(database, cfg.Game.Start.Time,
+		cfg.Game.End.Time, teamBase)
 	if err != nil {
 		return
+	}
+
+	if cfg.TaskPrice.UseNonLinear {
+		go g.TeamsBaseUpdater(database,
+			cfg.Scoreboard.RecalcTimeout.Duration)
 	}
 
 	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
@@ -174,22 +195,11 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 	log.Printf(fmt, 400, cfg.TaskPrice.P400)
 	log.Printf(fmt, 500, cfg.TaskPrice.P500)
 
-	game.SetTaskPrice(cfg.TaskPrice.P500, cfg.TaskPrice.P400,
+	g.SetTaskPrice(cfg.TaskPrice.P500, cfg.TaskPrice.P400,
 		cfg.TaskPrice.P300, cfg.TaskPrice.P200)
 
-	if cfg.TaskPrice.UseNonLinear {
-		go game.TeamsBaseUpdater(database,
-			cfg.Scoreboard.RecalcTimeout.Duration)
-		log.Println("Use teams amount based on session counter")
-	} else if cfg.TaskPrice.UseTeamsBase {
-		game.SetTeamsBase(cfg.TaskPrice.TeamsBase)
-		log.Println("Set teams base to", cfg.TaskPrice.TeamsBase)
-	} else {
-		log.Println("Use teams amount as teams base")
-	}
-
 	log.Println("Set task open timeout to", cfg.Task.OpenTimeout.Duration)
-	game.OpenTimeout = cfg.Task.OpenTimeout.Duration
+	g.OpenTimeout = cfg.Task.OpenTimeout.Duration
 
 	if cfg.Task.AutoOpen {
 		log.Println("Auto open tasks after",
@@ -198,10 +208,10 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 		log.Println("Auto open tasks disabled")
 	}
 
-	game.AutoOpen = cfg.Task.AutoOpen
-	game.AutoOpenTimeout = cfg.Task.AutoOpenTimeout.Duration
+	g.AutoOpen = cfg.Task.AutoOpen
+	g.AutoOpenTimeout = cfg.Task.AutoOpenTimeout.Duration
 
-	go game.Run()
+	go g.Run()
 
 	infoD := cfg.WebsocketTimeout.Info.Duration
 	if infoD != 0 {
@@ -235,7 +245,7 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
 	log.Println("Listen at", cfg.Scoreboard.Addr)
-	err = scoreboard.Scoreboard(database, &game,
+	err = scoreboard.Scoreboard(database, &g,
 		cfg.Scoreboard.WwwPath,
 		cfg.Scoreboard.TemplatePath,
 		cfg.Scoreboard.Addr)

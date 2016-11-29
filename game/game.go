@@ -89,7 +89,8 @@ func (ti byLevel) Less(i, j int) bool { return ti[i].Level < ti[j].Level }
 
 // TaskPrice provide task price info
 
-func calcTeamsBase(database *sql.DB) (z float64, err error) {
+// CalcTeamsBase calculate abstract amout of teams
+func CalcTeamsBase(database *sql.DB) (z float64, err error) {
 
 	teams, err := db.GetTeams(database)
 	if err != nil {
@@ -131,7 +132,8 @@ func calcTeamsBase(database *sql.DB) (z float64, err error) {
 }
 
 // NewGame create new game
-func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
+func NewGame(database *sql.DB, start, end time.Time,
+	teamBase float64) (g Game, err error) {
 
 	g.db = database
 	g.Start = start
@@ -145,11 +147,7 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 
 	g.scoreboardLock = &sync.Mutex{}
 
-	teams, err := db.GetTeams(g.db)
-	if err != nil {
-		return
-	}
-	g.TaskPrice.TeamsBase = float64(len(teams))
+	g.TaskPrice.TeamsBase = teamBase
 
 	_, err = g.Scoreboard()
 	if err != nil {
@@ -178,7 +176,7 @@ func (g *Game) SetTeamsBase(teams int) {
 // TeamsBaseUpdater auto update TeamsBase
 func (g *Game) TeamsBaseUpdater(database *sql.DB, updateTimeout time.Duration) {
 	for {
-		z, err := calcTeamsBase(database)
+		z, err := CalcTeamsBase(database)
 		if err != nil {
 			return
 		}

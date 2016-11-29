@@ -114,7 +114,12 @@ func TestGetInfo(*testing.T) {
 	startTime := time.Now().Add(time.Second)
 	endTime := startTime.Add(time.Second)
 
-	game, err := game.NewGame(database, startTime, endTime)
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err := game.NewGame(database, startTime, endTime, float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -413,7 +418,12 @@ func TestScoreboard(*testing.T) {
 	start := time.Now()
 	end := start.Add(time.Hour)
 
-	game, err := game.NewGame(database, start, end)
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err := game.NewGame(database, start, end, float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -453,7 +463,12 @@ func TestTaskHandler(*testing.T) {
 	start := time.Now()
 	end := start.Add(time.Hour)
 
-	game, err := game.NewGame(database, start, end)
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err := game.NewGame(database, start, end, float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
@@ -504,7 +519,12 @@ func TestFlagHandler(*testing.T) {
 	start := time.Now()
 	end := start.Add(time.Hour)
 
-	game, err := game.NewGame(database, start, end)
+	teams, err := db.GetTeams(database)
+	if err != nil {
+		return
+	}
+
+	game, err := game.NewGame(database, start, end, float64(len(teams)))
 	if err != nil {
 		panic(err)
 	}
