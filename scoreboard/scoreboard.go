@@ -178,19 +178,21 @@ func scoreboardHTML(teamID int) (result string) {
 func scoreboardUpdater(game *game.Game, updateTimeout time.Duration) {
 
 	for {
-		time.Sleep(updateTimeout)
-
 		err := game.RecalcScoreboard()
 		if err != nil {
 			log.Println("Recalc scoreboard fail:", err)
+			time.Sleep(updateTimeout)
 			continue
 		}
 
 		scoreCache, err = game.Scoreboard()
 		if err != nil {
 			log.Println("Get scoreboard fail:", err)
+			time.Sleep(updateTimeout)
 			continue
 		}
+
+		time.Sleep(updateTimeout)
 	}
 }
 

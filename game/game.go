@@ -109,9 +109,12 @@ func NewGame(database *sql.DB, start, end time.Time) (g Game, err error) {
 	}
 	g.TaskPrice.TeamsBase = float64(len(teams))
 
-	err = g.RecalcScoreboard()
+	_, err = g.Scoreboard()
 	if err != nil {
-		return
+		err = g.RecalcScoreboard()
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -133,16 +136,17 @@ func (g *Game) SetTeamsBase(teams int) {
 // TeamsBaseUpdater auto update TeamsBase depends on all time logged teams
 func (g *Game) TeamsBaseUpdater(updateTimeout time.Duration) {
 	for {
-		time.Sleep(updateTimeout)
-
 		count, err := db.GetSessionCount(g.db)
 		if err != nil {
 			log.Println("Get session count fail:", err)
+			time.Sleep(updateTimeout)
 			continue
 		}
 
 		g.SetTeamsBase(count)
 		log.Println("Set teams base to", count)
+
+		time.Sleep(updateTimeout)
 	}
 }
 
