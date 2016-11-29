@@ -175,18 +175,16 @@ func (g *Game) SetTeamsBase(teams int) {
 	g.TaskPrice.TeamsBase = float64(teams)
 }
 
-// TeamsBaseUpdater auto update TeamsBase depends on all time logged teams
-func (g *Game) TeamsBaseUpdater(updateTimeout time.Duration) {
+// TeamsBaseUpdater auto update TeamsBase
+func (g *Game) TeamsBaseUpdater(database *sql.DB, updateTimeout time.Duration) {
 	for {
-		count, err := db.GetSessionCount(g.db)
+		z, err := calcTeamsBase(database)
 		if err != nil {
-			log.Println("Get session count fail:", err)
-			time.Sleep(updateTimeout)
-			continue
+			return
 		}
 
-		g.SetTeamsBase(count)
-		log.Println("Set teams base to", count)
+		log.Println("Set teams base to", z)
+		g.TaskPrice.TeamsBase = z
 
 		time.Sleep(updateTimeout)
 	}
