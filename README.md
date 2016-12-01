@@ -11,9 +11,10 @@ Fundamental principle: if henhouse is not helping you make jeopardy-style CTF ea
 
 ## Install
 
-### PackageCloud
+### Packagecloud
+[![packagecloud](https://packagecloud.io/assets/packagecloud-badge-fbea7fd09f5aab38e8d59fec16f2268c.png)](https://packagecloud.io/jollheef/henhouse)
 
-Built for Ubuntu 16.04. Service may not be available because free plan.
+Built for Ubuntu 16.04.
 
     $ curl -s https://packagecloud.io/install/repositories/jollheef/henhouse/script.deb.sh | sudo bash
     $ sudo apt install henhouse
