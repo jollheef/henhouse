@@ -15,6 +15,6 @@ def delete_package(filename):
 
 packages = requests.get(api_url+"/packages.json").json()
 
-for pkg in packages[:-9]:
+for pkg in packages[:-2]:
     if pkg['name'] == name:
         delete_package(pkg['distro_version']+"/"+pkg['filename'])
