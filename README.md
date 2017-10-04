@@ -21,7 +21,7 @@ Built for Ubuntu 16.04.
 
 ### Build deb package from source
 
-    $ apt install golang build-essential
+    $ apt install golang build-essential binutils upx-ucl
     $ export GOPATH=$(realpath ./) && go get github.com/jollheef/henhouse/...
     $ cd ${GOPATH}/src/github.com/jollheef/henhouse
     $ ./package.sh
