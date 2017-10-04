@@ -13,7 +13,7 @@ before_install:
   - go get golang.org/x/tools/cmd/cover
   - gem install package_cloud
   - pip install --user requests
-  - sudo apt install upx-ucl binutils
+  - sudo apt install upx-ucl binutils fakeroot
 
 before_script:
   - psql -c 'create database henhouse_test;' -U postgres
