@@ -1,7 +1,7 @@
 language: go
 
 go:
-  - 1.7
+  - 1.7 # ubuntu 16.04
   - tip
 
 addons:
@@ -13,6 +13,7 @@ before_install:
   - go get golang.org/x/tools/cmd/cover
   - gem install package_cloud
   - pip install --user requests
+  - sudo apt install upx-ucl binutils
 
 before_script:
   - psql -c 'create database henhouse_test;' -U postgres

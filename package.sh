@@ -15,6 +15,8 @@ mkdir -p ${PKGDIR}/{DEBIAN,etc/henhouse,usr/bin,lib/systemd/system,var/lib/henho
 echo 'EXTRA=--reinit' > ${PKGDIR}/var/lib/henhouse/extra
 
 cp ${GOPATH}/bin/{henhouse,henhousectl} ${PKGDIR}/usr/bin/
+strip ${PKGDIR}/usr/bin/{henhouse,henhousectl}
+upx ${PKGDIR}/usr/bin/{henhouse,henhousectl}
 
 cp ./deb/{control,postinst} ${PKGDIR}/DEBIAN/
 
