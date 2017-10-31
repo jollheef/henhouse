@@ -3,6 +3,6 @@ Version: VERSION_PLACEHOLDER
 Section: base
 Priority: optional
 Architecture: amd64
-Depends: postgresql acl
+Depends: postgresql, acl
 Maintainer: Mikhail Klementyev <jollheef@riseup.net>
 Description: Scoreboard for jeopardy-style CTFs.
