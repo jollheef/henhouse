@@ -262,6 +262,11 @@ a
   color: #fff;
 }
 
+.jctf-simple-card__block
+{
+  padding: 10px 0;
+}
+
 #auth-logo
 {
   margin-bottom: 20px;
