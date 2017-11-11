@@ -342,6 +342,14 @@ a
     margin-bottom: 15px;
   }
 
+#description-footer>form
+{
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+}
+
   .mdl-button 
   {
     border: #39adc9 solid 1px;
@@ -476,6 +484,11 @@ a
   #auth-logo-image
   {
     width: 140px;
+  }
+
+  #description-header
+  {
+    word-break: break-all;
   }
   
   .jctf-description, .jctf-scoreboard, .jctf-simple-card
