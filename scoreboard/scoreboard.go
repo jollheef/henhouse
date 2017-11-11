@@ -444,7 +444,7 @@ func Scoreboard(database *sql.DB, game *game.Game,
 	handleStaticFileSimple("/js/scoreboard.js", wwwPath)
 	handleStaticFileSimple("/js/tasks.js", wwwPath)
 	handleStaticFileSimple("/js/material.min.js", wwwPath)
-	handleStaticFileSimple("/images/bg.png", wwwPath) 
+	handleStaticFileSimple("/images/bg.jpg", wwwPath) 
 	handleStaticFileSimple("/images/favicon.ico", wwwPath)
 	handleStaticFileSimple("/images/favicon.png", wwwPath)
 	handleStaticFileSimple("/images/401.jpg", wwwPath)
