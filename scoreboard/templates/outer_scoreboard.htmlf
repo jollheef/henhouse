@@ -6,14 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="images/favicon.png" type="image/png">
     <title>Juniors CTF</title>
-
-    <link rel="stylesheet" href="css/style.css" class="--apng-checked">
+  
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/material.min.css">
+    <link rel="stylesheet" href="css/main.css">
+  
   </head>
+
   <body>
-    <br>
-    <div class="center"><img id="juniorstext" src="./images/juniors_ctf_txt.png"></div>
-    <div id="content">
-      <table id="scoreboard-table">%s</table>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header is-upgraded">
+
+      <div class="jctf-header mdl-layout__header mdl-layout__header--waterfall">
+        <div class="mdl-layout__header-row">
+          <span class="jctf-center-title mdl-layout-title">
+            <img class="jctf-logo-image" src="images/logo.png">
+          </span>
+        </div>
+      </div>
+
+      <main class="jctf-content mdl-layout__content">
+        <div id="updated-scoreboard-content" class="jctf-content__cards mdl-grid">%s</div>
+      </main>
+     </div>
     </div>
+    <script src="js/material.min.js"></script>
   </body>
+
 </html>

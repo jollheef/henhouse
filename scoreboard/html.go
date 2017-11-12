@@ -37,11 +37,16 @@ func taskToHTML(teamID int, task game.TaskInfo,
 	}
 
 	if task.Opened {
-		html = fmt.Sprintf(`<a href="/task?id=%d" `+
-			`class="task_block task_block-%s">`,
+		html = fmt.Sprintf(`
+			<div class="jctf-task mdl-cell mdl-cell--3-col">
+				<a href="/task?id=%d" `+
+				`class="jctf-task-block %s">`,
 			task.ID, buttonClass)
 	} else {
-		html = fmt.Sprintf(`<a class="task_block task_block-%s">`, buttonClass)
+		html = fmt.Sprintf(`
+			<div class="jctf-task mdl-cell mdl-cell--3-col">
+				<a class="jctf-task-block %s">`, 
+			buttonClass)
 	}
 
 	var name string
@@ -51,15 +56,29 @@ func taskToHTML(teamID int, task game.TaskInfo,
 		name = task.NameEn
 	}
 
-	html += fmt.Sprintf(`
-          <div class="task_block-header">
-	    <span class="task_block-name">%s</span>
-	  </div>
-	  <div class="task_block-body">%d</div>
-	  <div class="task_block-footer">
-	    <span class="task_block-tags">%s</span>
-	  </div>
-	</a>`, name, task.Price, task.Tags)
+	if task.Opened {
+		html += fmt.Sprintf(`
+			<div class="jctf-task-block__header">
+				<span class="jctf-task-block__name">%s</span>
+			</div>
+			<div class="jctf-task-block__body">%d</div>
+			<div class="jctf-task-block__footer">
+				<span class="jctf-task-block__tags">%s</span>
+			</div>
+		</a></div>`, name, task.Price, task.Tags)
+	} else {
+		html += fmt.Sprintf(`
+			<div class="jctf-task-block__header">
+				<span class="jctf-task-block__name"></span>
+			</div>
+			<div class="jctf-task-block__body">
+				<img class="jctf-image-closed-task" src="images/closed_task.png">
+			</div>
+			<div class="jctf-task-block__footer">
+				<span class="jctf-task-block__tags"></span>
+			</div>
+		</a></div>`)
+	}
 
 	return
 }
@@ -67,7 +86,7 @@ func taskToHTML(teamID int, task game.TaskInfo,
 func categoryToHTML(teamID int, category game.CategoryInfo,
 	ru bool) (html string) {
 
-	html = `<div class="col-xs-3">`
+	html = `<div class="jctf-content__taskline mdl-cell mdl-cell--12-col mdl-grid">`
 
 	for _, task := range category.TasksInfo {
 		html += taskToHTML(teamID, task, ru)

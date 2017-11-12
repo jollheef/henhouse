@@ -86,13 +86,19 @@ func getInfo() string {
 		left = 0
 		btnType = "stop"
 	}
-
-	info := fmt.Sprintf(`<span id="game_status-%s">contest %s</span>`,
+	
+	info := fmt.Sprintf(`
+		<div id="game-status" class="jctf-game-status %s">
+			contest %s
+		</div>`,
 		btnType, contestStatus)
 
 	if left != 0 {
-		info += fmt.Sprintf(`<span id="timer">%s</span>`,
-			durationToHMS(left))
+		info += fmt.Sprintf(`
+			<div id="timer" class="jctf-game-status %s">
+				%s
+			</div>`,
+			btnType, durationToHMS(left))
 	}
 
 	return info
@@ -148,29 +154,35 @@ func scoreboardHandler(ws *websocket.Conn) {
 
 func scoreboardHTML(teamID int) (result string) {
 
-	result = "<thead>" +
-		"<th>#</th>" + "<th>Team</th>" +
-		"<th>Score</th>" +
-		"</thead>"
+	result = `<div class="jctf-content__scoreboard mdl-cell mdl-cell--12-col mdl-grid">
+		<div class="jctf-scoreboard mdl-cell mdl-cell--12-col">
+			<table id="scoreboard-table">
+	  			<thead>
+					<tr>
+		  				<th>#</th>
+		  				<th>Team</th>
+		  				<th>Score</th>
+					</tr>
+	  			</thead>`
 
 	result += "<tbody>"
 
 	for n, teamScore := range scoreCache {
 		if teamScore.ID == teamID {
-			result += `<tr class="self_team">`
+			result += `<tr class="jctf-self-team">`
 		} else {
 			result += `<tr>`
 		}
 
 		result += fmt.Sprintf(
-			`<td class="team_index">%d</td>`+
-				`<td class="team_name">%s</td>`+
-				`<td class="team_score">%d</td></tr>`,
+			`<td class="jctf-team-index">%d</td>`+
+				`<td class="jctf-team-name">%s</td>`+
+				`<td class="jctf-team-score">%d</td></tr>`,
 			n+1, teamScore.Name, teamScore.Score)
 
 	}
 
-	result += "</tbody>"
+	result += "</tbody></table></div>"
 
 	return
 }
@@ -279,13 +291,14 @@ func taskHandler(w http.ResponseWriter, r *http.Request) {
 
 	teamID := getTeamID(r)
 
-	flagSubmitFormat := `<br>` +
-		`<form class="input-group" action="/flag?id=%d" method="post">` +
-		`<input class="form-control float-left" name="flag" value="" placeholder="Flag">` +
-		`<span class="input-group-btn">` +
-		`<button class="btn btn-submit">Submit</button>` +
-		`</span>` +
-		`</form>`
+	flagSubmitFormat :=
+		`<form action="/flag?id=%d" method="post">
+			<div class="mdl-textfield mdl-js-textfield">
+				<input class="mdl-textfield__input" type="text" id="flag-input" name="flag">
+				<label class="mdl-textfield__label" for="flag-input">Flag</label>
+			</div>
+			<button type="submit" id="flag-button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">Submit</button>
+		</form>`
 
 	var submitForm string
 	if taskSolvedBy(task, teamID) {
@@ -340,9 +353,9 @@ func flagHandler(w http.ResponseWriter, r *http.Request) {
 
 	var solvedMsg string
 	if solved {
-		solvedMsg = `<div class="flag_status solved">Solved</div>`
+		solvedMsg = `<div class="mdl-cell mdl-cell--12-col jctf-check-flag solved">Solved</div>`
 	} else {
-		solvedMsg = `<div class="flag_status invalid">Invalid flag</div>`
+		solvedMsg = `<div class="mdl-cell mdl-cell--12-col jctf-check-flag invalid">Invalid flag</div>`
 	}
 
 	log.Printf("Team ID: %d, Task ID: %d, Flag: %s, Result: %s\n",
@@ -426,14 +439,17 @@ func Scoreboard(database *sql.DB, game *game.Game,
 	go scoreboardUpdater(game, ScoreboardRecalcTimeout)
 
 	// Static files
-	handleStaticFileSimple("/css/style.css", wwwPath)
+	handleStaticFileSimple("/css/main.css", wwwPath)
+	handleStaticFileSimple("/css/material.min.css", wwwPath)
 	handleStaticFileSimple("/js/scoreboard.js", wwwPath)
 	handleStaticFileSimple("/js/tasks.js", wwwPath)
-	handleStaticFileSimple("/images/bg.jpg", wwwPath)
+	handleStaticFileSimple("/js/material.min.js", wwwPath)
+	handleStaticFileSimple("/images/bg.png", wwwPath) 
 	handleStaticFileSimple("/images/favicon.ico", wwwPath)
 	handleStaticFileSimple("/images/favicon.png", wwwPath)
 	handleStaticFileSimple("/images/401.jpg", wwwPath)
-	handleStaticFileSimple("/images/juniors_ctf_txt.png", wwwPath)
+	handleStaticFileSimple("/images/logo.png", wwwPath)
+	handleStaticFileSimple("/images/closed_task.png", wwwPath)
 
 	// Get
 	http.HandleFunc("/auth.html", signinHandler)

@@ -1,26 +1,64 @@
 <!DOCTYPE html>
 <html class="full" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="images/favicon.png" type="image/png">
     <title>Juniors CTF</title>
-
-    <link rel="stylesheet" href="css/style.css" class="--apng-checked">
-    
-    <script type="text/javascript" src="js/scoreboard.js"></script>
-
+  
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/material.min.css">
+    <link rel="stylesheet" href="css/main.css">
+  
+    <!--<script type="text/javascript" src="js/info.js"></script>-->
   </head>
+
   <body>
-    <ul id="header">
-      <li class="header_link"><a href="scoreboard.html">Scoreboard</a></li>
-      <li class="header_link"><a href="tasks.html">Tasks</a></li>
-      <li class="header_link"><a href="news.html">News</a></li>
-      <li class="header_link"><a href="sponsors.html">Sponsors</a></li>
-      <li id="info"></li>
-    </ul>
-    <div id="content">%s</div>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header has-drawer is-upgraded">
+
+      <div class="jctf-header mdl-layout__header mdl-layout__header--waterfall">
+        <div class="mdl-layout__header-row">
+          <span class="jctf-title mdl-layout-title">
+            <img class="jctf-logo-image" src="images/logo.png">
+          </span>
+          
+          <div class="jctf-navigation-container">
+            <nav class="jctf-navigation mdl-navigation">
+              <a class="mdl-navigation__link" href="scoreboard.html">Scoreboard</a>
+              <a class="mdl-navigation__link" href="tasks.html">Tasks</a>
+              <a class="mdl-navigation__link" href="news.html">News</a>
+              <a class="mdl-navigation__link" href="sponsors.html">Sponsors</a>
+            </nav>
+          </div>
+          <div id="info"></div>
+          <span class="jctf-mobile-title mdl-layout-title">
+            <img class="jctf-logo-image" src="images/logo.png">
+          </span>
+        </div>
+      </div>
+
+      <div class="jctf-drawer mdl-layout__drawer">
+        <span class="mdl-layout-title">
+          <img class="jctf-logo-image" src="images/logo.png">
+        </span>
+        <nav class="mdl-navigation">
+          <a class="mdl-navigation__link" href="scoreboard.html">Scoreboard</a>
+          <a class="mdl-navigation__link" href="tasks.html">Tasks</a>
+          <a class="mdl-navigation__link" href="news.html">News</a>
+          <a class="mdl-navigation__link" href="sponsors.html">Sponsors</a>
+        </nav>
+      </div>
+
+      <main class="jctf-content mdl-layout__content">
+        <div class="jctf-content__cards mdl-grid">
+          <div class="jctf-content__check-flag mdl-cell mdl-cell--12-col mdl-grid">
+            %s
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="js/material.min.js"></script>
   </body>
 </html>
