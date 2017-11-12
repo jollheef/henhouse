@@ -293,6 +293,7 @@ a
 #scoreboard-table>thead>tr>th 
 {
   padding: 0px 8px 8px 8px;
+  text-align: left;
   vertical-align: bottom;
   font-weight: 600;
 }
