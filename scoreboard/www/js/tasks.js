@@ -6,7 +6,7 @@ else
 var scoreboard = new WebSocket(protocol + location.host + "/tasks");
 
 scoreboard.onmessage = function(e) {
-    document.getElementById('tasks-table').innerHTML = e.data
+    document.getElementById('updated-tasks-content').innerHTML = e.data
 }
 
 var info = new WebSocket(protocol + location.host + "/info");
