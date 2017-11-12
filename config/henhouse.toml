@@ -12,7 +12,7 @@ max_connections = 90 # should be less than same value in postgresql.conf
 safe_reinit = false # disallow reinit after game start
 
 [Scoreboard]
-www_path = "/var/www"
+www_path = "/var/www/henhouse"
 template_path = "/var/lib/henhouse/templates"
 addr = ":8000"
 recalc_timeout = "1m"
