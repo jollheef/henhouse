@@ -473,7 +473,7 @@ func (g Game) OpenNextTask(t db.Task) (err error) {
 			// If not already opened
 			if !task.Opened && !task.ForceClosed {
 				// Open it!
-				log.Println("Open task", t.Name, t.Level)
+				log.Println("Open task", task.Name, task.Level)
 				err = db.SetOpened(g.db, task.ID, true)
 				if err != nil {
 					return
