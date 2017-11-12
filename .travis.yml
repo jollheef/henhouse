@@ -2,7 +2,7 @@ language: go
 
 go:
   - 1.7 # ubuntu 16.04
-  - tip
+  - 1.x
 
 addons:
   postgresql: "9.4"
