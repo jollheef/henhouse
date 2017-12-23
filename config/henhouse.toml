@@ -1,19 +1,19 @@
 # henhouse.toml: config file for henhouse
 # Please check all values before running henhouse.
 
-log_file = "/var/log/henhouse.log"
+log_file = "/home/ubuntu/henhouse_logs/henhouse.log"
 
 # Path to directory contains task xml files
-task_dir = "/etc/henhouse/"
+task_dir = "/home/ubuntu/go/src/github.com/jollheef/henhouse/config/tasks/"
 
 [Database]
-connection = "user=henhouse password=PASSWORD_PLACEHOLDER dbname=henhouse sslmode=disable"
+connection = "user=henhouse password=STRENGTH_PASSWORD dbname=henhouse sslmode=disable"
 max_connections = 90 # should be less than same value in postgresql.conf
 safe_reinit = false # disallow reinit after game start
 
 [Scoreboard]
-www_path = "/var/www/henhouse"
-template_path = "/var/lib/henhouse/templates"
+www_path = "/home/ubuntu/go/src/github.com/jollheef/henhouse/scoreboard/www"
+template_path = "/home/ubuntu/go/src/github.com/jollheef/henhouse/scoreboard/templates"
 addr = ":8000"
 recalc_timeout = "1m"
 
@@ -38,8 +38,8 @@ p200 = 50
 
 [Game]
 # Europe/Moscow
-start = "Nov 17 10:00 2015"
-end = "Dec 31 23:59 2015"
+start = "Dec 18 00:00 2017"
+end = "Dec 18 23:59 2017"
 
 [Flag]
 # timeout between send flags
@@ -47,10 +47,10 @@ send_timeout = "1s"
 
 [Task]
 # timeout after send correct flag before open next task
-open_timeout = "1m"
+open_timeout = "1s"
 # auto open task after previous solved
 auto_open = true
-auto_open_timeout = "6h"
+auto_open_timeout = "1h"
 
 [[Teams]]
 name = "FooTeam"
