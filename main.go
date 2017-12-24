@@ -43,6 +43,22 @@ var (
 	BuildTime string
 )
 
+func fillTranslateFallback(task * config.Task) {
+	if task.NameEn == "" {
+		task.NameEn = task.Name
+	}
+	if task.Name == "" {
+		task.Name = task.NameEn
+	}
+	if task.DescriptionEn == "" {
+		task.DescriptionEn = task.Description
+	}
+	if task.Description == "" {
+		task.Description = task.DescriptionEn
+	}
+	return
+}
+
 func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 	log.Println("Reinit database")
 
@@ -108,21 +124,7 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 			log.Println("Add category", taskCategory.Name)
 		}
 
-		if task.NameEn == "" {
-			task.NameEn = task.Name
-		}
-
-		if task.Name == "" {
-			task.Name = task.NameEn
-		}
-
-		if task.DescriptionEn == "" {
-			task.DescriptionEn = task.Description
-		}
-
-		if task.Description == "" {
-			task.Description = task.DescriptionEn
-		}
+		fillTranslateFallback(&task)
 
 		err = db.AddTask(database, &db.Task{
 			Name:          task.Name,
@@ -149,6 +151,14 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 		}
 	}
 
+	return
+}
+
+func checkTaskPrices(cfg *config.Config)(err error){
+	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
+		cfg.TaskPrice.P400 == 0 || cfg.TaskPrice.P500 == 0 {
+		err = errors.New("Error: Task price not setted")
+	}
 	return
 }
 
@@ -183,9 +193,8 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 			cfg.Scoreboard.RecalcTimeout.Duration)
 	}
 
-	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
-		cfg.TaskPrice.P400 == 0 || cfg.TaskPrice.P500 == 0 {
-		err = errors.New("Error: Task price not setted")
+	err = checkTaskPrices(&cfg)
+	if err != nil{
 		return
 	}
 
@@ -241,6 +250,7 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 	if scoreboardRecalcD != 0 {
 		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
 	}
+
 	log.Println("Score recalc timeout:", scoreboard.ScoreboardRecalcTimeout)
 
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
@@ -249,9 +259,6 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 		cfg.Scoreboard.WwwPath,
 		cfg.Scoreboard.TemplatePath,
 		cfg.Scoreboard.Addr)
-	if err != nil {
-		return
-	}
 
 	return
 }
