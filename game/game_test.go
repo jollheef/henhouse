@@ -197,7 +197,7 @@ func TestScoreboard(*testing.T) {
 
 	var sumCheck int
 
-	database, err := db.InitDatabase(dbPath3)
+	database, err := db.InitDatabase(dbPath)
 	if err != nil {
 		panic(err)
 	}
