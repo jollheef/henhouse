@@ -435,6 +435,8 @@ func TestScoreboard(*testing.T) {
 		panic(err)
 	}
 
+	ScoreboardRecalcTimeout = time.Second / 10
+
 	go func() {
 		_, filename, _, _ := runtime.Caller(0)
 		err = Scoreboard(database, &game, filepath.Dir(filename)+"/www",
