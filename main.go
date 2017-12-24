@@ -43,6 +43,34 @@ var (
 	BuildTime string
 )
 
+func checkTaskNameEn(task *config.Task){
+	if task.NameEn == "" {
+		task.NameEn = task.Name
+	}
+	return
+}
+
+func checkTaskName(task *config.Task){
+	if task.Name == "" {
+		task.Name = task.NameEn
+	}
+	return
+}
+
+func checkTaskDescriptionEn(task *config.Task){
+	if task.DescriptionEn == "" {
+		task.DescriptionEn = task.Description
+	}
+	return
+}
+
+func checkTaskDescriprion(task *config.Task){
+	if task.Description == "" {
+		task.Description = task.DescriptionEn
+	}
+	return
+}
+
 func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 	log.Println("Reinit database")
 
@@ -108,21 +136,13 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 			log.Println("Add category", taskCategory.Name)
 		}
 
-		if task.NameEn == "" {
-			task.NameEn = task.Name
-		}
+		checkTaskNameEn(&task)
 
-		if task.Name == "" {
-			task.Name = task.NameEn
-		}
+		checkTaskName(&task)
 
-		if task.DescriptionEn == "" {
-			task.DescriptionEn = task.Description
-		}
+		checkTaskDescriptionEn(&task)
 
-		if task.Description == "" {
-			task.Description = task.DescriptionEn
-		}
+		checkTaskDescriprion(&task)
 
 		err = db.AddTask(database, &db.Task{
 			Name:          task.Name,
@@ -149,6 +169,14 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 		}
 	}
 
+	return
+}
+
+func checkScoreboardRecalcTimeout(cfg config.Config){
+	scoreboardRecalcD := cfg.Scoreboard.RecalcTimeout.Duration
+	if scoreboardRecalcD != 0 {
+		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
+	}
 	return
 }
 
@@ -237,10 +265,8 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 	}
 	log.Println("Flag timeout:", scoreboard.FlagTimeout)
 
-	scoreboardRecalcD := cfg.Scoreboard.RecalcTimeout.Duration
-	if scoreboardRecalcD != 0 {
-		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
-	}
+	checkScoreboardRecalcTimeout(cfg)
+
 	log.Println("Score recalc timeout:", scoreboard.ScoreboardRecalcTimeout)
 
 	log.Println("Use html files from", cfg.Scoreboard.WwwPath)
@@ -249,9 +275,6 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 		cfg.Scoreboard.WwwPath,
 		cfg.Scoreboard.TemplatePath,
 		cfg.Scoreboard.Addr)
-	if err != nil {
-		return
-	}
 
 	return
 }
@@ -334,7 +357,9 @@ func main() {
 	log.Println("Set max db connections to", cfg.Database.MaxConnections)
 	database.SetMaxOpenConns(cfg.Database.MaxConnections)
 
+
 	err = initGame(database, cfg)
+
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
