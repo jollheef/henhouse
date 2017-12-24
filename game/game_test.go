@@ -183,17 +183,21 @@ func addTestData(database *sql.DB, nteams, ncategories, ntasks int,
 	return
 }
 
-func calcSumScores(scores []TeamScoreInfo)(sumScores int){
+func checkSumScores(scores []TeamScoreInfo)(sumScores int){
 	for _, teamScoreInfo := range scores {
-		sumScores = sumScores + teamScoreInfo.Score
+		if teamScoreInfo.Score != 0 {
+			sumScores = 1
+			return
+		}
 	}
+	sumScores = 0
 	return
 }
 func TestScoreboard(*testing.T) {
 
-	var sumScores int
+	var sumCheck int
 
-	database, err := db.InitDatabase(dbPath)
+	database, err := db.InitDatabase(dbPath3)
 	if err != nil {
 		panic(err)
 	}
@@ -232,8 +236,9 @@ func TestScoreboard(*testing.T) {
 		panic(err)
 	}
 
-	sumScores = calcSumScores(scores)
-	if sumScores != 0 {
+	sumCheck = checkSumScores(scores)
+
+	if sumCheck == 1 {
 		panic("score at game start not zero")
 	}
 
@@ -263,7 +268,6 @@ func TestScoreboard(*testing.T) {
 		}
 	}
 }
-
 
 func fillTestDB(database *sql.DB, validFlag string) (err error) {
 
