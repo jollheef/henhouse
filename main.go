@@ -43,28 +43,16 @@ var (
 	BuildTime string
 )
 
-func checkTaskNameEn(task *config.Task){
+func fillTranslateFallback(task * config.Task) {
 	if task.NameEn == "" {
 		task.NameEn = task.Name
 	}
-	return
-}
-
-func checkTaskName(task *config.Task){
 	if task.Name == "" {
 		task.Name = task.NameEn
 	}
-	return
-}
-
-func checkTaskDescriptionEn(task *config.Task){
 	if task.DescriptionEn == "" {
 		task.DescriptionEn = task.Description
 	}
-	return
-}
-
-func checkTaskDescriprion(task *config.Task){
 	if task.Description == "" {
 		task.Description = task.DescriptionEn
 	}
@@ -136,13 +124,7 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 			log.Println("Add category", taskCategory.Name)
 		}
 
-		checkTaskNameEn(&task)
-
-		checkTaskName(&task)
-
-		checkTaskDescriptionEn(&task)
-
-		checkTaskDescriprion(&task)
+		fillTranslateFallback(&task)
 
 		err = db.AddTask(database, &db.Task{
 			Name:          task.Name,
