@@ -172,10 +172,10 @@ func reinitDatabase(database *sql.DB, cfg config.Config) (err error) {
 	return
 }
 
-func checkScoreboardRecalcTimeout(cfg config.Config){
-	scoreboardRecalcD := cfg.Scoreboard.RecalcTimeout.Duration
-	if scoreboardRecalcD != 0 {
-		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
+func checkTaskPrices(cfg *config.Config)(err error){
+	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
+		cfg.TaskPrice.P400 == 0 || cfg.TaskPrice.P500 == 0 {
+		err = errors.New("Error: Task price not setted")
 	}
 	return
 }
@@ -211,9 +211,8 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 			cfg.Scoreboard.RecalcTimeout.Duration)
 	}
 
-	if cfg.TaskPrice.P200 == 0 || cfg.TaskPrice.P300 == 0 ||
-		cfg.TaskPrice.P400 == 0 || cfg.TaskPrice.P500 == 0 {
-		err = errors.New("Error: Task price not setted")
+	err = checkTaskPrices(&cfg)
+	if err != nil{
 		return
 	}
 
@@ -265,7 +264,10 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 	}
 	log.Println("Flag timeout:", scoreboard.FlagTimeout)
 
-	checkScoreboardRecalcTimeout(cfg)
+	scoreboardRecalcD := cfg.Scoreboard.RecalcTimeout.Duration
+	if scoreboardRecalcD != 0 {
+		scoreboard.ScoreboardRecalcTimeout = scoreboardRecalcD
+	}
 
 	log.Println("Score recalc timeout:", scoreboard.ScoreboardRecalcTimeout)
 
@@ -357,9 +359,7 @@ func main() {
 	log.Println("Set max db connections to", cfg.Database.MaxConnections)
 	database.SetMaxOpenConns(cfg.Database.MaxConnections)
 
-
 	err = initGame(database, cfg)
-
 	if err != nil {
 		log.Fatalln("Error:", err)
 	}
