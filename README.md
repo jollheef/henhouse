@@ -9,6 +9,10 @@ Scoreboard for jeopardy-style CTFs.
 
 Fundamental principle: if henhouse is not helping you make jeopardy-style CTF easily, then there is a bug in henhouse.
 
+Donations are welcome and will go towards further development of this project. Use the wallet addresses below to donate.
+
+    BTC: 36Ks7J2a1qihJgJeJX21dNMez2BebxWzpA
+
 ![Imgur image](https://i.imgur.com/uMCFPw7.png)
 
 ## Install
