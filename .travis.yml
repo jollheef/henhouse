@@ -3,6 +3,10 @@ language: go
 go:
   - 1.x
 
+env:
+  matrix:
+  - RUN_ON_CONTAINER=ubuntu-18.04
+
 addons:
   postgresql: "9.4"
   apt:
