@@ -6,6 +6,11 @@ go:
 
 addons:
   postgresql: "9.4"
+  apt:
+    packages:
+    - upx-ucl
+    - binutils
+    - fakeroot
 
 before_install:
   - go get github.com/axw/gocov/gocov
@@ -13,7 +18,6 @@ before_install:
   - go get golang.org/x/tools/cmd/cover
   - gem install package_cloud
   - pip install --user requests
-  - sudo apt install upx-ucl binutils fakeroot
 
 before_script:
   - psql -c 'create database henhouse_test;' -U postgres
