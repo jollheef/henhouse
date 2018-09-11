@@ -1,7 +1,6 @@
 language: go
 
 go:
-  - 1.10 # ubuntu 18.04
   - 1.x
 
 addons:
