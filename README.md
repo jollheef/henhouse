@@ -19,7 +19,6 @@ Donations are welcome and will go towards further development of this project. U
 ## Install
 
 ### Packagecloud
-[![packagecloud](https://packagecloud.io/assets/packagecloud-badge-fbea7fd09f5aab38e8d59fec16f2268c.png)](https://packagecloud.io/jollheef/henhouse)
 
 Built for Ubuntu 16.04.
 
