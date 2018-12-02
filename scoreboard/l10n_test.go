@@ -13,23 +13,23 @@ import (
 	"testing"
 )
 
-func TestL10n(*testing.T) {
+func TestL10n(t *testing.T) {
 	r := httptest.NewRequest("GET", "http://localhost", nil)
 
 	// Must be translate
 	r.Header = map[string][]string{
-		"Accept-Language": {"ru-ru"},
+		"Accept-Language": {"ru"},
 	}
 
 	for key, value := range l10nMap {
 		if l10n(r, key) != value {
-			panic("Wrong l10n")
+			t.Fatal("Wrong l10n", r, key, value)
 		}
 	}
 
 	for _, value := range l10nMap {
 		if l10n(r, "RANDOM_STRING_c504fe0cc6abb24") == value {
-			panic("Wrong l10n")
+			t.Fatal("Wrong l10n")
 		}
 	}
 
@@ -40,13 +40,13 @@ func TestL10n(*testing.T) {
 
 	for key, value := range l10nMap {
 		if l10n(r, key) == value {
-			panic("Wrong l10n")
+			t.Fatal("Wrong l10n")
 		}
 	}
 
 	for _, value := range l10nMap {
 		if l10n(r, value) != value {
-			panic("Wrong l10n")
+			t.Fatal("Wrong l10n")
 		}
 	}
 
