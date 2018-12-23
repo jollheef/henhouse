@@ -258,7 +258,8 @@ func initGame(database *sql.DB, cfg config.Config) (err error) {
 	err = scoreboard.Scoreboard(database, &g,
 		cfg.Scoreboard.WwwPath,
 		cfg.Scoreboard.TemplatePath,
-		cfg.Scoreboard.Addr)
+		cfg.Scoreboard.Addr,
+		cfg.Scoreboard.UnderProxy)
 
 	return
 }

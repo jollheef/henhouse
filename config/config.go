@@ -36,6 +36,7 @@ type Config struct {
 		TemplatePath  string
 		Addr          string
 		RecalcTimeout _duration
+		UnderProxy    bool
 	}
 
 	WebsocketTimeout struct {

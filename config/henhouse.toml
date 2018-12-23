@@ -16,6 +16,7 @@ www_path = "/var/www/henhouse"
 template_path = "/var/lib/henhouse/templates"
 addr = ":8000"
 recalc_timeout = "1m"
+under_proxy = true
 
 [WebsocketTimeout]
 info = "1s"
