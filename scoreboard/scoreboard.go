@@ -411,11 +411,12 @@ func sponsorsHandler(w http.ResponseWriter, r *http.Request) {
 
 // Scoreboard implements web scoreboard
 func Scoreboard(database *sql.DB, game *game.Game,
-	wwwPath, tmpltsPath, addr string) (err error) {
+	wwwPath, tmpltsPath, addr string, proxy bool) (err error) {
 
 	contestStatus = contestStateNotAvailable
 	gameShim = game
 	templatePath = tmpltsPath
+	underProxy = proxy
 
 	scoreCache, err = gameShim.Scoreboard()
 	if err != nil {

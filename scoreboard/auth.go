@@ -26,6 +26,19 @@ const (
 
 var authEnabled = true
 
+var underProxy bool
+
+func getClientAddr(r *http.Request) (clientAddr string) {
+    
+    if underProxy {
+        clientAddr = r.Header.Get("x-real-ip")
+    } else {
+        clientAddr = r.RemoteAddr
+    }
+              
+    return
+}
+
 func genSession() (s string, err error) {
 
 	sessionLen := 256
@@ -115,7 +128,7 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("auth ip: %s, access_token: %s", r.RemoteAddr, token)
+	log.Printf("auth ip: %s, access_token: %s", getClientAddr(r), token)
 
 	teamID, err := db.GetTeamIDByToken(database, token)
 	if err != nil {
@@ -135,7 +148,7 @@ func authHandler(database *sql.DB, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Success auth ip: %s team ID: %d", r.RemoteAddr, teamID)
+	log.Printf("Success auth ip: %s team ID: %d", getClientAddr(r), teamID)
 
 	// Success auth
 	http.Redirect(w, r, "/", 303)

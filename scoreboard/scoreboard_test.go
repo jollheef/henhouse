@@ -436,11 +436,13 @@ func TestScoreboard(*testing.T) {
 	}
 
 	ScoreboardRecalcTimeout = time.Second / 10
+	
+	proxy := false
 
 	go func() {
 		_, filename, _, _ := runtime.Caller(0)
 		err = Scoreboard(database, &game, filepath.Dir(filename)+"/www",
-			filepath.Dir(filename)+"/templates", addr)
+			filepath.Dir(filename)+"/templates", addr, proxy)
 		if err != nil {
 			panic(err)
 		}
