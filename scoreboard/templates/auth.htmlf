@@ -1,25 +1,44 @@
 <!DOCTYPE html>
-<html class="full auth" lang="en">
+<html class="full" lang="en">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="images/favicon.png" type="image/png">
-    <link rel="stylesheet" href="css/style.css" class="--apng-checked">
     <title>Juniors CTF</title>
+  
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&amp;subset=cyrillic" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="css/material.min.css">
+    <link rel="stylesheet" href="css/main.css">
   </head>
+
   <body>
-    <div id="auth_logo">
-      <img id="juniorstext" src="images/juniors_ctf_txt.png">
-    </div>
-    <div class="container">
-      <div class="account-wall">
-        <form class="form-signin" action="auth.php" method="post">
-          <input name="token" class="form-control" placeholder="Access token" required autofocus>
-          <br>
-          <button class="btn btn-lg" type="submit">Sign in</button>
-        </form>
+    <div class="mdl-layout mdl-js-layout">
+      <main class="jctf-content mdl-layout__content">
+        <div class="jctf-content__cards mdl-grid">
+          <div class="jctf-content__auth mdl-cell mdl-cell--12-col mdl-grid">
+            <!-- Auth Begin-->
+            <div class="jctf-auth mdl-cell mdl-cell--12-col">
+              <div id="auth-logo">
+                <img id="auth-logo-image" src="images/logo.png">
+              </div>
+              <form action="auth.php" method="post">
+                <div class="mdl-textfield mdl-js-textfield">
+                  <input class="mdl-textfield__input" type="text" id="token-input" name="token">
+                    <label class="mdl-textfield__label" for="token-input">Access token</label>
+                </div>
+                <button type="submit" id="flag-button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                  Sign in
+                </button>
+              </form>
+            </div>
+            <!-- Auth End-->
+         </div>
+        </div>
+      </main>
       </div>
     </div>
+    <script src="js/material.min.js"></script>
   </body>
 </html>
